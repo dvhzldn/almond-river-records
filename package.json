@@ -1,25 +1,32 @@
 {
-  "name": "almond-river-records",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.2.2"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.2",
-    "@eslint/eslintrc": "^3"
-  }
+	"name": "almond-river-records",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@contentful/rich-text-react-renderer": "^16.0.1",
+		"@contentful/rich-text-types": "^17.0.0",
+		"axios": "^1.8.3",
+		"contentful": "^11.5.7",
+		"next": "15.2.2",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"react-hook-form": "^7.54.2"
+	},
+	"devDependencies": {
+		"@eslint/eslintrc": "^3",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"contentful-management": "^11.48.0",
+		"contentful-typescript-codegen": "^3.4.0",
+		"eslint": "^9",
+		"eslint-config-next": "15.2.2",
+		"typescript": "^5"
+	}
 }
