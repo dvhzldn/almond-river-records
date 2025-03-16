@@ -1,40 +1,78 @@
-"use client"; // Required for client components
+"use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-
-// Define TypeScript interface for form data
-interface ContactFormInputs {
-	name: string;
-	email: string;
-	message: string;
-}
+import { useState } from "react";
 
 export default function ContactPage() {
-	const { register, handleSubmit } = useForm<ContactFormInputs>();
+	const [formData, setFormData] = useState({
+		name: "",
+		email: "",
+		message: "",
+	});
 
-	// Define the correct type for onSubmit
-	const onSubmit: SubmitHandler<ContactFormInputs> = (data) => {
-		console.log(data);
+	const handleChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => {
+		setFormData({ ...formData, [e.target.name]: e.target.value });
+	};
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		// Add your form submission logic here (e.g., call an API endpoint)
+		console.log(formData);
+		alert("Message sent!");
+		setFormData({ name: "", email: "", message: "" });
 	};
 
 	return (
-		<section>
+		<main style={{ padding: "1rem" }}>
 			<h1>Contact Us</h1>
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<input {...register("name")} placeholder="Your Name" required />
-				<input
-					{...register("email")}
-					type="email"
-					placeholder="Your Email"
-					required
-				/>
-				<textarea
-					{...register("message")}
-					placeholder="Your Message"
-					required
-				/>
-				<button type="submit">Send</button>
+			<form
+				onSubmit={handleSubmit}
+				style={{ maxWidth: "500px", margin: "0 auto" }}
+			>
+				<div style={{ marginBottom: "1rem" }}>
+					<label htmlFor="name">Name:</label>
+					<br />
+					<input
+						type="text"
+						id="name"
+						name="name"
+						value={formData.name}
+						onChange={handleChange}
+						required
+						style={{ width: "100%", padding: "0.5rem" }}
+					/>
+				</div>
+				<div style={{ marginBottom: "1rem" }}>
+					<label htmlFor="email">Email:</label>
+					<br />
+					<input
+						type="email"
+						id="email"
+						name="email"
+						value={formData.email}
+						onChange={handleChange}
+						required
+						style={{ width: "100%", padding: "0.5rem" }}
+					/>
+				</div>
+				<div style={{ marginBottom: "1rem" }}>
+					<label htmlFor="message">Message:</label>
+					<br />
+					<textarea
+						id="message"
+						name="message"
+						value={formData.message}
+						onChange={handleChange}
+						required
+						rows={5}
+						style={{ width: "100%", padding: "0.5rem" }}
+					></textarea>
+				</div>
+				<button type="submit" style={{ padding: "0.5rem 1rem" }}>
+					Send Message
+				</button>
 			</form>
-		</section>
+		</main>
 	);
 }

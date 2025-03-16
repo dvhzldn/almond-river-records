@@ -1,99 +1,86 @@
-// page.tsx
-import { fetchVinylRecords } from "@/lib/contentful";
-import { VinylRecord } from "@/lib/types";
-import type { Document } from "@contentful/rich-text-types";
-import { BLOCKS, INLINES, Block, Inline } from "@contentful/rich-text-types";
+import Image from "next/image";
+import client from "@/lib/contentful";
+import {
+	IVinylRecord,
+	IVinylRecordFields,
+} from "@/@types/generated/contentful";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
-interface RecordDetailsPageProps {
-	params: { id: string };
+interface PageProps {
+	params: {
+		id: string;
+	};
 }
 
-export default async function RecordDetailsPage({
-	params,
-}: RecordDetailsPageProps) {
-	const records: VinylRecord[] = await fetchVinylRecords();
-	const record = records.find((r) => r.sys.id === params.id);
+// Extend the generated type by asserting that the sys property includes a contentTypeId.
+type VinylRecordEntry = IVinylRecord & {
+	sys: IVinylRecord["sys"] & { contentTypeId: string };
+};
+
+export default async function RecordPage({ params }: PageProps) {
+	// First cast the result to unknown then to VinylRecordEntry
+	const record = (await client.getEntry(
+		params.id
+	)) as unknown as VinylRecordEntry;
 
 	if (!record) {
-		return <p>Record not found.</p>;
+		return <div>Record not found</div>;
 	}
 
-	const { fields } = record;
-
-	// Use type guards explicitly for rich text
-	const description = fields.description as unknown as Document | undefined;
-	const link = fields.link as unknown as Document | undefined;
-
-	const safeField = (field: unknown): string =>
-		typeof field === "string" ? field : "N/A";
+	// Cast fields to IVinylRecordFields to ensure proper typing.
+	const {
+		title,
+		subTitle,
+		releaseDate,
+		genre,
+		description,
+		catalogueNumber,
+		barcode,
+		vinylCondition,
+		sleeveCondition,
+		price,
+		coverImage,
+	} = record.fields as IVinylRecordFields;
 
 	return (
-		<section>
-			<h1>{safeField(fields.title)}</h1>
-			{fields.subTitle && <h2>{safeField(fields.subTitle)}</h2>}
-
+		<main style={{ padding: "1rem" }}>
+			<h1>{title}</h1>
+			{subTitle && <h2>{subTitle}</h2>}
+			{coverImage && coverImage.fields.file && (
+				<Image
+					src={`https:${coverImage.fields.file.url}`}
+					alt={title}
+					width={300}
+					height={300}
+				/>
+			)}
 			<p>
-				<strong>Genre:</strong> {safeField(fields.genre)}
+				<strong>Release Date:</strong> {releaseDate || "N/A"}
 			</p>
 			<p>
-				<strong>Release Date:</strong> {safeField(fields.releaseDate)}
+				<strong>Genre:</strong> {genre || "N/A"}
 			</p>
 			<p>
-				<strong>Condition:</strong> Vinyl -{" "}
-				{safeField(fields.vinylCondition)}, Sleeve -{" "}
-				{safeField(fields.sleeveCondition)}
+				<strong>Catalogue Number:</strong> {catalogueNumber || "N/A"}
 			</p>
 			<p>
-				<strong>Catalogue Number:</strong>{" "}
-				{safeField(fields.catalogueNumber)}
+				<strong>Barcode:</strong> {barcode || "N/A"}
 			</p>
 			<p>
-				<strong>Barcode:</strong> {safeField(fields.barcode)}
+				<strong>Vinyl Condition:</strong> {vinylCondition}
 			</p>
 			<p>
-				<strong>Price:</strong>{" "}
-				{fields.price ? `£${fields.price}` : "Contact for pricing"}
+				<strong>Sleeve Condition:</strong> {sleeveCondition}
 			</p>
-
+			<p>
+				<strong>Price:</strong> {price ? `$${price}` : "N/A"}
+			</p>
 			{description && (
 				<div>
 					<h3>Description</h3>
-					{documentToReactComponents(description, richTextOptions)}
+					{documentToReactComponents(description)}
 				</div>
 			)}
-
-			{link && (
-				<div>
-					<h3>More Information</h3>
-					{documentToReactComponents(link, richTextOptions)}
-				</div>
-			)}
-		</section>
+		</main>
 	);
 }
-
-const richTextOptions = {
-	renderNode: {
-		[BLOCKS.PARAGRAPH]: (_node: unknown, children: React.ReactNode) => (
-			<p>{children}</p>
-		),
-		[INLINES.HYPERLINK]: (
-			node: Block | Inline,
-			children: React.ReactNode
-		) => {
-			if (node.nodeType === INLINES.HYPERLINK) {
-				return (
-					<a
-						href={node.data.uri}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{children}
-					</a>
-				);
-			}
-			return null;
-		},
-	},
-};

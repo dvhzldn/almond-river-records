@@ -1,8 +1,13 @@
 export default function AboutPage() {
 	return (
-		<section>
-			<h1>About Almond River Records</h1>
-			<p>We’ve been selling records since 1990...</p>
-		</section>
+		<main style={{ padding: "1rem" }}>
+			<h1>About Our Vinyl Record Store</h1>
+			<p>
+				Welcome to our second-hand vinyl record store. We offer a curated
+				collection of classic and modern records, each with its own story.
+				Our mission is to provide music lovers with a unique listening
+				experience through quality vintage finds and rare gems.
+			</p>
+		</main>
 	);
 }
