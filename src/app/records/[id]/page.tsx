@@ -43,7 +43,7 @@ export default async function RecordPage({ params }: PageProps) {
 	} = record.fields as IVinylRecordFields;
 
 	return (
-		<main style={{ padding: "1rem" }}>
+		<>
 			<h1>{title}</h1>
 			{subTitle && <h2>{subTitle}</h2>}
 			{coverImage && coverImage.fields.file && (
@@ -81,6 +81,6 @@ export default async function RecordPage({ params }: PageProps) {
 					{documentToReactComponents(description)}
 				</div>
 			)}
-		</main>
+		</>
 	);
 }

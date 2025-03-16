@@ -5,7 +5,9 @@ import NewThisWeek from "@/components/NewThisWeek";
 
 export default function Home() {
 	return (
-		<>
+		<section className="section">
+			<h1>Almond River Records</h1>
+			<h2>New website coming soon.</h2>
 			<Image
 				className="logo"
 				src="/almond-river-logo.jpg"
@@ -14,11 +16,8 @@ export default function Home() {
 				height={300}
 				priority
 			/>
-			<h1>Almond River Records</h1>
-			<h2>New website coming soon.</h2>
 
 			<div>
-				<h1>Almond River Records</h1>
 				<NewThisWeek />
 			</div>
 
@@ -52,6 +51,6 @@ export default function Home() {
 				</p>
 				<p>07729 421682</p>
 			</div>
-		</>
+		</section>
 	);
 }
