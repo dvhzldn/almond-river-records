@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
-import styles from "./page.module.css";
+import Menu from "@/components/Menu";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -28,39 +27,9 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable}`}>
 				<header>
-					<nav>
-						<ul>
-							<li>
-								<Link href="/">Home</Link>
-							</li>
-							<li>
-								<Link href="/records">Records</Link>
-							</li>
-							<li>
-								<Link href="/about">About</Link>
-							</li>
-							<li>
-								<Link href="/contact">Contact</Link>
-							</li>
-						</ul>
-					</nav>
+					<Menu />
 				</header>
 				<main>{children}</main>
-				<footer className={styles.footer}>
-					<p>© 2025 Almond River Records</p>
-					<ul>
-						<li>
-							<a
-								href="https://instagram.com/yourshop"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								Instagram
-							</a>
-						</li>
-						{/* Add other social media links here */}
-					</ul>
-				</footer>
 			</body>
 		</html>
 	);
