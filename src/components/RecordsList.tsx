@@ -13,6 +13,7 @@ import "swiper/css/pagination";
 import {
 	IVinylRecord,
 	IVinylRecordFields,
+	IArtist,
 } from "@/@types/generated/contentful";
 
 // Extend the generated type so that sys includes a contentTypeId property.
@@ -35,11 +36,11 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 
 	return (
 		<main style={{ padding: "1rem" }}>
-			<h1>Vinyl Records</h1>
+			<h1>Records for sale</h1>
 			{recordsData.length === 0 ? (
 				<p>No records found.</p>
 			) : (
-				<ul style={{ listStyle: "none", padding: 0 }}>
+				<ul style={{ listStyle: "none", padding: 10 }}>
 					{recordsData.map((record) => {
 						const fields = record.fields as IVinylRecordFields;
 						return (
@@ -51,7 +52,19 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 									paddingBottom: "1rem",
 								}}
 							>
-								{/* Clicking the title opens the modal */}
+								{fields.artist && fields.artist.length > 0 && (
+									<h3
+										style={{ cursor: "pointer" }}
+										onClick={() => setSelectedRecord(record)}
+									>
+										{fields.artist
+											.map(
+												(entry) =>
+													(entry as IArtist).fields.artistName
+											)
+											.join(", ")}
+									</h3>
+								)}
 								<h2
 									style={{ cursor: "pointer" }}
 									onClick={() => setSelectedRecord(record)}
@@ -63,12 +76,14 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 									<Image
 										src={`https:${fields.coverImage.fields.file.url}`}
 										alt={fields.title}
-										width={200}
-										height={200}
+										width={250}
+										height={250}
+										onClick={() => setSelectedRecord(record)}
+										style={{ cursor: "pointer" }}
 									/>
 								)}
 								<p>
-									Price: {fields.price ? `$${fields.price}` : "N/A"}
+									Price: {fields.price ? `£${fields.price}` : "N/A"}
 								</p>
 							</li>
 						);
@@ -116,8 +131,8 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 												<Image
 													src={`https:${file.url}`}
 													alt={`${fields.title} image ${index + 1}`}
-													width={300}
-													height={300}
+													width={450}
+													height={450}
 												/>
 											</SwiperSlide>
 										))}
@@ -147,7 +162,7 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 								</p>
 								<p>
 									<strong>Price:</strong>{" "}
-									{fields.price ? `$${fields.price}` : "N/A"}
+									{fields.price ? `£${fields.price}` : "N/A"}
 								</p>
 								{fields.description && (
 									<div>

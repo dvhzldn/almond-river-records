@@ -1,13 +1,11 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-// For external links, we use standard <a> tags
-// If you prefer using brands icons:
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
 
 export default function Home() {
 	return (
-		<div className={styles.page}>
+		<div className={styles.container}>
 			<main className={styles.main}>
 				<Image
 					className={styles.logo}
@@ -28,6 +26,7 @@ export default function Home() {
 							rel="noopener noreferrer"
 						>
 							<FontAwesomeIcon icon={faFacebook} />
+							Facebook
 						</a>
 						<a
 							href="https://www.instagram.com/almondriverrecords/"
@@ -35,6 +34,7 @@ export default function Home() {
 							rel="noopener noreferrer"
 						>
 							<FontAwesomeIcon icon={faInstagram} />
+							Instagram
 						</a>
 					</div>
 				</div>

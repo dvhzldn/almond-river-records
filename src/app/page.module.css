@@ -1,6 +1,6 @@
 /* Container for the main content of the page */
 .container {
-	background: white;
+	background: whitesmoke;
 	padding: 1.5rem; /* 25px ~ 1.56rem, rounded to 1.5rem */
 	border-radius: 10px;
 	width: 100%;
@@ -47,7 +47,6 @@
 /* Logo styling */
 .logo {
 	width: 100%;
-	max-width: 160px;
 	height: auto;
 }
 
@@ -63,12 +62,13 @@
 
 .socialLinks {
 	display: flex;
-	gap: 0.1rem;
+	gap: 0.5rem;
 	color: #0073e6;
 	transition: transform 0.2s;
 	cursor: pointer;
 	font-size: 1rem;
 	align-items: center;
+	justify-content: center;
 }
 .socialLinks a:hover {
 	transform: scale(1.5);

@@ -1,0 +1,10 @@
+/* Container for the main content of the page */
+.container {
+	background: whitesmoke;
+	padding: 1.5rem; /* 25px ~ 1.56rem, rounded to 1.5rem */
+	border-radius: 10px;
+	width: 100%;
+	max-width: 600px;
+	box-sizing: border-box;
+	margin: 0 auto; /* Center container horizontally */
+}
