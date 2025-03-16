@@ -48,10 +48,16 @@ export default async function RecordPage({ params }: PageProps) {
 			{subTitle && <h2>{subTitle}</h2>}
 			{coverImage && coverImage.fields.file && (
 				<Image
+					className="modal-image"
 					src={`https:${coverImage.fields.file.url}`}
 					alt={title}
 					width={300}
 					height={300}
+					style={{
+						maxWidth: "100%",
+						height: "auto",
+						objectFit: "contain",
+					}}
 				/>
 			)}
 			<p>

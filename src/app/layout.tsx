@@ -18,6 +18,11 @@ export default function RootLayout({
 					<Menu />
 				</header>
 				<main className="container">{children}</main>
+				<p className="copyright">
+					© {new Date().getFullYear()} Almond River Records
+				</p>
+				<p className="copyright">Made by Dave</p>
+
 				<footer>
 					<Footer />
 				</footer>

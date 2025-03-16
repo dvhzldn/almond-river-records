@@ -64,6 +64,7 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 								{fields.subTitle && <p>{fields.subTitle}</p>}
 								{fields.coverImage && fields.coverImage.fields.file && (
 									<Image
+										className="record-image"
 										src={`https:${fields.coverImage.fields.file.url}`}
 										alt={fields.title}
 										width={250}
@@ -104,6 +105,10 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 							<div>
 								<h2>{fields.title}</h2>
 								{fields.subTitle && <h3>{fields.subTitle}</h3>}
+								<p>
+									<strong>Price:</strong>{" "}
+									{fields.price ? `£${fields.price}` : "N/A"}
+								</p>
 								{images.length > 0 && (
 									<Swiper
 										modules={[Autoplay, Navigation, Pagination]}
@@ -118,6 +123,7 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 										{images.map((file, index) => (
 											<SwiperSlide key={index}>
 												<Image
+													className="modal-image"
 													src={`https:${file.url}`}
 													alt={`${fields.title} image ${index + 1}`}
 													width={450}
@@ -148,10 +154,6 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 								<p>
 									<strong>Sleeve Condition:</strong>{" "}
 									{fields.sleeveCondition}
-								</p>
-								<p>
-									<strong>Price:</strong>{" "}
-									{fields.price ? `£${fields.price}` : "N/A"}
 								</p>
 								{fields.description && (
 									<div>
