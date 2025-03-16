@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./page.module.css";
 
 export default function ContactPage() {
 	const [formData, setFormData] = useState({
@@ -27,7 +26,7 @@ export default function ContactPage() {
 	return (
 		<main style={{ padding: "1rem" }}>
 			<h1>Contact Us</h1>
-			<div className={styles.map}>
+			<div className="map">
 				<iframe
 					width="90%"
 					height="250"

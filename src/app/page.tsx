@@ -1,15 +1,14 @@
 import Image from "next/image";
-import styles from "./page.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import NewThisWeek from "@/components/NewThisWeek";
 
 export default function Home() {
 	return (
-		<div className={styles.container}>
-			<main className={styles.main}>
+		<div className="container">
+			<main>
 				<Image
-					className={styles.logo}
+					className="logo"
 					src="/almond-river-logo.jpg"
 					alt="Almond River Records logo"
 					width={300}
@@ -24,8 +23,8 @@ export default function Home() {
 					<NewThisWeek />
 				</div>
 
-				<div className={styles.socialWrapper}>
-					<div className={styles.socialLinks}>
+				<div className="socialWrapper">
+					<div className="socialLinks">
 						<a
 							href="https://www.facebook.com/almondriverrecords/?locale=en_GB"
 							target="_blank"
@@ -45,7 +44,7 @@ export default function Home() {
 					</div>
 				</div>
 
-				<div className={styles.contact}>
+				<div className="contact">
 					<p>Enquiries:</p>
 					<p>
 						<a href="mailto:almondriverrecords@gmail.com">
