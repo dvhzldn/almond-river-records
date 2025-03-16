@@ -1,0 +1,28 @@
+.container {
+	margin: 2rem 0;
+}
+
+.recordList {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.recordItem {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	background: #f7f7f7;
+	padding: 1rem;
+	border-radius: 8px;
+}
+
+.recordItem img {
+	border-radius: 4px;
+}
+
+h3 {
+	margin: 0;
+}

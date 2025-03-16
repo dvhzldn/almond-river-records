@@ -36,61 +36,63 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 
 	return (
 		<main style={{ padding: "1rem" }}>
-			<h1>Records for sale</h1>
-			{recordsData.length === 0 ? (
-				<p>No records found.</p>
-			) : (
-				<ul style={{ listStyle: "none", padding: 10 }}>
-					{recordsData.map((record) => {
-						const fields = record.fields as IVinylRecordFields;
-						return (
-							<li
-								key={record.sys.id}
-								style={{
-									marginBottom: "2rem",
-									borderBottom: "1px solid #ccc",
-									paddingBottom: "1rem",
-								}}
-							>
-								{fields.artist && fields.artist.length > 0 && (
-									<h3
+			<div className="body">
+				<h1>Records for sale</h1>
+				{recordsData.length === 0 ? (
+					<p>No records found.</p>
+				) : (
+					<ul style={{ listStyle: "none", padding: 10 }}>
+						{recordsData.map((record) => {
+							const fields = record.fields as IVinylRecordFields;
+							return (
+								<li
+									key={record.sys.id}
+									style={{
+										marginBottom: "2rem",
+										borderBottom: "1px solid #ccc",
+										paddingBottom: "1rem",
+									}}
+								>
+									{fields.artist && fields.artist.length > 0 && (
+										<h3
+											style={{ cursor: "pointer" }}
+											onClick={() => setSelectedRecord(record)}
+										>
+											{fields.artist
+												.map(
+													(entry) =>
+														(entry as IArtist).fields.artistName
+												)
+												.join(", ")}
+										</h3>
+									)}
+									<h2
 										style={{ cursor: "pointer" }}
 										onClick={() => setSelectedRecord(record)}
 									>
-										{fields.artist
-											.map(
-												(entry) =>
-													(entry as IArtist).fields.artistName
-											)
-											.join(", ")}
-									</h3>
-								)}
-								<h2
-									style={{ cursor: "pointer" }}
-									onClick={() => setSelectedRecord(record)}
-								>
-									{fields.title}
-								</h2>
-								{fields.subTitle && <p>{fields.subTitle}</p>}
-								{fields.coverImage && fields.coverImage.fields.file && (
-									<Image
-										src={`https:${fields.coverImage.fields.file.url}`}
-										alt={fields.title}
-										width={250}
-										height={250}
-										onClick={() => setSelectedRecord(record)}
-										style={{ cursor: "pointer" }}
-									/>
-								)}
-								<p>
-									Price: {fields.price ? `£${fields.price}` : "N/A"}
-								</p>
-							</li>
-						);
-					})}
-				</ul>
-			)}
-
+										{fields.title}
+									</h2>
+									{fields.subTitle && <p>{fields.subTitle}</p>}
+									{fields.coverImage &&
+										fields.coverImage.fields.file && (
+											<Image
+												src={`https:${fields.coverImage.fields.file.url}`}
+												alt={fields.title}
+												width={250}
+												height={250}
+												onClick={() => setSelectedRecord(record)}
+												style={{ cursor: "pointer" }}
+											/>
+										)}
+									<p>
+										Price: {fields.price ? `£${fields.price}` : "N/A"}
+									</p>
+								</li>
+							);
+						})}
+					</ul>
+				)}
+			</div>
 			{selectedRecord && (
 				<Modal onClose={() => setSelectedRecord(null)}>
 					{(() => {

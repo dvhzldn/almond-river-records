@@ -2,6 +2,7 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
+import NewThisWeek from "@/components/NewThisWeek";
 
 export default function Home() {
 	return (
@@ -17,6 +18,11 @@ export default function Home() {
 				/>
 				<h1>Almond River Records</h1>
 				<h2>New website coming soon.</h2>
+
+				<div>
+					<h1>Almond River Records</h1>
+					<NewThisWeek />
+				</div>
 
 				<div className={styles.socialWrapper}>
 					<div className={styles.socialLinks}>
