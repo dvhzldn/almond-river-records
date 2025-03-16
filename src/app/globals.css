@@ -1,7 +1,7 @@
 /* Root Variables */
 :root {
 	--background: linear-gradient(to right, #3e76a1 0%, #2a5298 100%);
-	--content-bg: white; /* For menu, body content, modal, etc. */
+	--content-bg: white;
 	--text-color: black;
 	--secondary-text: #444;
 	--border-radius: 10px;
@@ -10,7 +10,6 @@
 /* Set dark mode preferences if needed */
 /* @media (prefers-color-scheme: dark) {
 	:root {
-		--background: #0a0a0a;
 		--content-bg: #1a1a1a;
 		--text-color: white;
 		--secondary-text: #ccc;
@@ -90,23 +89,22 @@ a:hover {
 	transform: scale(1.02);
 }
 
-/* Global Headings */
+/* 🔹 Typography */
 h1,
 h2,
 h3 {
 	font-family: "Raleway", sans-serif;
+	margin-bottom: 0.1rem;
 }
 
 h1 {
 	font-size: 2rem;
 	font-weight: 700;
-	color: var(--text-color);
 }
 
 h2 {
 	font-size: 1.4rem;
 	font-weight: 500;
-	color: var(--text-color);
 }
 
 h3 {
@@ -114,7 +112,6 @@ h3 {
 	color: var(--secondary-text);
 }
 
-/* General Text Styles */
 .text {
 	font-size: 1.1rem;
 	color: var(--secondary-text);
@@ -148,7 +145,7 @@ h3 {
 .menu a {
 	font-size: 1rem;
 	font-weight: 500;
-	color: black; /* Ensure menu links are always black */
+	color: black;
 }
 
 /* Social Links */
@@ -159,7 +156,7 @@ h3 {
 .socialLinks {
 	display: flex;
 	gap: 0.5rem;
-	color: #0073e6;
+	color: black;
 	font-size: 1rem;
 	align-items: center;
 	justify-content: center;
@@ -202,6 +199,22 @@ h3 {
 	cursor: pointer;
 }
 
+/* 🔹 Map Styling */
+.map {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin: 1rem auto;
+}
+
+.map iframe {
+	width: 100%;
+	max-width: 600px;
+	height: 250px;
+	border-radius: var(--border-radius);
+	border: none;
+}
+
 /* Footer */
 .footer {
 	position: fixed;
@@ -221,22 +234,11 @@ h3 {
 		font-size: 0.9rem;
 	}
 
-	.page {
-		padding: 2rem;
-		gap: 2rem;
+	.container {
+		padding: 1.5rem;
 	}
 
-	.main {
-		align-items: center;
-	}
-
-	.ctas {
-		flex-direction: column;
-	}
-
-	.ctas a {
-		font-size: 0.875rem;
-		height: 2.5rem;
-		padding: 0 1rem;
+	.section {
+		padding: 1.5rem;
 	}
 }
