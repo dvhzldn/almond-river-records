@@ -14,7 +14,7 @@ export default function Menu() {
 					<Link href="/blog">Blog</Link>
 				</li>
 				<li>
-					<Link href="/reviews">Reviews</Link>
+					<Link href="/about">About Us</Link>
 				</li>
 				<li>
 					<Link href="/contact">Contact</Link>

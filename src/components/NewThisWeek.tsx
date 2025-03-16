@@ -36,7 +36,7 @@ export default function NewThisWeek() {
 	}, []);
 
 	return (
-		<section>
+		<section className="section">
 			<h2>New This Week</h2>
 			{loading ? (
 				<p>Loading...</p>
