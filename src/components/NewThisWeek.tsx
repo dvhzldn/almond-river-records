@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import client from "@/lib/contentful";
 import {
 	IVinylRecord,
 	IVinylRecordFields,
 } from "@/@types/generated/contentful";
-import RecordsList from "@/components/RecordsList";
 
 // Extend the generated type so that sys includes a contentTypeId property.
 type VinylRecordEntry = IVinylRecord & {
@@ -23,7 +23,7 @@ export default function NewThisWeek() {
 				const sevenDaysAgo = new Date();
 				sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-				// Format date correctly to ensure strict TypeScript compliance
+				// Format date correctly for TypeScript compliance
 				const formattedDate = sevenDaysAgo
 					.toISOString()
 					.replace(
@@ -39,7 +39,7 @@ export default function NewThisWeek() {
 				// Ensure TypeScript recognizes `inStock` as a valid field
 				const filteredRecords = res.items.filter((record) => {
 					const fields = record.fields as IVinylRecordFields;
-					return fields.inStock; // Only keep records that are in stock
+					return fields.inStock; // Only show in-stock records
 				});
 
 				setNewRecords(filteredRecords);
@@ -61,7 +61,30 @@ export default function NewThisWeek() {
 			) : newRecords.length === 0 ? (
 				<p>No new records added this week.</p>
 			) : (
-				<RecordsList recordsData={newRecords} />
+				<ul className="new-records-list">
+					{newRecords.map((record) => {
+						const fields = record.fields as IVinylRecordFields; // ✅ Explicitly cast
+						const { coverImage, artistName, title, price } = fields;
+
+						return (
+							<li key={record.sys.id} className="new-record-item">
+								{coverImage?.fields.file && (
+									<Image
+										className="new-record-image"
+										src={`http:${coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`}
+										alt={`${title} cover`}
+										width={250}
+										height={250}
+									/>
+								)}
+								<p className="new-record-title">
+									<strong>{artistName.join(", ")}</strong> - {title}
+								</p>
+								<p className="new-record-price">£{price.toFixed(2)}</p>
+							</li>
+						);
+					})}
+				</ul>
 			)}
 		</section>
 	);
