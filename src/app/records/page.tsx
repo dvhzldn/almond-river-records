@@ -101,7 +101,6 @@ export default function RecordsPage() {
 							onClick={() => setSelectedRecord(record)}
 						>
 							<div>
-								{/* Cover Image (Left) */}
 								{record.coverImage ? (
 									<Image
 										className="record-image"
@@ -120,7 +119,6 @@ export default function RecordsPage() {
 									/>
 								)}
 
-								{/* Record Details (Right) */}
 								<div className="record-details">
 									<h2>{record.artistName.join(", ")}</h2>
 									<h3>{record.title}</h3>

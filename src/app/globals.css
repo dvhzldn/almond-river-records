@@ -66,10 +66,10 @@ a:hover {
 /* Consistent Main Content Container */
 .container {
 	background: var(--content-bg);
-	padding: 2rem;
+	padding: 1rem;
 	border-radius: var(--border-radius);
 	width: 100%;
-	max-width: 800px;
+	max-width: 1200px;
 	box-sizing: border-box;
 	margin: auto;
 	text-align: center;
@@ -287,7 +287,6 @@ h3 {
 }
 
 .new-record-image {
-	border-radius: 5px;
 	display: block;
 	margin: 0 auto 0.5rem;
 	width: 100%;
@@ -295,17 +294,49 @@ h3 {
 	height: auto;
 }
 
-.new-record-title {
-	font-size: 1rem;
-	font-weight: 500;
-	color: var(--text-color);
-	margin-bottom: 0.3rem;
+/* Grid Layout for Records */
+/* 🔹 Grid Layout for Records Page */
+.records-grid {
+	display: grid;
+	grid-template-columns: repeat(
+		auto-fit,
+		minmax(200px, 1fr)
+	); /* Auto-adjusts from 1 to 4 columns */
+	gap: 1rem;
+	padding: 1rem;
+	max-width: 1200px;
+	margin: auto;
 }
 
-.new-record-price {
-	font-size: 1.1rem;
-	color: var(--secondary-text);
-	font-weight: 700;
+/* 🔹 Card for Each Record */
+.record-card {
+	padding: 0.5rem;
+	cursor: pointer;
+	transition: transform 0.2s;
+	align-items: center;
+	width: 100%;
+	text-align: left;
+}
+
+.record-card:hover {
+	transform: scale(1.02);
+}
+
+/* 🔹 Cover Image (Ensures Square & Responsive Scaling) */
+.record-image {
+	align-items: center;
+	max-width: 250px;
+	display: block;
+	aspect-ratio: 1 / 1;
+}
+
+/* 🔹 Record Details (Below Image, Left-Aligned) */
+.record-details {
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+	width: 100%;
+	padding: 0 0.2rem;
 }
 
 /* Filter Controls */
@@ -330,67 +361,6 @@ h3 {
 	border: none;
 	border-radius: 0px;
 	cursor: pointer;
-}
-
-/* Grid Layout for Records */
-/* 🔹 Grid Layout for Records Page */
-.records-grid {
-	display: grid;
-	grid-template-columns: repeat(
-		auto-fit,
-		minmax(300px, 1fr)
-	); /* Ensures 3 columns */
-	gap: 0.5rem;
-	justify-content: center;
-	padding: 0.2rem;
-	max-width: 1200px;
-	margin: auto;
-}
-
-/* 🔹 Card for Each Record */
-.record-card {
-	background: var(--content-bg);
-	padding: 0.5rem;
-	border-radius: var(--border-radius);
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	cursor: pointer;
-	transition: transform 0.2s;
-	display: flex;
-	flex-direction: column; /* Stack elements vertically */
-	align-items: center; /* Center image */
-	text-align: left; /* Align text */
-	width: 100%; /* Ensure full width */
-}
-
-.record-card:hover {
-	transform: scale(1.02);
-}
-
-/* 🔹 Record Content (Image + Details) */
-.record-card-content {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 10px;
-	width: 100%;
-}
-
-/* 🔹 Cover Image */
-.record-image {
-	width: 100%; /* Make image responsive */
-	max-width: 250px; /* Set max width */
-	height: auto;
-	border-radius: 5px;
-	margin-bottom: 0.5rem; /* Space between image and text */
-}
-
-/* 🔹 Details */
-.record-details {
-	display: flex;
-	flex-direction: column;
-	text-align: left; /* Align text to left */
-	width: 100%; /* Full width */
-	padding: 0 0.5rem; /* Add padding for spacing */
 }
 
 /* Responsive Adjustments */
