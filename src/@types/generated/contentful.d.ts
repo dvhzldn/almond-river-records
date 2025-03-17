@@ -3,76 +3,6 @@
 import { Asset, Entry } from "contentful";
 import { Document } from "@contentful/rich-text-types";
 
-export interface IArtistFields {
-  /** Description */
-  description?: Document | undefined;
-
-  /** Image */
-  image?: Asset | undefined;
-
-  /** Link */
-  link?: Document | undefined;
-
-  /** Records */
-  records?: Entry<{ [fieldId: string]: unknown }>[] | undefined;
-
-  /** Name */
-  artistName: string;
-}
-
-export interface IArtist extends Entry<IArtistFields> {
-  sys: {
-    id: string;
-    type: string;
-    createdAt: string;
-    updatedAt: string;
-    locale: string;
-    contentType: {
-      sys: {
-        id: "artist";
-        linkType: "ContentType";
-        type: "Link";
-      };
-    };
-  };
-}
-
-export interface ILabelFields {
-  /** Name */
-  name: string;
-
-  /** Description */
-  description?: string | undefined;
-
-  /** Link */
-  link?: Document | undefined;
-
-  /** Records */
-  records?: Entry<{ [fieldId: string]: unknown }>[] | undefined;
-
-  /** Labels */
-  labels?: Entry<{ [fieldId: string]: unknown }>[] | undefined;
-}
-
-/** The record label of a release */
-
-export interface ILabel extends Entry<ILabelFields> {
-  sys: {
-    id: string;
-    type: string;
-    createdAt: string;
-    updatedAt: string;
-    locale: string;
-    contentType: {
-      sys: {
-        id: "label";
-        linkType: "ContentType";
-        type: "Link";
-      };
-    };
-  };
-}
-
 export interface IVinylRecordFields {
   /** Title */
   title: string;
@@ -80,20 +10,17 @@ export interface IVinylRecordFields {
   /** Sub title */
   subTitle?: string | undefined;
 
-  /** Release Date */
-  releaseDate?: string | undefined;
+  /** Artist Name */
+  artistName: string[];
 
-  /** Genre */
-  genre?: string | undefined;
+  /** Label */
+  label: string;
 
-  /** Description */
-  description?: Document | undefined;
+  /** Year */
+  releaseYear: number;
 
-  /** Catalogue Number */
-  catalogueNumber?: string | undefined;
-
-  /** Barcode */
-  barcode?: string | undefined;
+  /** Price */
+  price: number;
 
   /** Vinyl Condition */
   vinylCondition:
@@ -119,23 +46,32 @@ export interface IVinylRecordFields {
     | "Poor"
     | "Other";
 
-  /** Price */
-  price?: number | undefined;
-
   /** Cover Image */
   coverImage: Asset;
-
-  /** Rear Image */
-  rearImage?: Asset | undefined;
 
   /** Other Image */
   otherImage?: Asset[] | undefined;
 
+  /** Description */
+  description?: Document | undefined;
+
+  /** Catalogue Number */
+  catalogueNumber?: string | undefined;
+
+  /** Barcode */
+  barcode?: string | undefined;
+
   /** Link */
   link?: Document | undefined;
 
-  /** Artist */
-  artist?: Entry<{ [fieldId: string]: unknown }>[] | undefined;
+  /** Quantity */
+  quantity: number;
+
+  /** In Stock */
+  inStock: boolean;
+
+  /** Genre */
+  genre?: string[] | undefined;
 }
 
 /** A vinyl record release */
@@ -157,9 +93,9 @@ export interface IVinylRecord extends Entry<IVinylRecordFields> {
   };
 }
 
-export type CONTENT_TYPE = "artist" | "label" | "vinylRecord";
+export type CONTENT_TYPE = "vinylRecord";
 
-export type IEntry = IArtist | ILabel | IVinylRecord;
+export type IEntry = IVinylRecord;
 
 export type LOCALE_CODE = "en-GB";
 

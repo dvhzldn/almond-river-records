@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-require("dotenv").config({ path: ".env.local" }); // Load env variables from .env file
+require("dotenv").config({ path: ".env.local" });
 
 const contentfulManagement = require("contentful-management");
 
@@ -8,9 +8,11 @@ function getEnvironment() {
 		accessToken: process.env.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN,
 	});
 	return client
-		.getSpace(process.env.CONTENTFUL_SPACE_ID)
+		.getSpace(process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID)
 		.then((space) =>
-			space.getEnvironment(process.env.CONTENTFUL_ENVIRONMENT || "master")
+			space.getEnvironment(
+				process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master"
+			)
 		);
 }
 

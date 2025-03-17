@@ -31,7 +31,7 @@ export default async function RecordPage({ params }: PageProps) {
 	const {
 		title,
 		subTitle,
-		releaseDate,
+		releaseYear,
 		genre,
 		description,
 		catalogueNumber,
@@ -49,7 +49,7 @@ export default async function RecordPage({ params }: PageProps) {
 			{coverImage && coverImage.fields.file && (
 				<Image
 					className="modal-image"
-					src={`https:${coverImage.fields.file.url}`}
+					src={`https:${coverImage.fields.file.url}?w=300&h=300&fit=thumb`}
 					alt={title}
 					width={300}
 					height={300}
@@ -61,7 +61,7 @@ export default async function RecordPage({ params }: PageProps) {
 				/>
 			)}
 			<p>
-				<strong>Release Date:</strong> {releaseDate || "N/A"}
+				<strong>Year:</strong> {releaseYear || "N/A"}
 			</p>
 			<p>
 				<strong>Genre:</strong> {genre || "N/A"}
@@ -79,7 +79,7 @@ export default async function RecordPage({ params }: PageProps) {
 				<strong>Sleeve Condition:</strong> {sleeveCondition}
 			</p>
 			<p>
-				<strong>Price:</strong> {price ? `$${price}` : "N/A"}
+				<strong>Price:</strong> {price ? `£${price}` : "N/A"}
 			</p>
 			{description && (
 				<div>

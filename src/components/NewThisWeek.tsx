@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import client from "@/lib/contentful";
-import { IVinylRecord } from "@/@types/generated/contentful";
+import {
+	IVinylRecord,
+	IVinylRecordFields,
+} from "@/@types/generated/contentful";
 import RecordsList from "@/components/RecordsList";
 
 // Extend the generated type so that sys includes a contentTypeId property.
@@ -16,20 +19,35 @@ export default function NewThisWeek() {
 
 	useEffect(() => {
 		const fetchNewRecords = async () => {
-			const sevenDaysAgo = new Date();
-			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			try {
+				const sevenDaysAgo = new Date();
+				sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-			// Format date manually to match the required format
-			const formattedDate = sevenDaysAgo.toISOString().split(".")[0] + "Z"; // Ensures correct format
+				// Format date correctly to ensure strict TypeScript compliance
+				const formattedDate = sevenDaysAgo
+					.toISOString()
+					.replace(
+						/\.\d{3}Z$/,
+						"Z"
+					) as `${number}-${number}-${number}T${number}:${number}:${number}Z`;
 
-			const res = (await client.getEntries({
-				content_type: "vinylRecord",
-				"sys.createdAt[gte]":
-					formattedDate as `${number}-${number}-${number}T${number}:${number}:${number}Z`,
-			})) as unknown as { items: VinylRecordEntry[] };
+				const res = (await client.getEntries({
+					content_type: "vinylRecord",
+					"sys.createdAt[gte]": formattedDate,
+				})) as unknown as { items: VinylRecordEntry[] };
 
-			setNewRecords(res.items);
-			setLoading(false);
+				// Ensure TypeScript recognizes `inStock` as a valid field
+				const filteredRecords = res.items.filter((record) => {
+					const fields = record.fields as IVinylRecordFields;
+					return fields.inStock; // Only keep records that are in stock
+				});
+
+				setNewRecords(filteredRecords);
+			} catch (error) {
+				console.error("Error fetching new records:", error);
+			} finally {
+				setLoading(false);
+			}
 		};
 
 		fetchNewRecords();

@@ -13,7 +13,6 @@ import "swiper/css/pagination";
 import {
 	IVinylRecord,
 	IVinylRecordFields,
-	IArtist,
 } from "@/@types/generated/contentful";
 
 // Extend the generated type so that sys includes a contentTypeId property.
@@ -36,7 +35,7 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 
 	return (
 		<section className="section">
-			<h1>Records for sale</h1>
+			<h1>Records for Sale</h1>
 			{recordsData.length === 0 ? (
 				<p>No records found.</p>
 			) : (
@@ -45,14 +44,9 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 						const fields = record.fields as IVinylRecordFields;
 						return (
 							<li key={record.sys.id} className="listItem">
-								{fields.artist && fields.artist.length > 0 && (
+								{fields.artistName.length > 0 && (
 									<h3 onClick={() => setSelectedRecord(record)}>
-										{fields.artist
-											.map(
-												(entry) =>
-													(entry as IArtist).fields.artistName
-											)
-											.join(", ")}
+										{fields.artistName.join(", ")}
 									</h3>
 								)}
 								<h2
@@ -65,7 +59,7 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 								{fields.coverImage && fields.coverImage.fields.file && (
 									<Image
 										className="record-image"
-										src={`https:${fields.coverImage.fields.file.url}`}
+										src={`https:${fields.coverImage.fields.file.url}?w=300&h=300&fit=thumb`}
 										alt={fields.title}
 										width={250}
 										height={250}
@@ -73,14 +67,20 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 										style={{ cursor: "pointer" }}
 									/>
 								)}
+								<p>Label: {fields.label}</p>
 								<p>
 									Price: {fields.price ? `£${fields.price}` : "N/A"}
+								</p>
+								<p>
+									Stock:{" "}
+									{fields.inStock ? "Available" : "Out of Stock"}
 								</p>
 							</li>
 						);
 					})}
 				</ul>
 			)}
+
 			{selectedRecord && (
 				<Modal onClose={() => setSelectedRecord(null)}>
 					{(() => {
@@ -89,9 +89,6 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 						const images: AssetFile[] = [];
 						if (fields.coverImage && fields.coverImage.fields.file) {
 							images.push(fields.coverImage.fields.file as AssetFile);
-						}
-						if (fields.rearImage && fields.rearImage.fields.file) {
-							images.push(fields.rearImage.fields.file as AssetFile);
 						}
 						if (fields.otherImage && Array.isArray(fields.otherImage)) {
 							fields.otherImage.forEach((asset) => {
@@ -108,6 +105,13 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 								<p>
 									<strong>Price:</strong>{" "}
 									{fields.price ? `£${fields.price}` : "N/A"}
+								</p>
+								<p>
+									<strong>Label:</strong> {fields.label}
+								</p>
+								<p>
+									<strong>Stock:</strong>{" "}
+									{fields.inStock ? "Available" : "Out of Stock"}
 								</p>
 								{images.length > 0 && (
 									<Swiper
@@ -134,11 +138,7 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 									</Swiper>
 								)}
 								<p>
-									<strong>Release Date:</strong>{" "}
-									{fields.releaseDate ?? "N/A"}
-								</p>
-								<p>
-									<strong>Genre:</strong> {fields.genre ?? "N/A"}
+									<strong>Year:</strong> {fields.releaseYear ?? "N/A"}
 								</p>
 								<p>
 									<strong>Catalogue Number:</strong>{" "}
