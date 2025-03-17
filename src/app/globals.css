@@ -80,26 +80,8 @@ a:hover {
 	background: white;
 	margin: 2rem auto;
 	padding: 2rem;
-}
-
-.list {
-	list-style: none;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
-}
-
-.listItem {
-	background: var(--content-bg);
-	padding: 1rem;
-	border-radius: var(--border-radius);
-	cursor: pointer;
-	transition: transform 0.2s;
-}
-
-.listItem:hover {
-	transform: scale(1.02);
+	width: 100%;
+	max-width: 1000px;
 }
 
 /* Typography */
@@ -200,6 +182,16 @@ h3 {
 	max-width: 600px;
 	width: 90%;
 	position: relative;
+	text-align: center;
+}
+
+.modal-image {
+	max-width: 300px;
+	width: 100%;
+	height: auto;
+	border-radius: 5px;
+	display: block;
+	margin: 0 auto;
 }
 
 .closeButton {
@@ -265,22 +257,6 @@ h3 {
 	text-align: center;
 }
 
-/* Default Image Size (Desktop) */
-.record-image {
-	width: 250px;
-	height: auto;
-	border-radius: 5px;
-}
-
-.modal-image {
-	max-width: 300px; /* Set a reasonable max size */
-	width: 100%; /* Make it fully responsive */
-	height: auto;
-	border-radius: 5px;
-	display: block;
-	margin: 0 auto;
-}
-
 /* New This Week Styling */
 .new-records-list {
 	list-style: none;
@@ -288,7 +264,7 @@ h3 {
 	grid-template-columns: repeat(
 		auto-fit,
 		minmax(200px, 1fr)
-	); /* Responsive grid */
+	); /* Ensures responsiveness */
 	gap: 1rem;
 	justify-content: center;
 	padding: 0;
@@ -302,12 +278,21 @@ h3 {
 	border-radius: var(--border-radius);
 	text-align: center;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	cursor: pointer;
+	transition: transform 0.2s;
+}
+
+.new-record-item:hover {
+	transform: scale(1.02);
 }
 
 .new-record-image {
 	border-radius: 5px;
 	display: block;
 	margin: 0 auto 0.5rem;
+	width: 100%;
+	max-width: 250px;
+	height: auto;
 }
 
 .new-record-title {
@@ -323,8 +308,93 @@ h3 {
 	font-weight: 700;
 }
 
+/* Filter Controls */
+.filter-controls {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	margin-bottom: 20px;
+}
+
+.filter-controls input,
+.filter-controls select {
+	padding: 1px;
+	border: 1px solid var(--secondary-text);
+	border-radius: 5px;
+}
+
+.filter-controls button {
+	padding: 2px 10px;
+	background: var(--cerulean);
+	color: white;
+	border: none;
+	border-radius: 0px;
+	cursor: pointer;
+}
+
+/* Grid Layout for Records */
+/* 🔹 Grid Layout for Records Page */
+.records-grid {
+	display: grid;
+	grid-template-columns: repeat(
+		auto-fit,
+		minmax(300px, 1fr)
+	); /* Ensures 3 columns */
+	gap: 0.5rem;
+	justify-content: center;
+	padding: 0.2rem;
+	max-width: 1200px;
+	margin: auto;
+}
+
+/* 🔹 Card for Each Record */
+.record-card {
+	background: var(--content-bg);
+	padding: 0.5rem;
+	border-radius: var(--border-radius);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	cursor: pointer;
+	transition: transform 0.2s;
+	display: flex;
+	flex-direction: column; /* Stack elements vertically */
+	align-items: center; /* Center image */
+	text-align: left; /* Align text */
+	width: 100%; /* Ensure full width */
+}
+
+.record-card:hover {
+	transform: scale(1.02);
+}
+
+/* 🔹 Record Content (Image + Details) */
+.record-card-content {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 10px;
+	width: 100%;
+}
+
+/* 🔹 Cover Image */
+.record-image {
+	width: 100%; /* Make image responsive */
+	max-width: 250px; /* Set max width */
+	height: auto;
+	border-radius: 5px;
+	margin-bottom: 0.5rem; /* Space between image and text */
+}
+
+/* 🔹 Details */
+.record-details {
+	display: flex;
+	flex-direction: column;
+	text-align: left; /* Align text to left */
+	width: 100%; /* Full width */
+	padding: 0 0.5rem; /* Add padding for spacing */
+}
+
 /* Responsive Adjustments */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
 	.record-image,
 	.modal-image,
 	.new-record-image {
@@ -346,5 +416,18 @@ h3 {
 
 	.section {
 		padding: 1.5rem;
+	}
+
+	.record-card-content {
+		flex-direction: column; /* Stack items vertically on small screens */
+		align-items: center;
+		text-align: center;
+	}
+
+	.records-grid {
+		grid-template-columns: repeat(
+			auto-fit,
+			minmax(200px, 1fr)
+		); /* Smaller screens adjust */
 	}
 }

@@ -1,19 +1,106 @@
 "use client";
+
 import { ReactNode } from "react";
+import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 interface ModalProps {
-	children: ReactNode;
+	record: {
+		title: string;
+		artistName: string[];
+		label: string;
+		price: number;
+		vinylCondition: string;
+		sleeveCondition: string;
+		inStock: boolean;
+		coverImage?: string | null;
+		otherImages?: string[];
+		releaseYear?: string;
+		catalogueNumber?: string;
+		barcode?: string;
+		description?: ReactNode;
+	};
 	onClose: () => void;
 }
 
-export default function Modal({ children, onClose }: ModalProps) {
+export default function Modal({ record, onClose }: ModalProps) {
+	// Collect images for Swiper
+	const images: string[] = [];
+	if (record.coverImage) images.push(record.coverImage);
+	if (record.otherImages && record.otherImages.length > 0) {
+		images.push(...record.otherImages);
+	}
+
 	return (
 		<div className="backdrop" onClick={onClose}>
 			<div className="modalContent" onClick={(e) => e.stopPropagation()}>
 				<button className="closeButton" onClick={onClose}>
 					×
 				</button>
-				{children}
+
+				<h2>
+					{record.artistName.join(", ")} - {record.title}
+				</h2>
+				<h3>£{record.price}</h3>
+
+				<p>
+					<strong>Stock:</strong>{" "}
+					{record.inStock ? "Available" : "Out of Stock"}
+				</p>
+
+				{/* Swiper for Images */}
+				{images.length > 0 && (
+					<Swiper
+						modules={[Autoplay, Navigation, Pagination]}
+						autoplay={{ delay: 3000, disableOnInteraction: true }}
+						navigation
+						pagination={{ clickable: true }}
+						loop
+					>
+						{images.map((url, index) => (
+							<SwiperSlide key={index}>
+								<Image
+									className="modal-image"
+									src={url}
+									alt={`${record.title} image ${index + 1}`}
+									width={450}
+									height={450}
+								/>
+							</SwiperSlide>
+						))}
+					</Swiper>
+				)}
+				<p>
+					<strong>Label:</strong> {record.label}
+				</p>
+				<p>
+					<strong>Vinyl Condition:</strong> {record.vinylCondition}
+				</p>
+				<p>
+					<strong>Sleeve Condition:</strong> {record.sleeveCondition}
+				</p>
+
+				<p>
+					<strong>Year:</strong> {record.releaseYear ?? "N/A"}
+				</p>
+				<p>
+					<strong>Catalogue Number:</strong>{" "}
+					{record.catalogueNumber ?? "N/A"}
+				</p>
+				<p>
+					<strong>Barcode:</strong> {record.barcode ?? "N/A"}
+				</p>
+
+				{record.description && (
+					<div>
+						<h4>Description:</h4>
+						{record.description}
+					</div>
+				)}
 			</div>
 		</div>
 	);

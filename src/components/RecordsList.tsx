@@ -4,29 +4,18 @@ import { useState } from "react";
 import Image from "next/image";
 import Modal from "@/components/Modal";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-
 import {
 	IVinylRecord,
 	IVinylRecordFields,
 } from "@/@types/generated/contentful";
 
-// Extend the generated type so that sys includes a contentTypeId property.
+// Define the type with Contentful system metadata
 type VinylRecordEntry = IVinylRecord & {
 	sys: IVinylRecord["sys"] & { contentTypeId: string };
 };
 
 interface RecordsListProps {
 	recordsData: VinylRecordEntry[];
-}
-
-// Define the type for a Contentful file object (adjust as needed)
-interface AssetFile {
-	url: string;
 }
 
 export default function RecordsList({ recordsData }: RecordsListProps) {
@@ -42,130 +31,91 @@ export default function RecordsList({ recordsData }: RecordsListProps) {
 				<ul className="list">
 					{recordsData.map((record) => {
 						const fields = record.fields as IVinylRecordFields;
+
 						return (
-							<li key={record.sys.id} className="listItem">
-								{fields.artistName.length > 0 && (
-									<h3 onClick={() => setSelectedRecord(record)}>
-										{fields.artistName.join(", ")}
-									</h3>
-								)}
-								<h2
-									style={{ cursor: "pointer" }}
-									onClick={() => setSelectedRecord(record)}
-								>
-									{fields.title}
-								</h2>
-								{fields.subTitle && <p>{fields.subTitle}</p>}
-								{fields.coverImage && fields.coverImage.fields.file && (
-									<Image
-										className="record-image"
-										src={`https:${fields.coverImage.fields.file.url}?w=300&h=300&fit=thumb`}
-										alt={fields.title}
-										width={250}
-										height={250}
-										onClick={() => setSelectedRecord(record)}
-										style={{ cursor: "pointer" }}
-									/>
-								)}
-								<p>Label: {fields.label}</p>
-								<p>
-									Price: {fields.price ? `£${fields.price}` : "N/A"}
-								</p>
-								<p>
-									Stock:{" "}
-									{fields.inStock ? "Available" : "Out of Stock"}
-								</p>
+							<li
+								key={record.sys.id}
+								className="listItem"
+								onClick={() => setSelectedRecord(record)}
+							>
+								{/* Two-column layout using .record-card-content */}
+								<div className="record-card-content">
+									{/* Cover Image (Left) */}
+									{fields.coverImage?.fields.file && (
+										<Image
+											className="record-image"
+											src={`https:${fields.coverImage.fields.file.url}?w=150&h=150&fit=thumb`}
+											alt={fields.title}
+											width={150}
+											height={150}
+										/>
+									)}
+
+									{/* Record Details (Right) */}
+									<div className="record-details">
+										{/* Artist Name */}
+										{fields.artistName?.length > 0 && (
+											<h3>{fields.artistName.join(", ")}</h3>
+										)}
+
+										{/* Title */}
+										<h2>{fields.title}</h2>
+
+										{/* Record Info */}
+										<p>Label: {fields.label ?? "Unknown"}</p>
+										<p>
+											Price:{" "}
+											{fields.price
+												? `£${fields.price.toFixed(2)}`
+												: "N/A"}
+										</p>
+										<p>
+											Stock:{" "}
+											{fields.inStock ? "Available" : "Out of Stock"}
+										</p>
+									</div>
+								</div>
 							</li>
 						);
 					})}
 				</ul>
 			)}
 
-			{selectedRecord && (
-				<Modal onClose={() => setSelectedRecord(null)}>
-					{(() => {
-						const fields = selectedRecord.fields as IVinylRecordFields;
-						// Build an array of image files with explicit type
-						const images: AssetFile[] = [];
-						if (fields.coverImage && fields.coverImage.fields.file) {
-							images.push(fields.coverImage.fields.file as AssetFile);
-						}
-						if (fields.otherImage && Array.isArray(fields.otherImage)) {
-							fields.otherImage.forEach((asset) => {
-								if (asset.fields.file) {
-									images.push(asset.fields.file as AssetFile);
-								}
-							});
-						}
+			{/* Modal - Show Detailed Record Info */}
+			{selectedRecord &&
+				(() => {
+					const fields = selectedRecord.fields as IVinylRecordFields;
 
-						return (
-							<div>
-								<h2>{fields.title}</h2>
-								{fields.subTitle && <h3>{fields.subTitle}</h3>}
-								<p>
-									<strong>Price:</strong>{" "}
-									{fields.price ? `£${fields.price}` : "N/A"}
-								</p>
-								<p>
-									<strong>Label:</strong> {fields.label}
-								</p>
-								<p>
-									<strong>Stock:</strong>{" "}
-									{fields.inStock ? "Available" : "Out of Stock"}
-								</p>
-								{images.length > 0 && (
-									<Swiper
-										modules={[Autoplay, Navigation, Pagination]}
-										autoplay={{
-											delay: 3000,
-											disableOnInteraction: true,
-										}}
-										navigation
-										pagination={{ clickable: true }}
-										loop
-									>
-										{images.map((file, index) => (
-											<SwiperSlide key={index}>
-												<Image
-													className="modal-image"
-													src={`https:${file.url}`}
-													alt={`${fields.title} image ${index + 1}`}
-													width={450}
-													height={450}
-												/>
-											</SwiperSlide>
-										))}
-									</Swiper>
-								)}
-								<p>
-									<strong>Year:</strong> {fields.releaseYear ?? "N/A"}
-								</p>
-								<p>
-									<strong>Catalogue Number:</strong>{" "}
-									{fields.catalogueNumber ?? "N/A"}
-								</p>
-								<p>
-									<strong>Barcode:</strong> {fields.barcode ?? "N/A"}
-								</p>
-								<p>
-									<strong>Vinyl Condition:</strong>{" "}
-									{fields.vinylCondition}
-								</p>
-								<p>
-									<strong>Sleeve Condition:</strong>{" "}
-									{fields.sleeveCondition}
-								</p>
-								{fields.description && (
-									<div>
-										<h4>Description:</h4>
-										{documentToReactComponents(fields.description)}
-									</div>
-								)}
-							</div>
-						);
-					})()}
-				</Modal>
-			)}
+					return (
+						<Modal
+							record={{
+								title: fields.title ?? "Unknown",
+								artistName: fields.artistName ?? [],
+								price: fields.price ?? 0,
+								coverImage: fields.coverImage?.fields.file?.url
+									? `https:${fields.coverImage.fields.file.url}`
+									: null,
+								otherImages:
+									fields.otherImage?.flatMap((image) =>
+										image.fields.file?.url
+											? [`https:${image.fields.file.url}`]
+											: []
+									) ?? [],
+								label: fields.label ?? "Unknown",
+								vinylCondition: fields.vinylCondition ?? "Unknown",
+								sleeveCondition: fields.sleeveCondition ?? "Unknown",
+								inStock: fields.inStock ?? false,
+								releaseYear: fields.releaseYear?.toString() ?? "N/A",
+								catalogueNumber: fields.catalogueNumber ?? "N/A",
+								barcode: fields.barcode ?? "N/A",
+								description: fields.description
+									? documentToReactComponents(fields.description)
+									: null,
+							}}
+							onClose={() => setSelectedRecord(null)}
+						/>
+					);
+				})()}
 		</section>
 	);
 }
