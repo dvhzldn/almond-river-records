@@ -78,7 +78,10 @@ export default function NewThisWeek() {
 									/>
 								)}
 								<p className="new-record-title">
-									<strong>{artistName.join(", ")}</strong> - {title}
+									<strong>{title}</strong>
+								</p>
+								<p className="new-record-title">
+									<strong>{artistName.join(", ")}</strong>
 								</p>
 								<p className="new-record-price">£{price.toFixed(2)}</p>
 							</li>

@@ -7,10 +7,9 @@ export default function Home() {
 	return (
 		<section className="section">
 			<h1>Almond River Records</h1>
-			<h2>New website coming soon.</h2>
 			<Image
 				className="logo"
-				src="/almond-river-logo.jpg"
+				src="/images/almond-river-logo.jpg"
 				alt="Almond River Records logo"
 				width={300}
 				height={300}
