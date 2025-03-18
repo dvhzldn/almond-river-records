@@ -34,7 +34,7 @@ export default async function RecordPage({ params }: PageProps) {
 		releaseYear,
 		genre,
 		description,
-		catalogueNumber,
+		// catalogueNumber,
 		// barcode,
 		vinylCondition,
 		sleeveCondition,
@@ -66,9 +66,9 @@ export default async function RecordPage({ params }: PageProps) {
 			<p>
 				<strong>Genre:</strong> {genre || "N/A"}
 			</p>
-			<p>
+			{/* <p>
 				<strong>Catalogue Number:</strong> {catalogueNumber || "N/A"}
-			</p>
+			</p> */}
 			{/* <p>
 				<strong>Barcode:</strong> {barcode || "N/A"}
 			</p> */}

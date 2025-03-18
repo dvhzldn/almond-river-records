@@ -21,7 +21,7 @@ interface ModalProps {
 		coverImage?: string | null;
 		otherImages?: string[];
 		releaseYear?: number | null;
-		catalogueNumber?: string;
+		// catalogueNumber?: string;
 		// barcode?: string;
 		description?: Document; // Updated to use Document type
 	};
@@ -86,10 +86,10 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<p>
 					<strong>Year:</strong> {record.releaseYear ?? "N/A"}
 				</p>
-				<p>
+				{/* <p>
 					<strong>Catalogue Number:</strong>{" "}
 					{record.catalogueNumber ?? "N/A"}
-				</p>
+				</p> */}
 				{/* <p>
 					<strong>Barcode:</strong> {record.barcode ?? "N/A"}
 				</p> */}

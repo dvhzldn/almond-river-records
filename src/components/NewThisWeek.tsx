@@ -28,7 +28,7 @@ interface Record {
 	sleeveCondition: string;
 	inStock: boolean;
 	releaseYear?: number | null;
-	catalogueNumber?: string;
+	// catalogueNumber?: string;
 	// barcode?: string;
 	description?: Document;
 }
@@ -90,7 +90,7 @@ export default function NewThisWeek() {
 				? `https:${fields.coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
 				: null,
 			releaseYear: fields.releaseYear ?? null,
-			catalogueNumber: fields.catalogueNumber,
+			// catalogueNumber: fields.catalogueNumber,
 			// barcode: fields.barcode,
 			description: fields.description,
 		};

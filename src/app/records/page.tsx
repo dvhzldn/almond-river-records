@@ -18,7 +18,7 @@ interface Record {
 	sleeveCondition: string;
 	inStock: boolean;
 	releaseYear?: number | null;
-	catalogueNumber?: string;
+	// catalogueNumber?: string;
 	// barcode?: string;
 	description?: Document;
 }
