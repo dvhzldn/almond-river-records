@@ -25,6 +25,7 @@ interface Record {
 
 export default function RecordsPage() {
 	const [records, setRecords] = useState<Record[]>([]);
+	const [searchInput, setSearchInput] = useState("");
 	const [search, setSearch] = useState("");
 	const [priceMin, setPriceMin] = useState("");
 	const [priceMax, setPriceMax] = useState("");
@@ -102,10 +103,16 @@ export default function RecordsPage() {
 					{/* Global Search */}
 					<input
 						type="text"
-						placeholder="Search for items..."
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Search all records..."
+						value={searchInput}
+						onChange={(e) => setSearchInput(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								setSearch(searchInput);
+							}
+						}}
 					/>
+					<button onClick={() => setSearch(searchInput)}>Search</button>
 					{/* Artist Dropdown */}
 					<select
 						value={artist}
@@ -146,7 +153,21 @@ export default function RecordsPage() {
 					{/* Apply Filters */}
 					{/* TODO: Removed for now */}
 					{/* <button onClick={fetchRecords}>Apply Filters</button> */}
+					<button
+						onClick={() => {
+							setSearch("");
+							setSearchInput("");
+							setPriceMin("");
+							setPriceMax("");
+							setCondition("");
+							setArtist("");
+							setPage(1);
+						}}
+					>
+						Clear Filters
+					</button>
 				</div>
+
 				<button
 					className="filter-toggle"
 					onClick={() => setFiltersOpen(!filtersOpen)}
