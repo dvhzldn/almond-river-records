@@ -97,13 +97,6 @@ export default function RecordsPage() {
 
 			{/* Filter Menu for Mobile */}
 			<div className="filter-menu">
-				<button
-					className="filter-toggle"
-					onClick={() => setFiltersOpen(!filtersOpen)}
-				>
-					{filtersOpen ? "Close Filters" : "Show Filters"}
-				</button>
-
 				{/* Filter Controls */}
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
 					<input
@@ -148,6 +141,12 @@ export default function RecordsPage() {
 						))}
 					</select>
 					<button onClick={fetchRecords}>Apply Filters</button>
+					<button
+						className="filter-toggle"
+						onClick={() => setFiltersOpen(!filtersOpen)}
+					>
+						{filtersOpen ? "Close Filters" : "Show Filters"}
+					</button>
 				</div>
 			</div>
 

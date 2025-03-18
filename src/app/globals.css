@@ -11,14 +11,14 @@
 :root {
 	--body-font: "Inter", sans-serif;
 	--heading-font: "Merriweather", serif;
-	--background: linear-gradient(to right, var(--colour-1), var(--colour-2));
+	--background: linear-gradient(to right, var(--colour-1), var(--colour-4));
 	--border-radius: 5px;
 
 	/* New Color Variables */
-	--colour-1: #1f363dff;
-	--colour-2: #40798cff;
+	--colour-1: #40798cff;
+	--colour-2: #97f9f9;
 	--colour-3: #975186;
-	--colour-4: #97f9f9;
+	--colour-4: #1f363dff;
 	--colour-5: #c8fffd;
 	--colour-6: #e7ffdb;
 	--colour-7: #ffffff;
@@ -78,7 +78,7 @@ a:hover {
 
 /* Sections & Lists */
 .section {
-	background: var(--colour-2);
+	background: var(--colour-7);
 	margin: 0 auto;
 	padding: 2rem;
 	width: 100%;
@@ -169,7 +169,7 @@ li {
 .burger {
 	display: none;
 	font-size: 1.5rem;
-	color: var(--colour-5);
+	color: var(--colour-7);
 	cursor: pointer;
 }
 
@@ -177,8 +177,6 @@ li {
 .footer {
 	background: var(--colour-1);
 	padding: 1rem 1.5rem;
-	border-radius: 8px;
-	box-shadow: 0 2px 4px var(--colour-1);
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 1rem;
@@ -193,7 +191,7 @@ li {
 
 .footer a {
 	font-size: 1rem;
-	color: var(--colour-5);
+	color: var(--colour-4);
 	text-decoration: none;
 }
 
@@ -263,7 +261,7 @@ li {
 	display: block;
 	margin-bottom: 0.5rem;
 	font-weight: 500;
-	color: var(--colour-1);
+	color: var(--colour-4);
 }
 
 .form input,
@@ -408,44 +406,45 @@ li {
 /* Filter Menu Container */
 .filter-menu {
 	text-align: center;
-	margin-bottom: 20px;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
 
 /* Toggle Button - Hidden on Desktop */
 .filter-menu .filter-toggle {
 	display: none;
-	background: var(--colour-2);
+	background: var(--colour-4);
 	color: white;
 	border: none;
-	padding: 0.5rem 1rem;
 	border-radius: var(--border-radius);
 	cursor: pointer;
-	margin-bottom: 1rem;
+	padding: 0.5rem 1rem;
 }
 
 /* Filter Controls (Desktop) */
 .filter-controls {
 	display: flex;
-	gap: 10px;
+	gap: 0.5rem;
 	justify-content: center;
-	margin-bottom: 20px;
+	margin-bottom: 1rem;
 }
 
 /* Filter Controls Elements */
 .filter-controls input,
 .filter-controls select {
-	padding: 1px;
-	border: 1px solid var(--colour-3);
-	border-radius: 5px;
+	padding: 5px;
+	border: 2px solid var(--colour-4);
 }
 
+/* Filter Apply Button */
 .filter-controls button {
-	padding: 2px 10px;
-	background: var(--colour-2);
-	color: white;
+	background: var(--colour-4);
+	color: var(--colour-7);
 	border: none;
-	border-radius: 0;
+	border-radius: var(--border-radius);
 	cursor: pointer;
+	padding: 0.5rem 1rem;
+	margin-bottom: 0;
 }
 
 .opening-hours {
@@ -495,8 +494,8 @@ li {
 }
 
 .pagination button {
-	background-color: var(--colour-2);
-	color: var(--colour-5);
+	background-color: var(--colour-4);
+	color: var(--colour-7);
 	border: none;
 	padding: 0.5rem 1rem;
 	border-radius: var(--border-radius);
@@ -513,7 +512,7 @@ li {
 }
 
 .pagination button:disabled {
-	opacity: 0.5;
+	opacity: 0.8;
 	cursor: not-allowed;
 }
 
