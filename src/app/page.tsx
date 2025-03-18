@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import NewThisWeek from "@/components/NewThisWeek";
 
 export default function Home() {
@@ -18,27 +16,6 @@ export default function Home() {
 
 			<div>
 				<NewThisWeek />
-			</div>
-
-			<div className="socialWrapper">
-				<div className="socialLinks">
-					<a
-						href="https://www.facebook.com/almondriverrecords/?locale=en_GB"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<FontAwesomeIcon icon={faFacebook} />
-						Facebook
-					</a>
-					<a
-						href="https://www.instagram.com/almondriverrecords/"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<FontAwesomeIcon icon={faInstagram} />
-						Instagram
-					</a>
-				</div>
 			</div>
 		</section>
 	);

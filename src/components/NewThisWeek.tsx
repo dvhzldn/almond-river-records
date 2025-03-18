@@ -56,39 +56,35 @@ export default function NewThisWeek() {
 
 	return (
 		<section className="section">
-			<h2>New Records This Week</h2>
-			<p>Our latest records on sale in the shop...</p>
+			<h2>New In Stock This Week</h2>
+			<h3>Our latest additions in the shop...</h3>
 			{loading ? (
 				<p>Loading...</p>
 			) : newRecords.length === 0 ? (
 				<p>No new records added this week.</p>
 			) : (
 				<>
-					<ul className="new-records-list">
+					<ul className="records-grid">
 						{newRecords.slice(0, 3).map((record) => {
 							const fields = record.fields as IVinylRecordFields; // ✅ Explicitly cast
 							const { coverImage, artistName, title, price } = fields;
 
 							return (
-								<li key={record.sys.id} className="new-record-item">
+								<li key={record.sys.id} className="record-card">
 									{coverImage?.fields.file && (
 										<Image
-											className="new-record-image"
+											className="record-image"
 											src={`http:${coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`}
 											alt={`${title} cover`}
 											width={250}
 											height={250}
 										/>
 									)}
-									<p className="new-record-title">
+									<p>
 										<strong>{title}</strong>
 									</p>
-									<p className="new-record-title">
-										<strong>{artistName.join(", ")}</strong>
-									</p>
-									<p className="new-record-price">
-										£{price.toFixed(2)}
-									</p>
+									<p>{artistName.join(", ")}</p>
+									<p>£{price.toFixed(2)}</p>
 								</li>
 							);
 						})}

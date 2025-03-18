@@ -10,7 +10,6 @@ export default function Menu() {
 
 	return (
 		<nav className="menu">
-			{/* Burger menu appears on mobile */}
 			<div className="burger" onClick={toggleMenu}>
 				{isOpen ? <span>&#x2715;</span> : <span>&#9776;</span>}
 			</div>
@@ -26,11 +25,6 @@ export default function Menu() {
 				<li>
 					<Link href="/records" onClick={closeMenu}>
 						Records
-					</Link>
-				</li>
-				<li>
-					<Link href="/blog" onClick={closeMenu}>
-						Blog
 					</Link>
 				</li>
 				<li>

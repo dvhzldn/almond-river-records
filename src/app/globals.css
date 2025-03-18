@@ -139,7 +139,7 @@ Link {
 
 /* Logo (optional) */
 .menu .logo a {
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	font-weight: bold;
 	color: var(--colour-5);
 }
@@ -172,27 +172,22 @@ li {
 	cursor: pointer;
 }
 
-/* Floating Footer */
+/* Footer */
 .footer {
-	position: fixed;
-	bottom: 1rem;
-	left: 50%;
-	transform: translateX(-50%);
 	background: var(--colour-1);
-	padding: 0.5rem 1.5rem;
+	padding: 1rem 1.5rem;
 	border-radius: 8px;
 	box-shadow: 0 2px 4px var(--colour-1);
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 	gap: 1rem;
 	text-align: center;
 }
 
 .footer ul {
 	list-style: none;
-	display: flex;
-	gap: 1.5rem;
+	padding: 0;
+	margin: 0;
 }
 
 .footer a {
@@ -336,8 +331,7 @@ li {
 
 .socialLinks {
 	display: flex;
-	gap: 0.5rem;
-	color: black;
+	gap: 1.5rem;
 	font-size: 1rem;
 	align-items: center;
 	justify-content: center;
@@ -353,42 +347,6 @@ li {
 	font-size: 0.85rem;
 	color: var(--colour-4);
 	text-align: center;
-}
-
-/* New This Week Styling */
-.new-records-list {
-	list-style: none;
-	display: grid;
-	grid-template-columns: repeat(
-		auto-fit,
-		minmax(200px, 1fr)
-	); /* Ensures responsiveness */
-	gap: 1rem;
-	justify-content: center;
-	padding: 0;
-	max-width: 800px;
-	margin: 0 auto;
-}
-
-.new-record-item {
-	background: var(--colour-1);
-	padding: 1rem;
-	border-radius: var(--border-radius);
-	text-align: center;
-	cursor: pointer;
-	transition: transform 0.2s;
-}
-
-.new-record-item:hover {
-	transform: scale(1.02);
-}
-
-.new-record-image {
-	display: block;
-	margin: 0 auto 0.5rem;
-	width: 100%;
-	max-width: 250px;
-	height: auto;
 }
 
 /* Grid Layout for Records */
@@ -522,6 +480,10 @@ li {
 		display: block;
 	}
 
+	.menu .logo a {
+		display: none;
+	}
+
 	/* Hide nav links by default */
 	.nav-links {
 		flex-direction: column;
@@ -542,20 +504,23 @@ li {
 	.nav-links li {
 		text-align: center;
 	}
+
 	.record-image,
 	.modal-image,
 	.new-record-image {
 		width: 170px;
 		height: 170px;
 	}
-	.menu ul,
-	.footer ul {
+	.menu ul {
 		gap: 1rem;
 	}
 
-	.menu a,
-	.footer a {
+	.menu a {
 		font-size: 0.9rem;
+	}
+
+	.footer {
+		grid-template-columns: 1fr;
 	}
 
 	.container {
