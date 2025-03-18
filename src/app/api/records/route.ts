@@ -10,6 +10,17 @@ type VinylRecordEntry = IVinylRecord & {
 	sys: IVinylRecord["sys"] & { contentTypeId: string };
 };
 
+// Define a type for the query parameters
+type RecordsQueryParams = {
+	content_type: string;
+	limit: number;
+	skip: number;
+	query?: string;
+	"fields.price[gte]"?: number;
+	"fields.price[lte]"?: number;
+	"fields.vinylCondition"?: string;
+};
+
 export async function GET(req: Request) {
 	const { searchParams } = new URL(req.url);
 
@@ -23,14 +34,48 @@ export async function GET(req: Request) {
 		: null;
 	const condition = searchParams.get("condition") || "";
 
+	// Extract pagination parameters (default: limit 20, skip 0)
+	const limitParam = searchParams.get("limit")
+		? Number(searchParams.get("limit"))
+		: 20;
+	const skipParam = searchParams.get("skip")
+		? Number(searchParams.get("skip"))
+		: 0;
+
+	// Build query parameters for Contentful using our custom type
+	const params: RecordsQueryParams = {
+		content_type: "vinylRecord",
+		limit: limitParam,
+		skip: skipParam,
+	};
+
+	// Apply search filter directly via Contentful's query parameter.
+	// This performs a full-text search across searchable fields.
+	if (searchQuery) {
+		params.query = searchQuery;
+	}
+
+	// Apply price filters using Contentful's filtering syntax.
+	if (priceMin !== null) {
+		params["fields.price[gte]"] = priceMin;
+	}
+	if (priceMax !== null) {
+		params["fields.price[lte]"] = priceMax;
+	}
+
+	// Apply condition filter
+	if (condition) {
+		params["fields.vinylCondition"] = condition;
+	}
+
 	try {
-		// Fetch records from Contentful
-		const res = (await client.getEntries({
-			content_type: "vinylRecord",
-		})) as unknown as { items: VinylRecordEntry[] };
+		// Fetch records from Contentful with filters and pagination
+		const res = (await client.getEntries(params)) as unknown as {
+			items: VinylRecordEntry[];
+		};
 
 		// Map data properly
-		let records = res.items.map((record) => {
+		const records = res.items.map((record) => {
 			const fields = record.fields as IVinylRecordFields;
 			return {
 				id: record.sys.id,
@@ -46,32 +91,6 @@ export async function GET(req: Request) {
 					: null,
 			};
 		});
-
-		// Apply search filter
-		if (searchQuery) {
-			records = records.filter(
-				(record) =>
-					record.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					record.artistName.some((artist: string) =>
-						artist.toLowerCase().includes(searchQuery.toLowerCase())
-					)
-			);
-		}
-
-		// Apply price filter
-		if (priceMin !== null) {
-			records = records.filter((record) => record.price >= priceMin);
-		}
-		if (priceMax !== null) {
-			records = records.filter((record) => record.price <= priceMax);
-		}
-
-		// Apply condition filter
-		if (condition) {
-			records = records.filter(
-				(record) => record.vinylCondition === condition
-			);
-		}
 
 		return NextResponse.json({ records });
 	} catch (error) {

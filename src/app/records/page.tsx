@@ -24,9 +24,12 @@ export default function RecordsPage() {
 	const [condition, setCondition] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
-	const [filtersOpen, setFiltersOpen] = useState(false); // Toggle for filters
+	const [filtersOpen, setFiltersOpen] = useState(false);
+	// New state for pagination
+	const [page, setPage] = useState(1);
+	const pageSize = 8; // Adjust as needed
 
-	// ✅ Fetch records with filters
+	// ✅ Fetch records with filters and pagination
 	const fetchRecords = useCallback(async () => {
 		setLoading(true);
 		const params = new URLSearchParams();
@@ -34,6 +37,10 @@ export default function RecordsPage() {
 		if (priceMin) params.append("priceMin", priceMin);
 		if (priceMax) params.append("priceMax", priceMax);
 		if (condition) params.append("condition", condition);
+
+		// Add pagination parameters
+		params.append("limit", pageSize.toString());
+		params.append("skip", ((page - 1) * pageSize).toString());
 
 		try {
 			const res = await fetch(`/api/records?${params.toString()}`);
@@ -44,11 +51,15 @@ export default function RecordsPage() {
 		} finally {
 			setLoading(false);
 		}
-	}, [search, priceMin, priceMax, condition]);
+	}, [search, priceMin, priceMax, condition, page]);
 
 	useEffect(() => {
 		fetchRecords();
 	}, [fetchRecords]);
+
+	// Handlers for pagination
+	const nextPage = () => setPage((prev) => prev + 1);
+	const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
 	return (
 		<section className="section">
@@ -147,6 +158,17 @@ export default function RecordsPage() {
 					))}
 				</div>
 			)}
+
+			{/* Pagination Controls */}
+			<div className="pagination">
+				<button onClick={prevPage} disabled={page === 1}>
+					Previous
+				</button>
+				<span>Page {page}</span>
+				<button onClick={nextPage} disabled={records.length < pageSize}>
+					Next
+				</button>
+			</div>
 
 			{/* Modal for Record Details */}
 			{selectedRecord && (
