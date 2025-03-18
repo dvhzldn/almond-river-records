@@ -19,7 +19,7 @@ interface Record {
 	inStock: boolean;
 	releaseYear?: number | null;
 	catalogueNumber?: string;
-	barcode?: string;
+	// barcode?: string;
 	description?: Document;
 }
 

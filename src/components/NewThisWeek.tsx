@@ -29,7 +29,7 @@ interface Record {
 	inStock: boolean;
 	releaseYear?: number | null;
 	catalogueNumber?: string;
-	barcode?: string;
+	// barcode?: string;
 	description?: Document;
 }
 
@@ -91,7 +91,7 @@ export default function NewThisWeek() {
 				: null,
 			releaseYear: fields.releaseYear ?? null,
 			catalogueNumber: fields.catalogueNumber,
-			barcode: fields.barcode,
+			// barcode: fields.barcode,
 			description: fields.description,
 		};
 		setSelectedRecord(recordData);

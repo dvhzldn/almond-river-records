@@ -98,7 +98,7 @@ export async function GET(req: Request) {
 					? `https:${fields.coverImage.fields.file.url}`
 					: null,
 				catalogueNumber: fields.catalogueNumber ?? "N/A",
-				barcode: fields.barcode,
+				// barcode: fields.barcode,
 				description: fields.description,
 			};
 		});
