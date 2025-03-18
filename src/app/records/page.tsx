@@ -24,6 +24,7 @@ export default function RecordsPage() {
 	const [condition, setCondition] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
+	const [filtersOpen, setFiltersOpen] = useState(false); // Toggle for filters
 
 	// ✅ Fetch records with filters
 	const fetchRecords = useCallback(async () => {
@@ -53,38 +54,48 @@ export default function RecordsPage() {
 		<section className="section">
 			<h1>Records for Sale</h1>
 
-			{/* Filter Controls */}
-			<div className="filter-controls">
-				<input
-					type="text"
-					placeholder="Search for items..."
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-				/>
-				<input
-					type="number"
-					placeholder="Min Price"
-					value={priceMin}
-					onChange={(e) => setPriceMin(e.target.value)}
-				/>
-				<input
-					type="number"
-					placeholder="Max Price"
-					value={priceMax}
-					onChange={(e) => setPriceMax(e.target.value)}
-				/>
-				<select
-					value={condition}
-					onChange={(e) => setCondition(e.target.value)}
+			{/* Filter Menu for Mobile */}
+			<div className="filter-menu">
+				<button
+					className="filter-toggle"
+					onClick={() => setFiltersOpen(!filtersOpen)}
 				>
-					<option value="">All Conditions</option>
-					<option value="Mint">Mint</option>
-					<option value="Near Mint">Near Mint</option>
-					<option value="Very Good Plus">Very Good Plus</option>
-					<option value="Very Good">Very Good</option>
-					<option value="Good">Good</option>
-				</select>
-				<button onClick={fetchRecords}>Apply Filters</button>
+					{filtersOpen ? "Close Filters" : "Show Filters"}
+				</button>
+
+				{/* Filter Controls */}
+				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
+					<input
+						type="text"
+						placeholder="Search for items..."
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+					/>
+					<input
+						type="number"
+						placeholder="Min Price"
+						value={priceMin}
+						onChange={(e) => setPriceMin(e.target.value)}
+					/>
+					<input
+						type="number"
+						placeholder="Max Price"
+						value={priceMax}
+						onChange={(e) => setPriceMax(e.target.value)}
+					/>
+					<select
+						value={condition}
+						onChange={(e) => setCondition(e.target.value)}
+					>
+						<option value="">All Conditions</option>
+						<option value="Mint">Mint</option>
+						<option value="Near Mint">Near Mint</option>
+						<option value="Very Good Plus">Very Good Plus</option>
+						<option value="Very Good">Very Good</option>
+						<option value="Good">Good</option>
+					</select>
+					<button onClick={fetchRecords}>Apply Filters</button>
+				</div>
 			</div>
 
 			{/* Display Records in a Grid */}
@@ -106,16 +117,16 @@ export default function RecordsPage() {
 										className="record-image"
 										src={record.coverImage}
 										alt={record.title}
-										width={150}
-										height={150}
+										width={250}
+										height={250}
 									/>
 								) : (
 									<Image
 										className="record-image"
 										src="/placeholder.jpg"
 										alt="No cover available"
-										width={150}
-										height={150}
+										width={250}
+										height={250}
 									/>
 								)}
 

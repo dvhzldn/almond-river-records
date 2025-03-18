@@ -7,6 +7,7 @@ import {
 	IVinylRecord,
 	IVinylRecordFields,
 } from "@/@types/generated/contentful";
+import Link from "next/link";
 
 // Extend the generated type so that sys includes a contentTypeId property.
 type VinylRecordEntry = IVinylRecord & {
@@ -55,39 +56,49 @@ export default function NewThisWeek() {
 
 	return (
 		<section className="section">
-			<h2>New This Week</h2>
+			<h2>New Records This Week</h2>
+			<p>Our latest records on sale in the shop...</p>
 			{loading ? (
 				<p>Loading...</p>
 			) : newRecords.length === 0 ? (
 				<p>No new records added this week.</p>
 			) : (
-				<ul className="new-records-list">
-					{newRecords.map((record) => {
-						const fields = record.fields as IVinylRecordFields; // ✅ Explicitly cast
-						const { coverImage, artistName, title, price } = fields;
+				<>
+					<ul className="new-records-list">
+						{newRecords.slice(0, 3).map((record) => {
+							const fields = record.fields as IVinylRecordFields; // ✅ Explicitly cast
+							const { coverImage, artistName, title, price } = fields;
 
-						return (
-							<li key={record.sys.id} className="new-record-item">
-								{coverImage?.fields.file && (
-									<Image
-										className="new-record-image"
-										src={`http:${coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`}
-										alt={`${title} cover`}
-										width={250}
-										height={250}
-									/>
-								)}
-								<p className="new-record-title">
-									<strong>{title}</strong>
-								</p>
-								<p className="new-record-title">
-									<strong>{artistName.join(", ")}</strong>
-								</p>
-								<p className="new-record-price">£{price.toFixed(2)}</p>
-							</li>
-						);
-					})}
-				</ul>
+							return (
+								<li key={record.sys.id} className="new-record-item">
+									{coverImage?.fields.file && (
+										<Image
+											className="new-record-image"
+											src={`http:${coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`}
+											alt={`${title} cover`}
+											width={250}
+											height={250}
+										/>
+									)}
+									<p className="new-record-title">
+										<strong>{title}</strong>
+									</p>
+									<p className="new-record-title">
+										<strong>{artistName.join(", ")}</strong>
+									</p>
+									<p className="new-record-price">
+										£{price.toFixed(2)}
+									</p>
+								</li>
+							);
+						})}
+					</ul>
+					<div className="show-more">
+						<Link className="text" href="/records">
+							Show me the rest of the records
+						</Link>
+					</div>
+				</>
 			)}
 		</section>
 	);

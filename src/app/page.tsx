@@ -40,16 +40,6 @@ export default function Home() {
 					</a>
 				</div>
 			</div>
-
-			<div className="contact">
-				<p>Enquiries:</p>
-				<p>
-					<a href="mailto:almondriverrecords@gmail.com">
-						almondriverrecords@gmail.com
-					</a>
-				</p>
-				<p>07729 421682</p>
-			</div>
 		</section>
 	);
 }
