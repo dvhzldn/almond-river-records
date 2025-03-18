@@ -138,10 +138,10 @@ Link {
 	background: var(--colour-4);
 	padding: 0.8rem 1.5rem;
 	width: 100%;
-	position: fixed; /* Changed from relative to fixed */
+	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 1000; /* Ensures the nav stays on top of other elements */
+	z-index: 1000;
 }
 
 /* Logo (optional) */
@@ -155,7 +155,7 @@ Link {
 .nav-links {
 	list-style: none;
 	display: flex;
-	gap: 2rem;
+	gap: 3rem;
 }
 
 .nav-links li a,

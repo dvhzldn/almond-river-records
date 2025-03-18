@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 export default function Menu() {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -17,6 +18,11 @@ export default function Menu() {
 				<Link href="/">Almond River Records</Link>
 			</div>
 			<ul className={isOpen ? "nav-links open" : "nav-links"}>
+				<li>
+					<Link href="/basket" onClick={closeMenu}>
+						<FontAwesomeIcon icon={faShoppingBasket} />
+					</Link>
+				</li>
 				<li>
 					<Link href="/" onClick={closeMenu}>
 						Home
