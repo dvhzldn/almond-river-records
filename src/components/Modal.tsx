@@ -1,12 +1,13 @@
 "use client";
 
-import { ReactNode } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { Document } from "@contentful/rich-text-types";
+import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
 interface ModalProps {
 	record: {
@@ -22,7 +23,7 @@ interface ModalProps {
 		releaseYear?: number | null;
 		catalogueNumber?: string;
 		barcode?: string;
-		description?: ReactNode;
+		description?: Document; // Updated to use Document type
 	};
 	onClose: () => void;
 }
@@ -83,8 +84,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				</p>
 
 				<p>
-					<strong>Year:</strong>{" "}
-					{record.releaseYear ? record.releaseYear : "N/A"}
+					<strong>Year:</strong> {record.releaseYear ?? "N/A"}
 				</p>
 				<p>
 					<strong>Catalogue Number:</strong>{" "}
@@ -97,7 +97,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				{record.description && (
 					<div>
 						<h4>Description:</h4>
-						{record.description}
+						{documentToReactComponents(record.description)}
 					</div>
 				)}
 			</div>
