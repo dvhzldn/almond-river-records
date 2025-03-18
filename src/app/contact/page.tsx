@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ContactPage() {
 	const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ export default function ContactPage() {
 		message: "",
 	});
 
+	const router = useRouter();
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
@@ -39,6 +41,7 @@ export default function ContactPage() {
 				"Thanks for getting in touch. We will be back in touch promptly."
 			);
 			setFormData({ name: "", email: "", phone: "", message: "" });
+			router.push("/");
 		} else {
 			alert("Message failed to send. Please try again.");
 		}
@@ -47,6 +50,16 @@ export default function ContactPage() {
 	return (
 		<section className="section">
 			<h1>Contact Us</h1>
+			<section>
+				<p className="text">
+					Contact Almond River Records through the form below. We are a
+					small team and will get back to you at our earliest convenience.
+				</p>
+				<br />
+				<p className="text">
+					For any urgent enquiries, please call Andy on 07729 421682.
+				</p>
+			</section>
 			<section>
 				<form onSubmit={handleSubmit} className="form">
 					<label htmlFor="name">Name:</label>
