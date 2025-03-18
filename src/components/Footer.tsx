@@ -5,22 +5,32 @@ import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
 export default function Footer() {
 	return (
 		<footer className="footer">
-			<div className="contact">
+			<div>
 				<ul>
-					<li>
-						<Link href="/returns">Returns Policy</Link>
-					</li>
-					<p>Enquiries:</p>
-					<li>
-						<Link href="mailto:almondriverrecords@gmail.com">
+					<p>
+						Enquiries:{` `}
+						<Link
+							href="mailto:almondriverrecords@gmail.com"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							almondriverrecords@gmail.com
 						</Link>
-					</li>
-
-					<p>Call us:</p>
-					<li>
+					</p>
+					<p>
+						Call us:{` `}
 						<Link href="tel:+447729421682">07729 421682</Link>
-					</li>
+					</p>
+					<p>
+						Visit us:{` `}
+						<Link
+							href="https://maps.app.goo.gl/7PSPh1NSHgHinheM9"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{`253 St John's Rd, Edinburgh EH12 7XD`}
+						</Link>
+					</p>
 				</ul>
 			</div>
 			<div className="socialWrapper">
@@ -44,11 +54,11 @@ export default function Footer() {
 				</div>
 			</div>
 			<div>
-				<p className="copyright">
-					© {new Date().getFullYear()} Almond River Records
+				<p>
+					<Link href="/returns">Returns Policy</Link>
 				</p>
-				<br />
-				<p className="copyright">Made by Dave</p>
+				<p>© {new Date().getFullYear()} Almond River Records</p>
+				<p>Made by Dave</p>
 			</div>
 		</footer>
 	);
