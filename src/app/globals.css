@@ -21,6 +21,7 @@
 	--colour-4: #97f9f9;
 	--colour-5: #c8fffd;
 	--colour-6: #e7ffdb;
+	--colour-7: #ffffff;
 	--blur: rgba(0, 0, 0, 0.5);
 }
 
@@ -128,7 +129,7 @@ Link {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background: var(--colour-1);
+	background: var(--background);
 	padding: 0.8rem 1.5rem;
 	width: 100%;
 	position: fixed; /* Changed from relative to fixed */
