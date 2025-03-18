@@ -128,7 +128,7 @@ export default function RecordsPage() {
 						<option value="Very Good">Very Good</option>
 						<option value="Good">Good</option>
 					</select>
-					{/* New Artist Dropdown */}
+					{/* Artist Dropdown */}
 					<select
 						value={artist}
 						onChange={(e) => setArtist(e.target.value)}
@@ -140,7 +140,9 @@ export default function RecordsPage() {
 							</option>
 						))}
 					</select>
-					<button onClick={fetchRecords}>Apply Filters</button>
+					{/* Apply Filters */}
+					{/* TODO: Removed for now */}
+					{/* <button onClick={fetchRecords}>Apply Filters</button> */}
 				</div>
 				<button
 					className="filter-toggle"
