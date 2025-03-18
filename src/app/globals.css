@@ -138,7 +138,7 @@ Link {
 }
 
 /* Logo (optional) */
-.menu .logo a {
+.menu .menu-logo a {
 	font-size: 1.5rem;
 	font-weight: bold;
 	color: var(--colour-5);
@@ -529,7 +529,7 @@ li {
 		display: block;
 	}
 
-	.menu .logo a {
+	.menu .menu-logo a {
 		display: none;
 	}
 
@@ -554,6 +554,7 @@ li {
 		text-align: center;
 	}
 
+	.logo,
 	.record-image,
 	.modal-image,
 	.new-record-image {

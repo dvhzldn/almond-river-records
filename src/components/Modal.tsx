@@ -19,7 +19,7 @@ interface ModalProps {
 		inStock: boolean;
 		coverImage?: string | null;
 		otherImages?: string[];
-		releaseYear?: string;
+		releaseYear?: number | null;
 		catalogueNumber?: string;
 		barcode?: string;
 		description?: ReactNode;
@@ -41,10 +41,8 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<button className="closeButton" onClick={onClose}>
 					×
 				</button>
-
-				<h2>
-					{record.artistName.join(", ")} - {record.title}
-				</h2>
+				<h2>{record.title}</h2>
+				<h3>{record.artistName.join(", ")}</h3>
 				<h3>£{record.price}</h3>
 
 				<p>
@@ -85,7 +83,8 @@ export default function Modal({ record, onClose }: ModalProps) {
 				</p>
 
 				<p>
-					<strong>Year:</strong> {record.releaseYear ?? "N/A"}
+					<strong>Year:</strong>{" "}
+					{record.releaseYear ? record.releaseYear : "N/A"}
 				</p>
 				<p>
 					<strong>Catalogue Number:</strong>{" "}

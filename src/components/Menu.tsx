@@ -13,7 +13,7 @@ export default function Menu() {
 			<div className="burger" onClick={toggleMenu}>
 				{isOpen ? <span>&#x2715;</span> : <span>&#9776;</span>}
 			</div>
-			<div className="logo">
+			<div className="menu-logo">
 				<Link href="/">Almond River Records</Link>
 			</div>
 			<ul className={isOpen ? "nav-links open" : "nav-links"}>

@@ -93,6 +93,7 @@ export async function GET(req: Request) {
 				vinylCondition: fields.vinylCondition ?? "Unknown Condition",
 				sleeveCondition: fields.sleeveCondition ?? "Unknown Condition",
 				inStock: fields.inStock ?? false,
+				releaseYear: fields.releaseYear ?? null,
 				coverImage: fields.coverImage?.fields.file?.url
 					? `https:${fields.coverImage.fields.file.url}`
 					: null,
