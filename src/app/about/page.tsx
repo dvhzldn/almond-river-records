@@ -17,6 +17,16 @@ export default function AboutPage() {
 					Andy Barbour of Almond River Records outside the shop. (Image:
 					Stuart Stott.)
 				</p>
+				<p className="text">
+					Almond River Records shop is located in Corstorphine to the west
+					of Edinburgh, easily accessible by public transport and with
+					on-street parking nearby.
+				</p>
+				<p className="text">
+					Drop by our shop to browse our extensive collection of records
+					and have a chat about music with our friendly staff.
+				</p>
+
 				<section className="opening-hours">
 					<h4>Opening Hours</h4>
 					<table>
@@ -52,16 +62,6 @@ export default function AboutPage() {
 						</tbody>
 					</table>
 				</section>
-
-				<p className="text">
-					Almond River Records shop is located in Corstorphine to the west
-					of Edinburgh, easily accessible by public transport and with
-					on-street parking nearby.
-				</p>
-				<p className="text">
-					Drop by our shop to browse our extensive collection of records
-					and have a chat about music with our friendly staff.
-				</p>
 
 				<div className="map">
 					<iframe
