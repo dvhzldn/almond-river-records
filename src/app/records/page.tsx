@@ -99,35 +99,13 @@ export default function RecordsPage() {
 			<div className="filter-menu">
 				{/* Filter Controls */}
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
+					{/* Global Search */}
 					<input
 						type="text"
 						placeholder="Search for items..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
 					/>
-					<input
-						type="number"
-						placeholder="Min Price"
-						value={priceMin}
-						onChange={(e) => setPriceMin(e.target.value)}
-					/>
-					<input
-						type="number"
-						placeholder="Max Price"
-						value={priceMax}
-						onChange={(e) => setPriceMax(e.target.value)}
-					/>
-					<select
-						value={condition}
-						onChange={(e) => setCondition(e.target.value)}
-					>
-						<option value="">All Conditions</option>
-						<option value="Mint">Mint</option>
-						<option value="Near Mint">Near Mint</option>
-						<option value="Very Good Plus">Very Good Plus</option>
-						<option value="Very Good">Very Good</option>
-						<option value="Good">Good</option>
-					</select>
 					{/* Artist Dropdown */}
 					<select
 						value={artist}
@@ -140,6 +118,31 @@ export default function RecordsPage() {
 							</option>
 						))}
 					</select>
+					{/* Record Condition */}
+					<select
+						value={condition}
+						onChange={(e) => setCondition(e.target.value)}
+					>
+						<option value="">All Conditions</option>
+						<option value="Mint">Mint</option>
+						<option value="Near Mint">Near Mint</option>
+						<option value="Very Good Plus">Very Good Plus</option>
+						<option value="Very Good">Very Good</option>
+						<option value="Good">Good</option>
+					</select>
+					{/* Pricing */}
+					<input
+						type="number"
+						placeholder="Min Price"
+						value={priceMin}
+						onChange={(e) => setPriceMin(e.target.value)}
+					/>
+					<input
+						type="number"
+						placeholder="Max Price"
+						value={priceMax}
+						onChange={(e) => setPriceMax(e.target.value)}
+					/>
 					{/* Apply Filters */}
 					{/* TODO: Removed for now */}
 					{/* <button onClick={fetchRecords}>Apply Filters</button> */}
