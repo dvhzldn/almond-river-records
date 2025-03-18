@@ -17,11 +17,10 @@ interface ModalProps {
 		price: number;
 		vinylCondition: string;
 		sleeveCondition: string;
-		inStock: boolean;
 		coverImage?: string | null;
 		otherImages?: string[];
 		releaseYear?: number | null;
-		description?: Document; // Updated to use Document type
+		description?: Document;
 	};
 	onClose: () => void;
 }
@@ -33,6 +32,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 	if (record.otherImages && record.otherImages.length > 0) {
 		images.push(...record.otherImages);
 	}
+	console.log("Images for Swiper:", images);
 
 	return (
 		<div className="backdrop" onClick={onClose}>
@@ -44,16 +44,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<h3>{record.artistName.join(", ")}</h3>
 				<h3>£{record.price}</h3>
 
-				<p>
-					<strong>Stock:</strong>{" "}
-					{record.inStock ? "Available" : "Out of Stock"}
-				</p>
-
 				{/* Swiper for Images */}
 				{images.length > 0 && (
 					<Swiper
 						modules={[Autoplay, Navigation, Pagination]}
-						autoplay={{ delay: 3000, disableOnInteraction: true }}
+						autoplay={{ delay: 1000, disableOnInteraction: true }}
 						navigation
 						pagination={{ clickable: true }}
 						loop
@@ -86,7 +81,9 @@ export default function Modal({ record, onClose }: ModalProps) {
 				</p>
 				{record.description && (
 					<div>
-						<h4>Description:</h4>
+						<p>
+							<strong>Description:</strong>
+						</p>
 						{documentToReactComponents(record.description)}
 					</div>
 				)}

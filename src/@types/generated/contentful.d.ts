@@ -13,6 +13,9 @@ export interface IVinylRecordFields {
   /** Artist Name */
   artistName: string[];
 
+  /** In Stock */
+  inStock: boolean;
+
   /** Label */
   label: string;
 
@@ -21,6 +24,9 @@ export interface IVinylRecordFields {
 
   /** Price */
   price: number;
+
+  /** Genre */
+  genre?: string[] | undefined;
 
   /** Vinyl Condition */
   vinylCondition:
@@ -46,14 +52,17 @@ export interface IVinylRecordFields {
     | "Poor"
     | "Other";
 
+  /** Description */
+  description?: Document | undefined;
+
+  /** Link */
+  link?: Document | undefined;
+
   /** Cover Image */
   coverImage: Asset;
 
   /** Other Image */
-  otherImage?: Asset[] | undefined;
-
-  /** Description */
-  description?: Document | undefined;
+  otherImages?: Asset[] | undefined;
 
   /** Catalogue Number */
   catalogueNumber?: string | undefined;
@@ -61,17 +70,8 @@ export interface IVinylRecordFields {
   /** Barcode */
   barcode?: string | undefined;
 
-  /** Link */
-  link?: Document | undefined;
-
   /** Quantity */
   quantity: number;
-
-  /** In Stock */
-  inStock: boolean;
-
-  /** Genre */
-  genre?: string[] | undefined;
 }
 
 /** A vinyl record release */

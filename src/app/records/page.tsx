@@ -5,7 +5,6 @@ import Image from "next/image";
 import Modal from "@/components/Modal";
 import client from "@/lib/contentful";
 import { IVinylRecordFields } from "@/@types/generated/contentful";
-import { Document } from "@contentful/rich-text-types";
 
 interface Record {
 	id: string;
@@ -18,7 +17,6 @@ interface Record {
 	sleeveCondition: string;
 	inStock: boolean;
 	releaseYear?: number | null;
-	description?: Document;
 }
 
 export default function RecordsPage() {

@@ -6,7 +6,6 @@ import client from "@/lib/contentful";
 import { IVinylRecordFields } from "@/@types/generated/contentful";
 import Link from "next/link";
 import Modal from "@/components/Modal";
-import { Document } from "@contentful/rich-text-types";
 
 // Extend the generated type so that sys includes a contentTypeId property.
 type VinylRecordEntry = {
@@ -28,7 +27,6 @@ interface Record {
 	sleeveCondition: string;
 	inStock: boolean;
 	releaseYear?: number | null;
-	description?: Document;
 }
 
 export default function NewThisWeek() {
@@ -88,7 +86,6 @@ export default function NewThisWeek() {
 				? `https:${fields.coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
 				: null,
 			releaseYear: fields.releaseYear ?? null,
-			description: fields.description,
 		};
 		setSelectedRecord(recordData);
 	};
