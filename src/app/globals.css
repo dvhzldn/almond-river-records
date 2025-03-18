@@ -485,6 +485,43 @@ li {
 	border-bottom: none;
 }
 
+.pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 2rem;
+}
+
+.pagination button {
+	background-color: var(--colour-2);
+	color: var(--colour-5);
+	border: none;
+	padding: 0.5rem 1rem;
+	border-radius: var(--border-radius);
+	font-size: 1rem;
+	cursor: pointer;
+	transition:
+		background-color 0.3s,
+		transform 0.2s;
+}
+
+.pagination button:hover:enabled {
+	background-color: var(--colour-1);
+	transform: scale(1.05);
+}
+
+.pagination button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.pagination span {
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--text-color);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
 	/* Show burger icon */

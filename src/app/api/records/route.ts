@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server";
 import client from "@/lib/contentful";
-import {
-	IVinylRecord,
-	IVinylRecordFields,
-} from "@/@types/generated/contentful";
+import { IVinylRecordFields } from "@/@types/generated/contentful";
 
 // Extend Contentful Entry Type to Include `contentTypeId`
-type VinylRecordEntry = IVinylRecord & {
-	sys: IVinylRecord["sys"] & { contentTypeId: string };
-};
-
-// Define a type for the query parameters
-type RecordsQueryParams = {
-	content_type: string;
-	limit: number;
-	skip: number;
-	query?: string;
-	"fields.price[gte]"?: number;
-	"fields.price[lte]"?: number;
-	"fields.vinylCondition"?: string;
+type VinylRecordEntry = {
+	sys: {
+		id: string;
+		contentTypeId: string;
+	};
+	// We'll cast this field later.
+	fields: unknown;
 };
 
 export async function GET(req: Request) {
@@ -33,29 +24,39 @@ export async function GET(req: Request) {
 		? Number(searchParams.get("priceMax"))
 		: null;
 	const condition = searchParams.get("condition") || "";
+	const artist = searchParams.get("artist") || "";
 
 	// Extract pagination parameters (default: limit 20, skip 0)
 	const limitParam = searchParams.get("limit")
 		? Number(searchParams.get("limit"))
-		: 20;
+		: 12;
 	const skipParam = searchParams.get("skip")
 		? Number(searchParams.get("skip"))
 		: 0;
 
-	// Build query parameters for Contentful using our custom type
+	// Build query parameters for Contentful using a custom type.
+	type RecordsQueryParams = {
+		content_type: string;
+		limit: number;
+		skip: number;
+		query?: string;
+		"fields.price[gte]"?: number;
+		"fields.price[lte]"?: number;
+		"fields.vinylCondition"?: string;
+		"fields.artistName[in]"?: string | string[];
+	};
 	const params: RecordsQueryParams = {
 		content_type: "vinylRecord",
 		limit: limitParam,
 		skip: skipParam,
 	};
 
-	// Apply search filter directly via Contentful's query parameter.
-	// This performs a full-text search across searchable fields.
+	// Apply search filter via Contentful's full-text search.
 	if (searchQuery) {
 		params.query = searchQuery;
 	}
 
-	// Apply price filters using Contentful's filtering syntax.
+	// Apply price filters.
 	if (priceMin !== null) {
 		params["fields.price[gte]"] = priceMin;
 	}
@@ -63,9 +64,15 @@ export async function GET(req: Request) {
 		params["fields.price[lte]"] = priceMax;
 	}
 
-	// Apply condition filter
+	// Apply condition filter.
 	if (condition) {
 		params["fields.vinylCondition"] = condition;
+	}
+
+	// Apply artist filter.
+	if (artist) {
+		// Contentful's [in] operator can accept an array of values.
+		params["fields.artistName[in]"] = [artist];
 	}
 
 	try {
@@ -74,9 +81,9 @@ export async function GET(req: Request) {
 			items: VinylRecordEntry[];
 		};
 
-		// Map data properly
+		// Map data properly, casting fields via unknown to satisfy our type.
 		const records = res.items.map((record) => {
-			const fields = record.fields as IVinylRecordFields;
+			const fields = record.fields as unknown as IVinylRecordFields;
 			return {
 				id: record.sys.id,
 				title: fields.title ?? "Unknown Title",
