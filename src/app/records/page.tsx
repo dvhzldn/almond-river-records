@@ -141,13 +141,13 @@ export default function RecordsPage() {
 						))}
 					</select>
 					<button onClick={fetchRecords}>Apply Filters</button>
-					<button
-						className="filter-toggle"
-						onClick={() => setFiltersOpen(!filtersOpen)}
-					>
-						{filtersOpen ? "Close Filters" : "Show Filters"}
-					</button>
 				</div>
+				<button
+					className="filter-toggle"
+					onClick={() => setFiltersOpen(!filtersOpen)}
+				>
+					{filtersOpen ? "Close Filters" : "Show Filters"}
+				</button>
 			</div>
 
 			{/* Display Records in a Grid */}
