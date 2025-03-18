@@ -261,7 +261,6 @@ li {
 
 .modal-image {
 	max-width: 300px;
-	width: 100%;
 	height: auto;
 	border-radius: 5px;
 	display: block;
@@ -435,6 +434,7 @@ li {
 .record-image {
 	align-items: center;
 	max-width: 240px;
+	width: auto;
 	display: block;
 	aspect-ratio: 1 / 1;
 	margin: auto;

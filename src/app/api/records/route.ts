@@ -95,8 +95,17 @@ export async function GET(req: Request) {
 				inStock: fields.inStock ?? false,
 				releaseYear: fields.releaseYear ?? null,
 				coverImage: fields.coverImage?.fields.file?.url
-					? `https:${fields.coverImage.fields.file.url}`
+					? `https:${fields.coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
 					: null,
+				otherImages: fields.otherImages
+					? fields.otherImages
+							.map((asset) =>
+								asset.fields.file?.url
+									? `https:${asset.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
+									: null
+							)
+							.filter((url) => url !== null)
+					: [],
 				description: fields.description,
 			};
 		});

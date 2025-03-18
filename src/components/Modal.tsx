@@ -32,7 +32,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 	if (record.otherImages && record.otherImages.length > 0) {
 		images.push(...record.otherImages);
 	}
-	console.log("Images for Swiper:", images);
 
 	return (
 		<div className="backdrop" onClick={onClose}>
@@ -48,7 +47,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				{images.length > 0 && (
 					<Swiper
 						modules={[Autoplay, Navigation, Pagination]}
-						autoplay={{ delay: 1000, disableOnInteraction: true }}
+						autoplay={{ delay: 2000, disableOnInteraction: true }}
 						navigation
 						pagination={{ clickable: true }}
 						loop

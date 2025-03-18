@@ -23,6 +23,7 @@ interface Record {
 	price: number;
 	vinylCondition: string;
 	coverImage: string | null;
+	otherImages?: string[];
 	label: string;
 	sleeveCondition: string;
 	inStock: boolean;
@@ -85,6 +86,15 @@ export default function NewThisWeek() {
 			coverImage: fields.coverImage?.fields.file?.url
 				? `https:${fields.coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
 				: null,
+			otherImages: fields.otherImages
+				? fields.otherImages
+						.map((asset) =>
+							asset.fields.file?.url
+								? `https:${asset.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
+								: null
+						)
+						.filter((url) => url !== null)
+				: [],
 			releaseYear: fields.releaseYear ?? null,
 		};
 		setSelectedRecord(recordData);
