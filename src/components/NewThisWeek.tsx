@@ -110,7 +110,7 @@ export default function NewThisWeek() {
 			) : (
 				<>
 					<ul className="records-grid">
-						{newRecords.slice(0, 3).map((record) => {
+						{newRecords.slice(0, 4).map((record) => {
 							const fields =
 								record.fields as unknown as IVinylRecordFields;
 							const { coverImage, artistName, title, price } = fields;

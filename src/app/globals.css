@@ -258,7 +258,7 @@ li {
 }
 
 .modalContent {
-	background: var(--colour-5);
+	background: var(--colour-7);
 	padding: 1.5rem;
 	border-radius: var(--border-radius);
 	max-width: 600px;
