@@ -47,6 +47,7 @@ export default function Footer() {
 				<p className="copyright">
 					© {new Date().getFullYear()} Almond River Records
 				</p>
+				<br />
 				<p className="copyright">Made by Dave</p>
 			</div>
 		</footer>

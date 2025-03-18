@@ -57,7 +57,7 @@ export default function NewThisWeek() {
 	return (
 		<section className="section">
 			<h2>New In Stock This Week</h2>
-			<h3>Our latest additions in the shop...</h3>
+			<h3>Our latest additions to the shop...</h3>
 			{loading ? (
 				<p>Loading...</p>
 			) : newRecords.length === 0 ? (
@@ -66,7 +66,7 @@ export default function NewThisWeek() {
 				<>
 					<ul className="records-grid">
 						{newRecords.slice(0, 3).map((record) => {
-							const fields = record.fields as IVinylRecordFields; // ✅ Explicitly cast
+							const fields = record.fields as IVinylRecordFields;
 							const { coverImage, artistName, title, price } = fields;
 
 							return (
