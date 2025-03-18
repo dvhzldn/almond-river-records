@@ -22,14 +22,14 @@
 	--colour-5: #c8fffd;
 	--colour-6: #e7ffdb;
 	--colour-7: #ffffff;
-	--blur: rgba(0, 0, 0, 0.5);
+	--blur: rgba(0, 0, 0, 0.7);
 }
 
 /* Base Layout */
 html {
 	max-width: 100vw;
 	overflow-x: hidden;
-	background: var(--colour-7);
+	background: var(--colour-4);
 	height: 100%;
 }
 
@@ -40,7 +40,7 @@ body {
 	flex-direction: column;
 	min-height: 100vh;
 	margin: 0;
-	padding: 0;
+	padding: 3rem 0 0 0;
 	box-sizing: border-box;
 }
 
@@ -63,15 +63,12 @@ a:hover {
 	opacity: 0.8;
 }
 
-/* Consistent Main Content Container */
 .container {
-	background: var(--colour-7);
-	padding: 1.2rem 0 0 0;
-	border-radius: var(--border-radius);
+	background: var(--colour-4);
+	padding: 0 1.2rem;
 	width: 100%;
-	max-width: 1400px;
 	box-sizing: border-box;
-	margin: auto;
+	margin: 0;
 	text-align: center;
 }
 
@@ -79,9 +76,10 @@ a:hover {
 .section {
 	background: var(--colour-7);
 	margin: 0 auto;
-	padding: 3rem 1rem;
+	padding: 1rem 1rem;
 	width: 100%;
 	max-width: 1400px;
+	max-height: 80%;
 }
 
 /* Typography */
@@ -163,7 +161,7 @@ Link {
 li {
 	font-size: 1rem;
 	font-weight: 500;
-	color: var(--colour-5);
+	color: var(--colour-2);
 	text-decoration: none;
 	transition: color 0.3s ease;
 }
@@ -268,7 +266,7 @@ li {
 }
 
 .modal-image {
-	max-width: 300px;
+	max-width: 270px;
 	height: auto;
 	border-radius: 5px;
 	display: block;
@@ -380,6 +378,40 @@ li {
 
 .opening-hours tr:last-child td {
 	border-bottom: none;
+}
+
+/* Google Reviews Section */
+.reviews-section {
+	text-align: center;
+	padding: 0.5rem 0.1rem;
+	background: var(--colour-4);
+	border-radius: var(--border-radius);
+	max-width: 700px;
+	margin: auto;
+}
+
+/* Review Container */
+.review-container {
+	position: relative;
+	min-height: 60px;
+	padding: 0.2rem;
+}
+
+/* Star Rating */
+.review-rating {
+	display: block;
+	font-size: 1rem;
+	color: #ffb400;
+	margin-bottom: 0.2rem;
+}
+
+/* Review Text */
+.review-text {
+	font-size: 0.9rem;
+	font-weight: 200;
+	color: var(--colour-7);
+	line-height: 1.2;
+	font-style: italic;
 }
 
 /* Map Styling */
@@ -570,7 +602,6 @@ li {
 
 	.logo,
 	.record-image,
-	.modal-image,
 	.new-record-image {
 		width: 170px;
 		height: 170px;
@@ -593,11 +624,11 @@ li {
 	}
 
 	.container {
-		padding: 2rem 0.1rem 0.1rem 0.1rem;
+		padding: 0rem 0.2rem;
 	}
 
 	.section {
-		padding: 1.5rem;
+		padding: 1rem;
 	}
 
 	.record-card-content {
@@ -607,7 +638,7 @@ li {
 	}
 
 	.records-grid {
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 	}
 
 	.responsive-image {

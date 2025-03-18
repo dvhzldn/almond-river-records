@@ -17,7 +17,7 @@ export default function RootLayout({
 				<header>
 					<Menu />
 				</header>
-				<main className="container">{children}</main>
+				<main>{children}</main>
 				<footer>
 					<Footer />
 				</footer>

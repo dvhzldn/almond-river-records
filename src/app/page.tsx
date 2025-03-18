@@ -1,5 +1,6 @@
 import Image from "next/image";
 import NewThisWeek from "@/components/NewThisWeek";
+import GoogleReviews from "@/components/GoogleReviews";
 
 export default function Home() {
 	return (
@@ -13,10 +14,10 @@ export default function Home() {
 				height={300}
 				priority
 			/>
-
 			<div>
 				<NewThisWeek />
 			</div>
+			<GoogleReviews />
 		</section>
 	);
 }

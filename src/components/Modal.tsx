@@ -47,10 +47,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 				{images.length > 0 && (
 					<Swiper
 						modules={[Autoplay, Navigation, Pagination]}
-						autoplay={{ delay: 2000, disableOnInteraction: true }}
+						autoplay={{ delay: 4000, disableOnInteraction: true }}
 						navigation
 						pagination={{ clickable: true }}
-						loop
+						loop={images.length > 1}
+						slidesPerView={1}
 					>
 						{images.map((url, index) => (
 							<SwiperSlide key={index}>
