@@ -11,7 +11,7 @@
 :root {
 	--body-font: "Inter", sans-serif;
 	--heading-font: "Merriweather", serif;
-	--background: linear-gradient(to right, var(--colour-1), var(--colour-4));
+	--background: linear-gradient(to bottom, var(--colour-4), var(--colour-1));
 	--border-radius: 5px;
 
 	/* New Color Variables */
@@ -29,19 +29,18 @@
 html {
 	max-width: 100vw;
 	overflow-x: hidden;
-	background: var(--colour-1);
+	background: var(--colour-7);
 	height: 100%;
 }
 
 body {
-	color: var(--colour-1);
 	font-family: var(--body-font);
 	text-align: center;
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
 	margin: 0;
-	padding: 0.1rem;
+	padding: 0;
 	box-sizing: border-box;
 }
 
@@ -50,7 +49,7 @@ main {
 	flex: 1;
 	display: block;
 	width: 100%;
-	padding: 0rem 0;
+	padding: 0;
 }
 
 /* Links */
@@ -66,8 +65,8 @@ a:hover {
 
 /* Consistent Main Content Container */
 .container {
-	background: var(--colour-1);
-	padding: 1.5rem;
+	background: var(--colour-7);
+	padding: 1.2rem;
 	border-radius: var(--border-radius);
 	width: 100%;
 	max-width: 1400px;
@@ -80,7 +79,7 @@ a:hover {
 .section {
 	background: var(--colour-7);
 	margin: 0 auto;
-	padding: 2rem;
+	padding: 3rem 1rem;
 	width: 100%;
 	max-width: 1400px;
 }
@@ -88,7 +87,8 @@ a:hover {
 /* Typography */
 h1,
 h2,
-h3 {
+h3,
+h4 {
 	font-family: var(--heading-font);
 	margin-bottom: 0.1rem;
 }
@@ -102,18 +102,24 @@ h1 {
 h2 {
 	font-size: 1.1rem;
 	font-weight: 500;
-	color: var(--colour-5);
+	color: var(--colour-4);
 }
 
 h3 {
+	font-size: 1.1rem;
+	color: var(--colour-4);
+}
+
+h4 {
 	font-size: 1rem;
-	color: var(--colour-5);
+	color: var(--colour-1);
 }
 
 p,
 Link {
+	font-family: var(--body-font);
 	font-size: 0.9rem;
-	color: var(--colour-6);
+	color: var(--colour-4);
 }
 
 .text {
@@ -129,7 +135,7 @@ Link {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background: var(--background);
+	background: var(--colour-4);
 	padding: 0.8rem 1.5rem;
 	width: 100%;
 	position: fixed; /* Changed from relative to fixed */
@@ -244,7 +250,7 @@ li {
 }
 
 .modalContent {
-	background: var(--colour-1);
+	background: var(--colour-5);
 	padding: 1.5rem;
 	border-radius: var(--border-radius);
 	max-width: 600px;
@@ -269,7 +275,7 @@ li {
 	background: transparent;
 	border: none;
 	font-size: 2.5rem;
-	color: white;
+	color: var(--colour-4);
 	cursor: pointer;
 }
 
@@ -302,7 +308,7 @@ li {
 .form textarea {
 	width: 100%;
 	padding: 0.75rem;
-	border: 1px solid var(--colour-3);
+	border: 1px solid var(--colour-4);
 	border-radius: var(--border-radius);
 	margin-bottom: 1rem;
 	font-family: inherit;
@@ -410,7 +416,7 @@ li {
 }
 
 .record-card {
-	background: var(--colour-1);
+	background: var(--colour-7);
 	padding: 0.2rem;
 	border-radius: var(--border-radius);
 	cursor: pointer;
@@ -419,10 +425,11 @@ li {
 	align-items: center;
 	width: 100%;
 	text-align: left;
+	border: 2px solid var(--colour-7);
 }
 
 .record-card:hover {
-	transform: scale(1.02);
+	border: 2px solid var(--colour-4);
 }
 
 .record-image {

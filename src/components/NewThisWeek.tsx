@@ -98,7 +98,7 @@ export default function NewThisWeek() {
 	};
 
 	return (
-		<section className="section">
+		<div>
 			<h2>New In Stock This Week</h2>
 			<h3>Our latest additions to the shop...</h3>
 			{loading ? (
@@ -150,6 +150,6 @@ export default function NewThisWeek() {
 					onClose={() => setSelectedRecord(null)}
 				/>
 			)}
-		</section>
+		</div>
 	);
 }
