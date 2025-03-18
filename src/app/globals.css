@@ -100,13 +100,14 @@ h1 {
 }
 
 h2 {
-	font-size: 1.1rem;
+	font-size: 1.2rem;
 	font-weight: 500;
 	color: var(--colour-4);
 }
 
 h3 {
 	font-size: 1.1rem;
+	font-weight: 400;
 	color: var(--colour-4);
 }
 

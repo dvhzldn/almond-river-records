@@ -103,7 +103,6 @@ export default function NewThisWeek() {
 	return (
 		<div>
 			<h2>New In Stock This Week</h2>
-			<h3>Our latest additions to the shop...</h3>
 			{loading ? (
 				<p>Loading...</p>
 			) : newRecords.length === 0 ? (
