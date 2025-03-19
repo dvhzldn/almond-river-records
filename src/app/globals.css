@@ -505,14 +505,13 @@ li {
 	padding: 0 0.2rem;
 }
 
-/* Filter Menu Container */
+/* Filter Menu*/
 .filter-menu {
 	text-align: center;
-	margin-top: 1rem;
-	margin-bottom: 1rem;
+	margin-top: 0.1rem;
+	margin-bottom: 1.2rem;
 }
 
-/* Toggle Button - Hidden on Desktop */
 .filter-menu .filter-toggle {
 	display: none;
 	background: var(--colour-4);
@@ -523,7 +522,6 @@ li {
 	padding: 0.5rem 1rem;
 }
 
-/* Filter Controls (Desktop) */
 .filter-controls {
 	display: flex;
 	gap: 0.5rem;
@@ -531,22 +529,24 @@ li {
 	margin-bottom: 1rem;
 }
 
-/* Filter Controls Elements */
 .filter-controls input,
 .filter-controls select {
-	padding: 5px;
-	border: 2px solid var(--colour-4);
+	width: 120px;
+	padding: 0.5rem 0.2rem;
+	border: 1px solid var(--colour-4);
+	border-radius: var(--border-radius);
+	box-sizing: border-box;
 }
 
-/* Filter Apply Button */
-.filter-controls button {
+.filter-controls button,
+.clear-filters-button {
+	width: 110px;
 	background: var(--colour-4);
 	color: var(--colour-7);
 	border: none;
 	border-radius: var(--border-radius);
 	cursor: pointer;
 	padding: 0.5rem 1rem;
-	margin-bottom: 0;
 }
 
 /* Results */
@@ -703,6 +703,11 @@ li {
 		width: 100%;
 		height: auto;
 	}
+
+	.filter-controls {
+		flex-wrap: wrap; /* Prevents odd resizing */
+		justify-content: center;
+	}
 }
 
 @media (max-width: 768px) {
@@ -742,10 +747,9 @@ li {
 		top: 100%;
 		left: 0;
 		right: 0;
-		background: var(--colour-1);
+		background: var(--colour-4);
 		display: none;
-		gap: 5rem;
-		padding: 1rem 0;
+		padding: 2rem 0;
 	}
 
 	.nav-links.open {
@@ -823,13 +827,12 @@ li {
 	/* Show the toggle button on mobile */
 	.filter-menu .filter-toggle {
 		display: block;
-		margin: 0 auto;
+		margin: 0.5rem auto;
 	}
 	.filter-controls {
 		display: none;
-		flex-direction: column;
-		gap: 10px;
-		align-items: center;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.8rem;
 	}
 
 	/* When open, display filter controls in mobile view */

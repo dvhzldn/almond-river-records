@@ -94,21 +94,14 @@ export default function RecordsPage() {
 
 			{/* Filter Menu for Mobile */}
 			<div className="filter-menu">
+				<button
+					className="filter-toggle"
+					onClick={() => setFiltersOpen(!filtersOpen)}
+				>
+					{filtersOpen ? "Close Filters" : "Show Filters"}
+				</button>
 				{/* Filter Controls */}
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
-					{/* Global Search */}
-					<input
-						type="text"
-						placeholder="Search all records..."
-						value={searchInput}
-						onChange={(e) => setSearchInput(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								setSearch(searchInput);
-							}
-						}}
-					/>
-					<button onClick={() => setSearch(searchInput)}>Search</button>
 					{/* Artist Dropdown */}
 					<select
 						value={artist}
@@ -145,11 +138,24 @@ export default function RecordsPage() {
 						placeholder="Max Price"
 						value={priceMax}
 						onChange={(e) => setPriceMax(e.target.value)}
+					/>{" "}
+					{/* Global Search */}
+					<input
+						type="text"
+						placeholder="Search all records..."
+						value={searchInput}
+						onChange={(e) => setSearchInput(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								setSearch(searchInput);
+							}
+						}}
 					/>
-					{/* Apply Filters */}
-					{/* TODO: Removed for now */}
-					{/* <button onClick={fetchRecords}>Apply Filters</button> */}
+					<button onClick={() => setSearch(searchInput)}>Search</button>
+				</div>
+				<div>
 					<button
+						className="clear-filters-button"
 						onClick={() => {
 							setSearch("");
 							setSearchInput("");
@@ -163,13 +169,6 @@ export default function RecordsPage() {
 						Clear Filters
 					</button>
 				</div>
-
-				<button
-					className="filter-toggle"
-					onClick={() => setFiltersOpen(!filtersOpen)}
-				>
-					{filtersOpen ? "Close Filters" : "Show Filters"}
-				</button>
 			</div>
 			<div className="content-box">
 				{/* Display Records in a Grid */}
