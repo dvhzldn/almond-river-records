@@ -475,6 +475,7 @@ li {
 .record-image {
 	align-items: center;
 	max-width: 240px;
+	max-height: 240px;
 	width: auto;
 	display: block;
 	aspect-ratio: 1 / 1;
@@ -487,6 +488,15 @@ li {
 	text-align: left;
 	width: 100%;
 	padding: 0 0.2rem;
+}
+
+.record-title,
+.artist-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 240px;
+	display: block;
 }
 
 /* Filter Menu*/

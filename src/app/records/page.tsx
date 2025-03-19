@@ -203,8 +203,10 @@ export default function RecordsPage() {
 										/>
 									)}
 									<div className="record-details">
-										<h3>{record.title}</h3>
-										<h4>{record.artistName.join(", ")}</h4>
+										<h3 className="record-title">{record.title}</h3>
+										<h4 className="artist-name">
+											{record.artistName.join(", ")}
+										</h4>
 										<p>Price: £{record.price}</p>
 										<p>Condition: {record.vinylCondition}</p>
 										<p>
