@@ -535,7 +535,8 @@ li {
 .filter-controls button,
 .clear-filters-button,
 .form button,
-.pagination button {
+.pagination button,
+.payment-button {
 	width: 110px;
 	background: var(--colour-4);
 	color: var(--colour-7);

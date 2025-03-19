@@ -8,6 +8,9 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Document } from "@contentful/rich-text-types";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import SimulatePayment from "./SimulatePayment";
+import SumUpConnectButton from "./SumUpConnectButton";
+import ProductPayment from "./ProductPayment";
 
 interface ModalProps {
 	record: {
@@ -21,6 +24,7 @@ interface ModalProps {
 		otherImages?: string[];
 		releaseYear?: number | null;
 		description?: Document;
+		id: string;
 	};
 	onClose: () => void;
 }
@@ -39,6 +43,10 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<button className="closeButton" onClick={onClose}>
 					×
 				</button>
+				<div>
+					<SumUpConnectButton />
+					<SimulatePayment />
+				</div>
 				<h2>{record.title}</h2>
 				<h3>{record.artistName.join(", ")}</h3>
 				<h3>£{record.price}</h3>
@@ -87,6 +95,14 @@ export default function Modal({ record, onClose }: ModalProps) {
 						{documentToReactComponents(record.description)}
 					</div>
 				)}
+				<ProductPayment
+					recordId={record.id}
+					price={record.price * 100}
+					description={`Purchase of ${record.title} by ${record.artistName.join(" & ")}`}
+					title={record.title}
+					artist={record.artistName.join(" & ")}
+					coverImage={record.coverImage || ""}
+				/>
 			</div>
 		</div>
 	);
