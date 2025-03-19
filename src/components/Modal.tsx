@@ -1,5 +1,5 @@
 "use client";
-
+import { useBasket } from "@/app/api/context/BasketContext";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -11,7 +11,6 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import SimulatePayment from "./SimulatePayment";
 import SumUpConnectButton from "./SumUpConnectButton";
 import ProductPayment from "./ProductPayment";
-
 interface ModalProps {
 	record: {
 		title: string;
@@ -36,6 +35,18 @@ export default function Modal({ record, onClose }: ModalProps) {
 	if (record.otherImages && record.otherImages.length > 0) {
 		images.push(...record.otherImages);
 	}
+
+	const { addToBasket } = useBasket();
+
+	const handleAddToBasket = () => {
+		addToBasket({
+			id: record.id,
+			title: record.title,
+			artist: record.artistName.join(" & "),
+			price: record.price * 100,
+			coverImage: record.coverImage || "",
+		});
+	};
 
 	return (
 		<div className="backdrop" onClick={onClose}>
@@ -103,6 +114,9 @@ export default function Modal({ record, onClose }: ModalProps) {
 					artist={record.artistName.join(" & ")}
 					coverImage={record.coverImage || ""}
 				/>
+				<button className="basket-button" onClick={handleAddToBasket}>
+					Add to Basket
+				</button>
 			</div>
 		</div>
 	);

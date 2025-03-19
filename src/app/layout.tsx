@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Menu from "@/components/Menu";
 import Footer from "@/components/Footer";
+import { BasketProvider } from "./api/context/BasketContext";
 
 export const metadata: Metadata = {
 	title: "Almond River Records",
@@ -13,15 +14,17 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en">
-			<body>
-				<header>
-					<Menu />
-				</header>
-				<main>{children}</main>
-				<footer>
-					<Footer />
-				</footer>
-			</body>
+			<BasketProvider>
+				<body>
+					<header>
+						<Menu />
+					</header>
+					<main>{children}</main>
+					<footer>
+						<Footer />
+					</footer>
+				</body>
+			</BasketProvider>
 		</html>
 	);
 }
