@@ -57,7 +57,7 @@ export default function GoogleReviews() {
 	return (
 		<div>
 			{" "}
-			<h2>Feedback from our customers</h2>
+			<h2>Customer feedback</h2>
 			<section className="reviews-section">
 				<div className="review-container">
 					<span className="review-rating">

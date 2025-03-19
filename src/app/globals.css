@@ -543,8 +543,8 @@ li {
 .clear-filters-button:hover,
 .form button:hover,
 .pagination button:hover:enabled {
-	transform: scale(1.1);
 	background: var(--colour-6);
+	font-weight: bold;
 }
 
 .pagination button:disabled {
