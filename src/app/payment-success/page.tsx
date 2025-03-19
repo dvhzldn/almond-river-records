@@ -1,12 +1,6 @@
-// app/payment-success/page.tsx
 import Image from "next/image";
 
-export default function PaymentSuccess({
-	searchParams,
-}: {
-	searchParams: Record<string, string | undefined>;
-}) {
-	// Directly use searchParams provided by Next.js
+export default function PaymentSuccess({ searchParams }) {
 	const checkoutId = searchParams.checkout_id;
 	const title = searchParams.title;
 	const artist = searchParams.artist;
