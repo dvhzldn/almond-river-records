@@ -1,16 +1,11 @@
 // app/payment-success/page.tsx
 import Image from "next/image";
 
-type PaymentSuccessProps = {
-	searchParams: {
-		checkout_id?: string;
-		title?: string;
-		artist?: string;
-		coverImage?: string;
-	};
-};
-
-const PaymentSuccess = ({ searchParams }: PaymentSuccessProps) => {
+export default function PaymentSuccess({
+	searchParams,
+}: {
+	searchParams: { [key: string]: string | undefined };
+}) {
 	const checkoutId = searchParams.checkout_id;
 	const title = searchParams.title;
 	const artist = searchParams.artist;
@@ -40,6 +35,4 @@ const PaymentSuccess = ({ searchParams }: PaymentSuccessProps) => {
 			</div>
 		</div>
 	);
-};
-
-export default PaymentSuccess;
+}
