@@ -1,26 +1,20 @@
 // app/payment-success/page.tsx
 import Image from "next/image";
 
-export default function PaymentSuccess({
-	searchParams,
-}: {
-	searchParams: { [key: string]: string | undefined };
-}) {
-	// Ensure searchParams is an object and handle undefined values
-	const validSearchParams = searchParams ?? {};
+type PaymentSuccessProps = {
+	searchParams: {
+		checkout_id?: string;
+		title?: string;
+		artist?: string;
+		coverImage?: string;
+	};
+};
 
-	// Filter out undefined values and ensure only valid strings are passed to URLSearchParams
-	const urlSearchParams = new URLSearchParams(
-		Object.entries(validSearchParams)
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			.filter(([_, value]) => value !== undefined) // Only keep entries where value is a string
-			.map(([key, value]) => [key, value as string]) // Ensure value is treated as a string
-	);
-
-	const checkoutId = urlSearchParams.get("checkout_id");
-	const title = urlSearchParams.get("title");
-	const artist = urlSearchParams.get("artist");
-	const coverImage = urlSearchParams.get("coverImage");
+const PaymentSuccess = ({ searchParams }: PaymentSuccessProps) => {
+	const checkoutId = searchParams.checkout_id;
+	const title = searchParams.title;
+	const artist = searchParams.artist;
+	const coverImage = searchParams.coverImage;
 
 	return (
 		<div className="page-container">
@@ -46,4 +40,6 @@ export default function PaymentSuccess({
 			</div>
 		</div>
 	);
-}
+};
+
+export default PaymentSuccess;
