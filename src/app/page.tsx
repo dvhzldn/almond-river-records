@@ -1,6 +1,7 @@
 import Image from "next/image";
 import NewThisWeek from "@/components/NewThisWeek";
 import GoogleReviews from "@/components/GoogleReviews";
+import SpotifyPlaylist from "@/components/SpotifyPlaylist";
 
 export default function Home() {
 	return (
@@ -18,6 +19,10 @@ export default function Home() {
 				<NewThisWeek />
 			</div>
 			<GoogleReviews />
+			<div>
+				<h2>What we are listening to</h2>
+				<SpotifyPlaylist playlistId="2XPOAAUp0mNqNmz7gk2Kfx" />
+			</div>
 		</section>
 	);
 }

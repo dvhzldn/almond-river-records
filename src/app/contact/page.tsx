@@ -50,6 +50,7 @@ export default function ContactPage() {
 	return (
 		<section className="section">
 			<h1>Contact Us</h1>
+			<br />
 			<section>
 				<p className="text">
 					Contact Almond River Records through the form below. We are a
