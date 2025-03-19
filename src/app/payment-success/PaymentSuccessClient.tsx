@@ -2,13 +2,28 @@
 
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function PaymentSuccessClient() {
 	const searchParams = useSearchParams();
-	const checkoutId = searchParams.get("checkout_id");
-	const title = searchParams.get("title");
-	const artist = searchParams.get("artist");
-	const coverImage = searchParams.get("coverImage");
+
+	const [checkoutId, setCheckoutId] = useState<string | null>(null);
+	const [title, setTitle] = useState<string | null>(null);
+	const [artist, setArtist] = useState<string | null>(null);
+	const [coverImage, setCoverImage] = useState<string | null>(null);
+
+	// This ensures it only runs on the client
+	useEffect(() => {
+		const checkoutIdParam = searchParams.get("checkout_id");
+		const titleParam = searchParams.get("title");
+		const artistParam = searchParams.get("artist");
+		const coverImageParam = searchParams.get("coverImage");
+
+		setCheckoutId(checkoutIdParam);
+		setTitle(titleParam);
+		setArtist(artistParam);
+		setCoverImage(coverImageParam);
+	}, [searchParams]);
 
 	return (
 		<div className="page-container">
