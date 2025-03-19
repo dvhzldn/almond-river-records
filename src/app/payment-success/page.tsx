@@ -1,20 +1,27 @@
 // app/payment-success/page.tsx
-import { GetServerSideProps } from "next";
 import Image from "next/image";
 
-interface PaymentSuccessProps {
-	checkoutId: string | null;
-	title: string | null;
-	artist: string | null;
-	coverImage: string | null;
-}
-
 export default function PaymentSuccess({
-	checkoutId,
-	title,
-	artist,
-	coverImage,
-}: PaymentSuccessProps) {
+	searchParams,
+}: {
+	searchParams: { [key: string]: string | undefined };
+}) {
+	// Ensure searchParams is an object and handle undefined values
+	const validSearchParams = searchParams ?? {};
+
+	// Filter out undefined values and ensure only valid strings are passed to URLSearchParams
+	const urlSearchParams = new URLSearchParams(
+		Object.entries(validSearchParams)
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			.filter(([_, value]) => value !== undefined) // Only keep entries where value is a string
+			.map(([key, value]) => [key, value as string]) // Ensure value is treated as a string
+	);
+
+	const checkoutId = urlSearchParams.get("checkout_id");
+	const title = urlSearchParams.get("title");
+	const artist = urlSearchParams.get("artist");
+	const coverImage = urlSearchParams.get("coverImage");
+
 	return (
 		<div className="page-container">
 			<h1 className="page-title">Payment Successful</h1>
@@ -32,7 +39,6 @@ export default function PaymentSuccess({
 					/>
 				)}
 				<h2>Thank you for your purchase!</h2>
-
 				<br />
 				<h4>Your order will be processed and dispatched shortly.</h4>
 				<br />
@@ -41,17 +47,3 @@ export default function PaymentSuccess({
 		</div>
 	);
 }
-
-// Use getServerSideProps to handle the query parameters server-side
-export const getServerSideProps: GetServerSideProps = async (context) => {
-	const { query } = context;
-
-	return {
-		props: {
-			checkoutId: query.checkout_id || null,
-			title: query.title || null,
-			artist: query.artist || null,
-			coverImage: query.coverImage || null,
-		},
-	};
-};
