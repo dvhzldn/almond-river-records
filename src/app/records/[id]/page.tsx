@@ -6,18 +6,16 @@ import {
 } from "@/@types/generated/contentful";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
-interface PageProps {
-	params: {
-		id: string;
-	};
-}
-
 // Extend the generated type by asserting that the sys property includes a contentTypeId.
 type VinylRecordEntry = IVinylRecord & {
 	sys: IVinylRecord["sys"] & { contentTypeId: string };
 };
 
-export default async function RecordPage({ params }: PageProps) {
+export default async function RecordPage({
+	params,
+}: {
+	params: { id: string };
+}) {
 	// First cast the result to unknown then to VinylRecordEntry
 	const record = (await client.getEntry(
 		params.id
