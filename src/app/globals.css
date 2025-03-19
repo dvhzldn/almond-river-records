@@ -21,7 +21,7 @@
 	--colour-3: #975186;
 	--colour-4: #1f363dff;
 	--colour-5: #c8fffd;
-	--colour-6: #1d5203;
+	--colour-6: #1e7508;
 	--colour-7: #ffffff;
 	--blur: rgba(0, 0, 0, 0.2);
 }
@@ -542,6 +542,7 @@ li {
 .filter-controls button:hover,
 .clear-filters-button:hover,
 .form button:hover {
+	transform: scale(1.1);
 	background: var(--colour-6);
 }
 
