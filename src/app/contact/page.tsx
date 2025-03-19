@@ -48,64 +48,66 @@ export default function ContactPage() {
 	};
 
 	return (
-		<section className="section">
-			<h1>Contact Us</h1>
-			<br />
-			<section>
-				<p className="text">
-					Contact Almond River Records through the form below. We are a
-					small team and will get back to you at our earliest convenience.
-				</p>
-				<br />
-				<p className="text">
-					For any urgent enquiries, please call Andy on 07729 421682.
-				</p>
-			</section>
-			<section>
-				<form onSubmit={handleSubmit} className="form">
-					<label htmlFor="name">Name:</label>
-					<input
-						type="text"
-						id="name"
-						name="name"
-						value={formData.name}
-						onChange={handleChange}
-						required
-					/>
+		<div className="page-container">
+			<h1 className="page-title">Contact Us</h1>
+			<div className="content-box">
+				<div className="text">
+					<p>
+						Contact Almond River Records through the form below. We are a
+						small team and will get back to you at our earliest
+						convenience.
+					</p>
+					<br />
+					<p>
+						For any urgent enquiries, please call Andy on 07729 421682.
+					</p>
+				</div>
+				<div>
+					<form onSubmit={handleSubmit} className="form">
+						<label htmlFor="name">Name:</label>
+						<input
+							type="text"
+							id="name"
+							name="name"
+							value={formData.name}
+							onChange={handleChange}
+							required
+						/>
 
-					<label htmlFor="email">Email:</label>
-					<input
-						type="email"
-						id="email"
-						name="email"
-						value={formData.email}
-						onChange={handleChange}
-						required
-					/>
+						<label htmlFor="email">Email:</label>
+						<input
+							type="email"
+							id="email"
+							name="email"
+							value={formData.email}
+							onChange={handleChange}
+							required
+						/>
 
-					<label htmlFor="phone">Phone:</label>
-					<input
-						type="text"
-						id="phone"
-						name="phone"
-						value={formData.phone}
-						onChange={handleChange}
-						required
-					/>
+						<label htmlFor="phone">Phone:</label>
+						<input
+							type="text"
+							id="phone"
+							name="phone"
+							value={formData.phone}
+							onChange={handleChange}
+							required
+						/>
 
-					<label htmlFor="message">Message:</label>
-					<textarea
-						id="message"
-						name="message"
-						value={formData.message}
-						onChange={handleChange}
-						required
-						rows={5}
-					/>
+						<label htmlFor="message">Message:</label>
+						<textarea
+							id="message"
+							name="message"
+							value={formData.message}
+							onChange={handleChange}
+							required
+							rows={5}
+						/>
 
-					<button type="submit">Send</button>
-				</form>
-			</section>
-		</section>
+						<button type="submit">Send</button>
+					</form>
+				</div>
+			</div>
+		</div>
 	);
 }

@@ -135,14 +135,6 @@ a:hover,
 	opacity: 0.8;
 	text-decoration: underline;
 }
-.text {
-	font-size: 1.1rem;
-	color: var(--colour-4);
-	font-weight: 400;
-	line-height: 1.4;
-	text-align: left;
-	margin-bottom: 1rem;
-}
 
 /* Navigation Bar */
 .menu {
@@ -629,10 +621,10 @@ li {
 
 /* Content Box */
 .content-box {
-	background: white;
+	background: var(--colour-7);
 	max-width: 1000px;
 	width: 90%;
-	padding: 3rem;
+	padding: 2rem;
 	box-shadow: var(--box-shadow);
 	border-radius: var(--border-radius);
 }
@@ -658,6 +650,15 @@ li {
 
 .reverse .image-container {
 	order: 1; /* Move image to the left */
+}
+
+.text {
+	font-size: 1.1rem;
+	color: var(--colour-4);
+	font-weight: 400;
+	line-height: 1.4;
+	text-align: left;
+	margin-bottom: 1rem;
 }
 
 .text-content {

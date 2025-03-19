@@ -89,8 +89,8 @@ export default function RecordsPage() {
 	const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
 	return (
-		<section className="section">
-			<h1>Records for Sale</h1>
+		<div className="page-container">
+			<h1 className="page-title">Records for Sale</h1>
 
 			{/* Filter Menu for Mobile */}
 			<div className="filter-menu">
@@ -171,56 +171,58 @@ export default function RecordsPage() {
 					{filtersOpen ? "Close Filters" : "Show Filters"}
 				</button>
 			</div>
-
-			{/* Display Records in a Grid */}
-			{loading ? (
-				<p>Loading...</p>
-			) : records.length === 0 ? (
-				<p>No records found.</p>
-			) : (
-				<div className="records-grid">
-					{records.map((record) => (
-						<div
-							key={record.id}
-							className="record-card"
-							onClick={() => setSelectedRecord(record)}
-						>
-							<div>
-								{record.coverImage ? (
-									<Image
-										className="record-image"
-										src={record.coverImage}
-										alt={record.title}
-										width={250}
-										height={250}
-									/>
-								) : (
-									<Image
-										className="record-image"
-										src="/placeholder.jpg"
-										alt="No cover available"
-										width={250}
-										height={250}
-									/>
-								)}
-								<div className="record-details">
-									<h3>{record.title}</h3>
-									<h4>{record.artistName.join(", ")}</h4>
-									<p>Price: £{record.price}</p>
-									<p>Condition: {record.vinylCondition}</p>
-									<p>
-										<strong>
-											Stock:{" "}
-											{record.inStock ? "Available" : "Out of Stock"}
-										</strong>
-									</p>
+			<div className="content-box">
+				{/* Display Records in a Grid */}
+				{loading ? (
+					<p>Loading...</p>
+				) : records.length === 0 ? (
+					<p>No records found.</p>
+				) : (
+					<div className="records-grid">
+						{records.map((record) => (
+							<div
+								key={record.id}
+								className="record-card"
+								onClick={() => setSelectedRecord(record)}
+							>
+								<div>
+									{record.coverImage ? (
+										<Image
+											className="record-image"
+											src={record.coverImage}
+											alt={record.title}
+											width={250}
+											height={250}
+										/>
+									) : (
+										<Image
+											className="record-image"
+											src="/placeholder.jpg"
+											alt="No cover available"
+											width={250}
+											height={250}
+										/>
+									)}
+									<div className="record-details">
+										<h3>{record.title}</h3>
+										<h4>{record.artistName.join(", ")}</h4>
+										<p>Price: £{record.price}</p>
+										<p>Condition: {record.vinylCondition}</p>
+										<p>
+											<strong>
+												Stock:{" "}
+												{record.inStock
+													? "Available"
+													: "Out of Stock"}
+											</strong>
+										</p>
+									</div>
 								</div>
 							</div>
-						</div>
-					))}
-				</div>
-			)}
-
+						))}
+					</div>
+				)}
+			</div>
 			{/* Pagination Controls */}
 			<div className="pagination">
 				<button onClick={prevPage} disabled={page === 1}>
@@ -239,6 +241,6 @@ export default function RecordsPage() {
 					onClose={() => setSelectedRecord(null)}
 				/>
 			)}
-		</section>
+		</div>
 	);
 }
