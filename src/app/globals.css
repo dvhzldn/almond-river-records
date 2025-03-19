@@ -136,6 +136,7 @@ a:hover,
 	color: var(--colour-2);
 	opacity: 0.9;
 	text-decoration: underline;
+	font-weight: bold;
 }
 
 /* Navigation Bar */
@@ -203,8 +204,9 @@ li {
 
 .footer a,
 .footer p {
-	font-size: 1rem;
+	font-size: 1.2rem;
 	color: var(--colour-7);
+	font-weight: lighter;
 }
 
 .footer-icon {
