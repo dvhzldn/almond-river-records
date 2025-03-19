@@ -139,9 +139,11 @@ export default function NewThisWeek() {
 							);
 						})}
 					</ul>
-					<div className="show-more">
+					<div>
 						<Link href="/records">
-							<h1>View all records</h1>
+							<h2>
+								<strong>View all records</strong>
+							</h2>
 						</Link>
 					</div>
 				</>

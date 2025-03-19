@@ -131,8 +131,10 @@ a,
 
 Link:hover,
 a:hover,
-.hyperLink:hover {
-	opacity: 0.8;
+.hyperLink:hover,
+.nav-links li a:hover {
+	color: var(--colour-2);
+	opacity: 0.9;
 	text-decoration: underline;
 }
 
@@ -171,10 +173,6 @@ li {
 	color: var(--colour-7);
 	text-decoration: none;
 	transition: color 0.3s ease;
-}
-
-.nav-links li a:hover {
-	opacity: 0.8;
 }
 
 /* Burger Icon - hidden on larger screens */
@@ -406,6 +404,7 @@ li {
 	box-shadow: var(--box-shadow);
 	max-width: 700px;
 	margin: auto;
+	margin-bottom: 2rem;
 }
 
 /* Review Container */
@@ -523,7 +522,8 @@ li {
 
 .filter-controls button,
 .clear-filters-button,
-.form button {
+.form button,
+.pagination button {
 	width: 110px;
 	background: var(--colour-4);
 	color: var(--colour-7);
@@ -541,9 +541,15 @@ li {
 
 .filter-controls button:hover,
 .clear-filters-button:hover,
-.form button:hover {
+.form button:hover,
+.pagination button:hover:enabled {
 	transform: scale(1.1);
 	background: var(--colour-6);
+}
+
+.pagination button:disabled {
+	opacity: 0.8;
+	cursor: not-allowed;
 }
 
 /* Results */
@@ -553,29 +559,6 @@ li {
 	align-items: center;
 	gap: 1rem;
 	margin-top: 2rem;
-}
-
-.pagination button {
-	background-color: var(--colour-4);
-	color: var(--colour-7);
-	border: none;
-	padding: 0.5rem 1rem;
-	border-radius: var(--border-radius);
-	font-size: 1rem;
-	cursor: pointer;
-	transition:
-		background-color 0.3s,
-		transform 0.2s;
-}
-
-.pagination button:hover:enabled {
-	background-color: var(--colour-1);
-	transform: scale(1.05);
-}
-
-.pagination button:disabled {
-	opacity: 0.8;
-	cursor: not-allowed;
 }
 
 .pagination span {
@@ -678,6 +661,13 @@ li {
 	max-width: 500px;
 }
 
+hr {
+	border: none;
+	height: 1px;
+	background-color: rgba(0, 0, 0, 0.1);
+	margin: 20px 0;
+}
+
 /* Responsive Adjustments */
 
 @media (max-width: 1024px) {
@@ -760,8 +750,8 @@ li {
 	.logo,
 	.record-image,
 	.new-record-image {
-		width: 170px;
-		height: 170px;
+		width: 140px;
+		height: 140px;
 	}
 	.menu ul {
 		gap: 1rem;

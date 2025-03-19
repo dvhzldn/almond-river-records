@@ -15,7 +15,7 @@ export default function Menu() {
 				{isOpen ? <span>&#x2715;</span> : <span>&#9776;</span>}
 			</div>
 			<div className="menu-logo">
-				<Link href="/">Almond River Records</Link>
+				<Link href="/"></Link>
 			</div>
 			<ul className={isOpen ? "nav-links open" : "nav-links"}>
 				<li>

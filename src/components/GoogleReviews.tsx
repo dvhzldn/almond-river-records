@@ -55,13 +55,17 @@ export default function GoogleReviews() {
 	const renderStars = (rating: number) => "⭐".repeat(rating);
 
 	return (
-		<section className="reviews-section">
-			<div className="review-container">
-				<span className="review-rating">
-					{renderStars(currentReview.rating)}
-				</span>
-				<p className="review-text">{currentReview.text}</p>
-			</div>
-		</section>
+		<div>
+			{" "}
+			<h2>Feedback from our customers</h2>
+			<section className="reviews-section">
+				<div className="review-container">
+					<span className="review-rating">
+						{renderStars(currentReview.rating)}
+					</span>
+					<p className="review-text">{currentReview.text}</p>
+				</div>
+			</section>
+		</div>
 	);
 }
