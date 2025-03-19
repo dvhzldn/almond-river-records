@@ -11,8 +11,18 @@ export default function AboutPage() {
 					<div className="text-content">
 						<h2>Our Location</h2>
 						<p>
-							Almond River Records shop opened in December 2021, located
-							in Corstorphine to the west of Edinburgh.
+							Shop address:{" "}
+							<a
+								href="https://maps.app.goo.gl/7PSPh1NSHgHinheM9"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{`253 St John's Rd, Edinburgh EH12 7XD`}
+							</a>
+						</p>
+						<p>
+							Almond River Records shop is located in Corstorphine to the
+							west of Edinburgh.
 						</p>
 						<p>
 							Easily accessible by public transport, you can find
@@ -92,7 +102,7 @@ export default function AboutPage() {
 								07729 421682
 							</a>
 							.
-						</p>{" "}
+						</p>
 						<p>
 							You can also reach us by email at{" "}
 							<a
@@ -120,6 +130,18 @@ export default function AboutPage() {
 								mean something to you. Whether it is the music itself or
 								the art work that comes with it.“
 							</em>
+						</p>
+						<p>
+							{" "}
+							Almond River Records started as an online record shop on
+							Christmas Eve 2020, but expanded to open a physical shop in
+							December 2021 after a unit became available during
+							lockdown.
+						</p>
+						<p>
+							We hope to create an environment that is welcoming for all
+							record lovers - with customers able to leave with a £5
+							album or a more expensive collector style item.
 						</p>
 					</div>
 

@@ -53,13 +53,21 @@ export default function ContactPage() {
 			<div className="content-box">
 				<div className="text">
 					<p>
-						Contact Almond River Records through the form below. We are a
-						small team and will get back to you at our earliest
-						convenience.
+						Send a message through the form below and we will get back to
+						you at our earliest convenience.
 					</p>
 					<br />
 					<p>
-						For any urgent enquiries, please call Andy on 07729 421682.
+						For any urgent enquiries, please call Andy on{" "}
+						<a
+							href="tel:+447729421682"
+							className="hyperLink"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							07729 421682
+						</a>
+						.
 					</p>
 				</div>
 				<div>
