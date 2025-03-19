@@ -26,14 +26,23 @@ const BasketContext = createContext<BasketContextType | undefined>(undefined);
 export const BasketProvider = ({ children }: { children: ReactNode }) => {
 	const [basket, setBasket] = useState<BasketItem[]>([]);
 
+	// Add item to basket, but only if it's not already there
 	const addToBasket = (item: BasketItem) => {
-		setBasket((prevBasket) => [...prevBasket, item]);
+		// Check if the item is already in the basket
+		if (!basket.find((existingItem) => existingItem.id === item.id)) {
+			setBasket((prevBasket) => [...prevBasket, item]);
+		} else {
+			// You can add a notification or log here if you'd like
+			alert(`${item.artist} - ${item.title} is already in your basket!`);
+		}
 	};
 
+	// Remove item from basket
 	const removeFromBasket = (id: string) => {
 		setBasket((prevBasket) => prevBasket.filter((item) => item.id !== id));
 	};
 
+	// Clear the basket
 	const clearBasket = () => {
 		setBasket([]);
 	};

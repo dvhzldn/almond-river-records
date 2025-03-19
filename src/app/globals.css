@@ -619,6 +619,42 @@ li {
 	cursor: not-allowed;
 }
 
+/* Basket Page */
+
+.basket-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	width: 100%;
+	max-width: 600px;
+	margin: auto;
+	text-align: left;
+}
+
+/* Individual Basket Item */
+.basket-item {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	padding: 1rem;
+	border-bottom: 1px solid #ccc;
+	width: 100%;
+}
+
+/* Back to Home Link */
+.back-to-home {
+	display: block;
+	text-align: center;
+	margin-top: 1rem;
+	color: #0073a1;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.back-to-home:hover {
+	text-decoration: underline;
+}
+
 /* Results */
 .pagination {
 	display: flex;
