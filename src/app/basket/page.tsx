@@ -37,8 +37,8 @@ export default function BasketPage() {
 									/>
 
 									<div>
-										<h3>{item.title}</h3>
-										<p>By {item.artist}</p>
+										<h2>{item.title}</h2>
+										<h3>By {item.artist}</h3>
 										<p>Price: £{(item.price / 100).toFixed(2)}</p>
 										<button
 											className="basket-remove"

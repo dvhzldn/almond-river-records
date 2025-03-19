@@ -46,6 +46,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 			price: record.price * 100,
 			coverImage: record.coverImage || "",
 		});
+		onClose();
 	};
 
 	return (
