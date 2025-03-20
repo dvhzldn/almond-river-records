@@ -8,9 +8,9 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Document } from "@contentful/rich-text-types";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import SimulatePayment from "./SimulatePayment";
-import SumUpConnectButton from "./SumUpConnectButton";
 import ProductPayment from "./ProductPayment";
+// import SimulatePayment from "./SimulatePayment";
+// import SumUpConnectButton from "./SumUpConnectButton";
 interface ModalProps {
 	record: {
 		title: string;
@@ -56,8 +56,8 @@ export default function Modal({ record, onClose }: ModalProps) {
 					×
 				</button>
 				<div>
-					<SumUpConnectButton />
-					<SimulatePayment />
+					{/* <SumUpConnectButton />
+					<SimulatePayment /> */}
 				</div>
 				<h2>{record.title}</h2>
 				<h3>{record.artistName.join(", ")}</h3>
