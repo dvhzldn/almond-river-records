@@ -124,7 +124,7 @@ p {
 
 .basket-wrapper {
 	position: absolute;
-	right: 20px;
+	right: 0px;
 	top: 50%;
 	transform: translateY(-50%);
 }
@@ -135,7 +135,7 @@ p {
 	align-items: center;
 	color: var(--colour-7);
 	text-decoration: none;
-	font-size: 22px;
+	font-size: 1.5rem;
 }
 
 .basket-count {
@@ -639,20 +639,6 @@ li {
 	padding: 1rem;
 	border-bottom: 1px solid #ccc;
 	width: 100%;
-}
-
-/* Back to Home Link */
-.back-to-home {
-	display: block;
-	text-align: center;
-	margin-top: 1rem;
-	color: #0073a1;
-	font-weight: bold;
-	text-decoration: none;
-}
-
-.back-to-home:hover {
-	text-decoration: underline;
 }
 
 /* Results */
