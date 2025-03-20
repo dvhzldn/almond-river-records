@@ -9,8 +9,6 @@ import "swiper/css/pagination";
 import { Document } from "@contentful/rich-text-types";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import ProductPayment from "./ProductPayment";
-// import SimulatePayment from "./SimulatePayment";
-// import SumUpConnectButton from "./SumUpConnectButton";
 interface ModalProps {
 	record: {
 		title: string;
@@ -43,7 +41,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 			id: record.id,
 			title: record.title,
 			artist: record.artistName.join(" & "),
-			price: record.price * 100,
+			price: record.price,
 			coverImage: record.coverImage || "",
 		});
 		onClose();
@@ -55,10 +53,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<button className="closeButton" onClick={onClose}>
 					×
 				</button>
-				<div>
-					{/* <SumUpConnectButton />
-					<SimulatePayment /> */}
-				</div>
 				<h2>{record.title}</h2>
 				<h3>{record.artistName.join(", ")}</h3>
 				<h3>£{record.price}</h3>
@@ -109,8 +103,8 @@ export default function Modal({ record, onClose }: ModalProps) {
 				)}
 				<ProductPayment
 					recordId={record.id}
-					price={record.price * 100}
-					description={`Purchase of ${record.title} by ${record.artistName.join(" & ")}`}
+					price={record.price}
+					description={`${record.artistName.join(" & ")} - ${record.title}`}
 					title={record.title}
 					artist={record.artistName.join(" & ")}
 					coverImage={record.coverImage || ""}

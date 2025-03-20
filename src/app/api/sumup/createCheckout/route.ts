@@ -8,6 +8,12 @@ export async function POST(request: Request) {
 		const checkoutReference = `ARR-${orderId}-${Date.now()}`;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 
+		// const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success?orderId=${orderId}&title=${encodeURIComponent(
+		// 	body.title
+		// )}&artist=${encodeURIComponent(body.artist)}&coverImage=${encodeURIComponent(body.coverImage)}`;
+
+		const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`;
+
 		const response = await fetch("https://api.sumup.com/v0.1/checkouts", {
 			method: "POST",
 			headers: {
@@ -21,6 +27,7 @@ export async function POST(request: Request) {
 				description,
 				merchant_code,
 				hosted_checkout: { enabled: true },
+				redirect_url: redirectUrl,
 			}),
 		});
 

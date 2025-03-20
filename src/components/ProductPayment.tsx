@@ -15,9 +15,10 @@ const ProductPayment: React.FC<ProductPaymentProps> = ({
 	recordId,
 	price,
 	description,
-	title,
-	artist,
-	coverImage,
+	// Include when testing Payment Success page
+	// title,
+	// artist,
+	// coverImage,
 }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -34,7 +35,7 @@ const ProductPayment: React.FC<ProductPaymentProps> = ({
 		}
 
 		try {
-			const response = await fetch("/api/sumup/createPaymentLink", {
+			const response = await fetch("/api/sumup/createCheckout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -56,16 +57,20 @@ const ProductPayment: React.FC<ProductPaymentProps> = ({
 			const data = await response.json();
 			console.log("Full Checkout Data:", JSON.stringify(data, null, 2));
 
-			if (data.checkout_link) {
-				console.log("Redirecting to SumUp checkout:", data.checkout_link);
-				window.location.href = data.checkout_link;
+			if (data.hosted_checkout_url) {
+				console.log(
+					"Redirecting to SumUp checkout:",
+					data.hosted_checkout_url
+				);
+				window.location.href = data.hosted_checkout_url;
 			} else if (data.id) {
 				console.warn(
 					"No checkout link returned. Redirecting to test success page."
 				);
-				window.location.href = `/payment-success?checkout_id=${data.id}&title=${encodeURIComponent(
-					title
-				)}&artist=${encodeURIComponent(artist)}&coverImage=${encodeURIComponent(coverImage)}`;
+				// Page redirect on failed Checkout for testing
+				// window.location.href = `/payment-success?checkout_id=${data.id}&title=${encodeURIComponent(
+				// 	title
+				// )}&artist=${encodeURIComponent(artist)}&coverImage=${encodeURIComponent(coverImage)}`;
 			} else {
 				console.error(
 					"Payment not processed. No checkout link or ID available."
