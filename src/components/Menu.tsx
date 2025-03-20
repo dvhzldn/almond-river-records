@@ -52,6 +52,11 @@ export default function Menu() {
 						</Link>
 					</li>
 					<li>
+						<Link href="/gift-vouchers" onClick={closeMenu}>
+							Gift Vouchers
+						</Link>
+					</li>
+					<li>
 						<Link href="/contact" onClick={closeMenu}>
 							Get In Touch
 						</Link>
