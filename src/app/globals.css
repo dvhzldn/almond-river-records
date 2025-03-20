@@ -862,10 +862,6 @@ hr {
 		gap: 1rem;
 	}
 
-	.menu a {
-		font-size: 0.9rem;
-	}
-
 	.footer {
 		grid-template-columns: 1fr;
 		text-align: center;
