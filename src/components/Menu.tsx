@@ -56,6 +56,11 @@ export default function Menu() {
 							Get In Touch
 						</Link>
 					</li>
+					<li>
+						<Link href="/help" onClick={closeMenu}>
+							Help
+						</Link>
+					</li>
 				</ul>
 
 				{/* Basket Icon (Right - Always Visible) */}
