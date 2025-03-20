@@ -150,7 +150,7 @@ export default function AboutPage() {
 						<p>Andy of Almond River Records outside the shop.</p>
 						<Image
 							src="/images/shop-front.webp"
-							alt="Turntable with Sister Ray Logo"
+							alt="Andy outside our shop in Corstorphine"
 							width={500}
 							height={350}
 							className="responsive-image"

@@ -47,6 +47,11 @@ export default function Menu() {
 						</Link>
 					</li>
 					<li>
+						<Link href="/record-cleaning" onClick={closeMenu}>
+							Record Cleaning
+						</Link>
+					</li>
+					<li>
 						<Link href="/contact" onClick={closeMenu}>
 							Get In Touch
 						</Link>
