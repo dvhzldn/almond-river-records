@@ -19,7 +19,7 @@ export default function BasketPage() {
 		const orderId = `basket-${Date.now()}`;
 
 		try {
-			const response = await fetch("/api/sumup/createPaymentLink", {
+			const response = await fetch("/api/sumup/createCheckout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

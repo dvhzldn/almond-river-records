@@ -27,19 +27,11 @@ const ProductPayment: React.FC<ProductPaymentProps> = ({
 		setLoading(true);
 		setError(null);
 
-		const accessToken = process.env.NEXT_PUBLIC_SUMUP_TEST_TOKEN;
-		if (!accessToken) {
-			setError("No access token configured.");
-			setLoading(false);
-			return;
-		}
-
 		try {
 			const response = await fetch("/api/sumup/createCheckout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					accessToken,
 					amount: price,
 					description,
 					orderId: recordId,
@@ -55,13 +47,13 @@ const ProductPayment: React.FC<ProductPaymentProps> = ({
 			}
 
 			const data = await response.json();
-			console.log("Full Checkout Data:", JSON.stringify(data, null, 2));
+			// console.log("Full Checkout Data:", JSON.stringify(data, null, 2));
 
 			if (data.hosted_checkout_url) {
-				console.log(
-					"Redirecting to SumUp checkout:",
-					data.hosted_checkout_url
-				);
+				// console.log(
+				// 	"Redirecting to SumUp checkout:",
+				// 	data.hosted_checkout_url
+				// );
 				window.location.href = data.hosted_checkout_url;
 			} else if (data.id) {
 				console.warn(
