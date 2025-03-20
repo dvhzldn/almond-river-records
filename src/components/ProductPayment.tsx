@@ -47,13 +47,8 @@ const ProductPayment: React.FC<ProductPaymentProps> = ({
 			}
 
 			const data = await response.json();
-			// console.log("Full Checkout Data:", JSON.stringify(data, null, 2));
 
 			if (data.hosted_checkout_url) {
-				// console.log(
-				// 	"Redirecting to SumUp checkout:",
-				// 	data.hosted_checkout_url
-				// );
 				window.location.href = data.hosted_checkout_url;
 			} else if (data.id) {
 				console.warn(
