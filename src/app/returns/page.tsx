@@ -3,7 +3,7 @@ export default function Returns() {
 		<div className="page-container">
 			<h1 className="page-title">Returns</h1>
 			<div className="content-box">
-				<h2>Here is information about our returns policy.</h2>
+				<h2>Our returns policy</h2>
 				<br />
 				<p className="text">
 					Information about the returns policy should go here.
