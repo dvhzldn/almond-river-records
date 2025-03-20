@@ -789,7 +789,8 @@ hr {
 
 @media (max-width: 768px) {
 	.content-box {
-		padding: 2rem;
+		padding: 2rem 0.3rem;
+		width: 95%;
 	}
 	.text-image-container {
 		flex-direction: column;

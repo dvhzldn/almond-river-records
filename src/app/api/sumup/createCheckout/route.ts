@@ -1,11 +1,12 @@
-// app/api/sumup/createCheckout/route.ts
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		const { accessToken, amount } = body;
-		const checkoutReference = `order-123-${Date.now()}`;
+		const { amount, description, orderId } = body;
+		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
+		const checkoutReference = `ARR-${orderId}-${Date.now()}`;
+		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 
 		const response = await fetch("https://api.sumup.com/v0.1/checkouts", {
 			method: "POST",
@@ -15,11 +16,11 @@ export async function POST(request: Request) {
 			},
 			body: JSON.stringify({
 				amount,
-				currency: "GBP", // or your preferred currency
+				currency: "GBP",
 				checkout_reference: checkoutReference,
-				description: "Test Payment",
-				return_url: "http://localhost:3000/payment-success",
-				pay_to_email: "davehazeldean@gmail.com",
+				description,
+				merchant_code,
+				hosted_checkout: { enabled: true },
 			}),
 		});
 

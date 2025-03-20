@@ -4,13 +4,12 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		const { accessToken, amount, description, orderId } = body;
+		const { amount, description, orderId } = body;
+		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
+		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 
-		// Create a unique checkout reference by combining orderId with current timestamp
 		const checkoutReference = `order-${orderId}-${Date.now()}`;
 
-		const payToEmail = process.env.NEXT_PUBLIC_SUMUP_EMAIL_ADDRESS;
-		// Send the request to SumUp to create a checkout (payment link)
 		const response = await fetch("https://api.sumup.com/v0.1/checkouts", {
 			method: "POST",
 			headers: {
@@ -18,12 +17,13 @@ export async function POST(request: Request) {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				amount, // Make sure this is in the smallest unit (pence for GBP)
+				amount,
 				currency: "GBP",
 				checkout_reference: checkoutReference,
 				description,
+				merchant_code,
+				hosted_checkout: { enabled: true },
 				return_url: "http://localhost:3000/payment-success",
-				pay_to_email: payToEmail,
 			}),
 		});
 
