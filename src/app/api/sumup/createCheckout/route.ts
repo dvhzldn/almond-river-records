@@ -10,11 +10,11 @@ export async function POST(request: Request) {
 			? recordIds
 			: recordIds.split(",").map((r: string) => r.trim());
 
-		// Format today's date as YYYY-MM-DD
-		const today = new Date().toISOString().split("T")[0];
+		const now = new Date();
+		const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
+		const uniqueSuffix = now.getTime(); // milliseconds timestamp
+		const checkoutReference = `${today}-${recordIdsArray.join("-")}-${uniqueSuffix}`;
 
-		// Generate checkoutReference in the format: ARR-YYYY-MM-DD-RECORDID(S)
-		const checkoutReference = `${today}-${recordIdsArray.join("-")}`;
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 
