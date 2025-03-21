@@ -38,6 +38,7 @@ export async function POST(request: Request) {
 				merchant_code,
 				hosted_checkout: { enabled: true },
 				redirect_url: redirectUrl,
+				return_url: redirectUrl,
 			}),
 		});
 
