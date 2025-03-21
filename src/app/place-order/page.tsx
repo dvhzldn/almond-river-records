@@ -1,8 +1,6 @@
-// pages/place-order.tsx
 "use client";
 
-import React, { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
 interface OrderData {
@@ -16,13 +14,23 @@ interface OrderData {
 }
 
 const PlaceOrder: React.FC = () => {
-	const searchParams = useSearchParams();
-	const initialRecordId = searchParams.get("recordId") || "";
-	const initialPrice = Number(searchParams.get("price")) || 0;
-	const initialDescription = searchParams.get("description") || "";
-	const initialTitle = searchParams.get("title") || "";
-	const initialArtist = searchParams.get("artist") || "";
-	const initialCoverImage = searchParams.get("coverImage") || "";
+	const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
+		null
+	);
+
+	useEffect(() => {
+		// On client-side, useSearchParams to get search params
+		const params = new URLSearchParams(window.location.search);
+		setSearchParams(params);
+	}, []);
+
+	// Make sure searchParams is available before accessing its values
+	const initialRecordId = searchParams?.get("recordId") || "";
+	const initialPrice = Number(searchParams?.get("price")) || 0;
+	const initialDescription = searchParams?.get("description") || "";
+	const initialTitle = searchParams?.get("title") || "";
+	const initialArtist = searchParams?.get("artist") || "";
+	const initialCoverImage = searchParams?.get("coverImage") || "";
 
 	const [orderData, setOrderData] = useState<OrderData>({
 		name: "",
