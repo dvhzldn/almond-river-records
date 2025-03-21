@@ -2,7 +2,6 @@
 
 import { useBasket } from "../api/context/BasketContext";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function BasketPage() {
 	const { basket, removeFromBasket, clearBasket } = useBasket();
@@ -98,7 +97,11 @@ export default function BasketPage() {
 								</div>
 							))}
 						</div>
+						<button className="clear-button" onClick={clearBasket}>
+							Clear
+						</button>
 						<div>
+							<hr />
 							<h3>Sub-total: £{subTotalPrice}</h3>
 							<h3>Postage: £{postagePrice}</h3>
 							<br />
@@ -109,14 +112,8 @@ export default function BasketPage() {
 						<button className="basket-button" onClick={handleCheckout}>
 							Buy Now
 						</button>
-						<button className="clear-button" onClick={clearBasket}>
-							Clear Basket
-						</button>
 					</>
 				)}
-				<Link href="/" className="back-to-home">
-					Back to Home
-				</Link>
 			</div>
 		</div>
 	);

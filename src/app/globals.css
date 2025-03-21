@@ -94,15 +94,14 @@ button {
 
 h1 {
 	font-size: 2.6rem;
-	font-weight: 500;
+	font-weight: 400;
 	color: var(--colour-4);
 }
 
 h2 {
 	font-size: 1.8rem;
-	font-weight: 500;
+	font-weight: 300;
 	color: var(--colour-4);
-	margin-bottom: 0.8rem;
 }
 
 h3 {
@@ -119,6 +118,7 @@ h4 {
 
 p {
 	font-size: 1rem;
+	font-weight: 400;
 	color: var(--colour-4);
 }
 
@@ -255,7 +255,7 @@ li {
 
 .footer a,
 .footer p {
-	font-size: 1.2rem;
+	font-size: 1.1rem;
 	color: var(--colour-7);
 	font-weight: lighter;
 }
@@ -316,7 +316,7 @@ li {
 
 .modalContent {
 	background: var(--colour-7);
-	padding: 1.5rem;
+	padding: 1rem;
 	border-radius: var(--border-radius);
 	max-width: 600px;
 	width: 90%;
@@ -325,7 +325,7 @@ li {
 }
 
 .modal-image {
-	max-width: 270px;
+	max-width: 500px;
 	height: auto;
 	border-radius: 5px;
 	display: block;
@@ -469,16 +469,16 @@ li {
 	display: block;
 	font-size: 1rem;
 	color: #ffb400;
-	margin-bottom: 0.2rem;
 }
 
 /* Review Text */
 .review-text {
-	font-size: 0.9rem;
+	font-size: 1.2rem;
 	font-weight: 200;
 	color: var(--colour-4);
 	line-height: 1.2;
 	font-style: italic;
+	margin-bottom: 0.4rem;
 }
 
 /* Universal Responsive Image */
@@ -504,6 +504,7 @@ li {
 }
 
 .record-card {
+	position: relative;
 	background: var(--colour-7);
 	padding: 0.2rem;
 	border-radius: var(--border-radius);
@@ -520,6 +521,13 @@ li {
 	border: 2px solid var(--colour-4);
 }
 
+.record-image-container {
+	position: relative; /* Needed for absolute positioning of price */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .record-image {
 	align-items: center;
 	max-width: 240px;
@@ -530,12 +538,68 @@ li {
 	margin: auto;
 }
 
+.record-price {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: black;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 5px 10px;
+	border-radius: 0;
+}
+
 .record-details {
 	display: flex;
 	flex-direction: column;
 	text-align: left;
 	width: 100%;
 	padding: 0 0.2rem;
+	position: relative; /* Needed for absolute positioning of buttons */
+}
+
+/* Button Container */
+.record-actions {
+	position: absolute;
+	top: -50px;
+	right: 0px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+/* Styling for both buttons */
+.record-actions button {
+	border: none;
+	padding: 4px 6px;
+	font-size: 10px;
+	font-weight: bold;
+	border-radius: 0px;
+	cursor: pointer;
+	transition: background 0.2s ease-in-out;
+	width: auto;
+	text-align: center;
+}
+
+/* Buy Button (Green) */
+.grid-buy-button {
+	background: #28a745;
+	color: white;
+}
+
+.grid-buy-button:hover {
+	background: #218838;
+}
+
+/* Add to Basket Button (Light Blue) */
+.grid-basket-button {
+	background: #007bff;
+	color: white;
+}
+
+.grid-basket-button:hover {
+	background: #0056b3;
 }
 
 .record-title,
@@ -652,9 +716,8 @@ li {
 .basket-item {
 	display: flex;
 	align-items: center;
-	gap: 1.5rem;
-	padding: 1rem;
-	border-bottom: 1px solid #ccc;
+	gap: 1rem;
+	padding: 0.5rem;
 	width: 100%;
 }
 
@@ -688,7 +751,7 @@ li {
 /* Page Container */
 .page-container {
 	background: var(--colour-7);
-	padding: 3rem 0;
+	padding: 1.5rem 0;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -755,12 +818,12 @@ li {
 }
 
 .text-content p {
-	margin-bottom: 1.2rem; /* Space between paragraphs */
+	margin-bottom: 1.2rem;
 }
 
 .text-content em {
-	display: block; /* Ensures each emphasized block takes a new line */
-	margin-bottom: 1rem; /* Adds spacing between italicized lines */
+	display: block;
+	margin-bottom: 1rem;
 	font-style: italic;
 }
 
@@ -824,6 +887,10 @@ hr {
 	.image-container img {
 		width: 100%;
 		height: auto;
+	}
+
+	.modal-image {
+		max-width: 300px;
 	}
 
 	/* Show burger icon */

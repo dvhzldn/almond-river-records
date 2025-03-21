@@ -171,7 +171,6 @@ export default function RecordsPage() {
 				</div>
 			</div>
 			<div className="content-box">
-				{/* Display Records in a Grid */}
 				{loading ? (
 					<p>Loading...</p>
 				) : records.length === 0 ? (
@@ -184,7 +183,7 @@ export default function RecordsPage() {
 								className="record-card"
 								onClick={() => setSelectedRecord(record)}
 							>
-								<div>
+								<div className="record-image-container">
 									{record.coverImage ? (
 										<Image
 											className="record-image"
@@ -202,21 +201,25 @@ export default function RecordsPage() {
 											height={250}
 										/>
 									)}
-									<div className="record-details">
-										<h3 className="record-title">{record.title}</h3>
-										<h4 className="artist-name">
-											{record.artistName.join(", ")}
-										</h4>
-										<p>Price: £{record.price}</p>
-										<p>Condition: {record.vinylCondition}</p>
-										<p>
-											<strong>
-												Stock:{" "}
-												{record.inStock
-													? "Available"
-													: "Out of Stock"}
-											</strong>
-										</p>
+									<div className="record-price">£{record.price}</div>
+								</div>
+								<div className="record-details">
+									<h3 className="record-title">{record.title}</h3>
+									<h4 className="artist-name">
+										{record.artistName.join(", ")}
+									</h4>
+									<p>Condition: {record.vinylCondition}</p>
+									<p>
+										{/* <strong>
+											Stock:
+											{record.inStock ? "Available" : "Out of Stock"}
+										</strong> */}
+									</p>
+									<div className="record-actions">
+										<button className="grid-buy-button">Buy</button>
+										<button className="grid-basket-button">
+											Add to Basket
+										</button>
 									</div>
 								</div>
 							</div>
