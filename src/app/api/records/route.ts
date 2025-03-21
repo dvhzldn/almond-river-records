@@ -25,7 +25,9 @@ export async function GET(req: Request) {
 		: null;
 	const condition = searchParams.get("condition") || "";
 	const artist = searchParams.get("artist") || "";
+	const artists = searchParams.getAll("artist");
 	const genre = searchParams.get("genre") || "";
+	const genres = searchParams.getAll("genre");
 
 	// Extract pagination parameters (default: limit 20, skip 0)
 	const limitParam = searchParams.get("limit")
@@ -77,9 +79,17 @@ export async function GET(req: Request) {
 		params["fields.artistName[in]"] = [artist];
 	}
 
+	if (artists.length > 0) {
+		params["fields.artistName[in]"] = artists;
+	}
+
 	// Apply genre filter
 	if (genre) {
 		params["fields.genre[all]"] = genre;
+	}
+
+	if (genres.length > 0) {
+		params["fields.genre[all]"] = genres;
 	}
 
 	try {

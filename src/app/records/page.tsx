@@ -52,7 +52,9 @@ export default function RecordsPage() {
 					return fields.artistName || [];
 				});
 				// Deduplicate using a Set
-				const uniqueArtists = Array.from(new Set(allArtists));
+				const uniqueArtists = Array.from(new Set(allArtists)).sort((a, b) =>
+					a.localeCompare(b)
+				);
 				setArtistOptions(uniqueArtists);
 			} catch (error) {
 				console.error("Error fetching artists:", error);
@@ -71,7 +73,9 @@ export default function RecordsPage() {
 					const fields = item.fields as unknown as IVinylRecordFields;
 					return fields.genre ?? [];
 				});
-				const uniqueGenres = Array.from(new Set(allGenres.filter(Boolean)));
+				const uniqueGenres = Array.from(
+					new Set(allGenres.filter(Boolean))
+				).sort((a, b) => a.localeCompare(b));
 				setGenreOptions(uniqueGenres);
 			} catch (error) {
 				console.error("Error fetching genres:", error);
