@@ -1,5 +1,6 @@
 "use client";
 import { useBasket } from "@/app/api/context/BasketContext";
+import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -8,7 +9,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Document } from "@contentful/rich-text-types";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import ProductPayment from "./ProductPayment";
 interface ModalProps {
 	record: {
 		title: string;
@@ -46,6 +46,15 @@ export default function Modal({ record, onClose }: ModalProps) {
 		});
 		onClose();
 	};
+
+	const queryParams = new URLSearchParams({
+		recordId: record.id,
+		price: record.price.toString(),
+		description: `${record.artistName.join(" & ")} - ${record.title}`,
+		title: record.title,
+		artist: record.artistName.join(" & "),
+		coverImage: record.coverImage || "",
+	}).toString();
 
 	return (
 		<div className="backdrop" onClick={onClose}>
@@ -101,14 +110,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 						{documentToReactComponents(record.description)}
 					</div>
 				)}
-				<ProductPayment
-					recordId={record.id}
-					price={record.price}
-					description={`${record.artistName.join(" & ")} - ${record.title}`}
-					title={record.title}
-					artist={record.artistName.join(" & ")}
-					coverImage={record.coverImage || ""}
-				/>
+
+				<Link href={`/place-order?${queryParams}`}>
+					<button className="payment-button">Buy Now</button>
+				</Link>
+
 				<button className="basket-button" onClick={handleAddToBasket}>
 					Add to Basket
 				</button>
