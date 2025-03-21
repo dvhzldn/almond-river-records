@@ -92,6 +92,9 @@ export async function GET(req: Request) {
 		params["fields.genre[all]"] = genres;
 	}
 
+	params["fields.quantity[eq]"] = 1;
+	params["fields.inStock[eq]"] = true;
+
 	try {
 		// Fetch records from Contentful with filters and pagination
 		const res = (await client.getEntries(params)) as unknown as {
