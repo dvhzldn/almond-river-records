@@ -32,6 +32,12 @@ const PlaceOrder: React.FC = () => {
 	const initialArtist = searchParams?.get("artist") || "";
 	const initialCoverImage = searchParams?.get("coverImage") || "";
 
+	// Support multiple record IDs (comma separated in URL) by converting to an array
+	const recordIds = initialRecordId
+		.split(",")
+		.map((id) => id.trim())
+		.filter(Boolean);
+
 	const [orderData, setOrderData] = useState<OrderData>({
 		name: "",
 		email: "",
@@ -81,6 +87,21 @@ const PlaceOrder: React.FC = () => {
 				return;
 			}
 			const newOrderId = orderDataResponse.orderId;
+
+			// Reserve the items immediately (mark them as unavailable in Contentful)
+			const reserveResponse = await fetch("/api/updateInventory", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					recordIds,
+					action: "reserve",
+				}),
+			});
+			const reserveData = await reserveResponse.json();
+			if (!reserveResponse.ok) {
+				setError(reserveData.error || "Error reserving inventory items");
+				return;
+			}
 
 			// Immediately create SumUp checkout session
 			const paymentResponse = await fetch("/api/sumup/createCheckout", {
