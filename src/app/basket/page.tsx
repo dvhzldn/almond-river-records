@@ -1,62 +1,44 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useBasket } from "../api/context/BasketContext";
 import Image from "next/image";
 
 export default function BasketPage() {
 	const { basket, removeFromBasket, clearBasket } = useBasket();
+	const router = useRouter();
 
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
 	const totalPrice = subTotalPrice + postagePrice;
 
-	const handleCheckout = async () => {
-		const checkoutTotal = totalPrice;
-		const description = basket
+	const handleCheckout = () => {
+		// Build a comma-separated string of record IDs.
+		// (Assuming each basket item has an 'id' that corresponds to its Contentful entry.)
+		const recordIdsParam = basket.map((item) => item.id).join(",");
+
+		// Build a comma-separated string of cover image URLs.
+		// If an item doesn't have a coverImage, use a default.
+		const coverImagesParam = basket
+			.map((item) => item.coverImage || defaultImage)
+			.join(",");
+
+		// Build a description from the basket items.
+		const descriptionParam = basket
 			.map((item) => `${item.artist} - ${item.title}`)
 			.join(", ");
 
-		const orderId = `basket-${Date.now()}`;
+		// Build query parameters.
+		const queryParams = new URLSearchParams({
+			recordIds: recordIdsParam, // use plural "recordIds" for multiple items
+			price: totalPrice.toString(),
+			description: descriptionParam,
+			coverImages: coverImagesParam,
+			// Optionally, you could pass additional parameters as needed.
+		}).toString();
 
-		try {
-			const response = await fetch("/api/sumup/createCheckout", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					amount: checkoutTotal,
-					description,
-					orderId,
-				}),
-			});
-
-			if (!response.ok) {
-				const errData = await response.json();
-				console.error("Error response from SumUp:", errData);
-				alert(errData.error || "Error creating payment link");
-				return;
-			}
-
-			const data = await response.json();
-			console.log("Full Checkout Data:", JSON.stringify(data, null, 2));
-
-			if (data.hosted_checkout_url) {
-				console.log(
-					"Redirecting to SumUp checkout:",
-					data.hosted_checkout_url
-				);
-				window.location.href = data.hosted_checkout_url;
-			} else {
-				console.error("Payment not processed. No checkout link available.");
-				alert("Payment not processed. No checkout link available.");
-			}
-		} catch (err) {
-			console.error("Unexpected error:", err);
-			alert(
-				err instanceof Error
-					? `Unexpected error: ${err.message}`
-					: "An unexpected error occurred."
-			);
-		}
+		// Redirect to PlaceOrder page where the remaining steps occur.
+		router.push(`/place-order?${queryParams}`);
 	};
 
 	const defaultImage = "/images/almond-river-logo.jpg";
@@ -64,7 +46,6 @@ export default function BasketPage() {
 	return (
 		<div className="page-container">
 			<h1 className="page-title">Your Basket</h1>
-			{basket.length > 0}
 			<div className="content-box">
 				{basket.length === 0 ? (
 					<p>Your basket is empty.</p>
@@ -88,7 +69,6 @@ export default function BasketPage() {
 											Remove
 										</button>
 									</div>
-
 									<div>
 										<h3>{item.title}</h3>
 										<h3>By {item.artist}</h3>

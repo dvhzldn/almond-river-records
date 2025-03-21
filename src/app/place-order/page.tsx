@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
@@ -23,18 +22,27 @@ const PlaceOrder: React.FC = () => {
 		setSearchParams(params);
 	}, []);
 
-	const initialRecordId = searchParams?.get("recordId") || "";
+	// Use "recordIds" (plural) if available; otherwise fallback to "recordId"
+	const initialRecordIds =
+		searchParams?.get("recordIds") || searchParams?.get("recordId") || "";
+	const recordIds = initialRecordIds
+		.split(",")
+		.map((id) => id.trim())
+		.filter(Boolean);
+
+	// For cover images, use "coverImages" if available; otherwise fallback to "coverImage"
+	const initialCoverImages =
+		searchParams?.get("coverImages") || searchParams?.get("coverImage") || "";
+	const coverImages = initialCoverImages
+		.split(",")
+		.map((url) => url.trim())
+		.filter(Boolean);
+
 	const initialPrice = Number(searchParams?.get("price")) || 0;
 	const initialDescription = searchParams?.get("description") || "";
 	const initialTitle = searchParams?.get("title") || "";
 	const initialArtist = searchParams?.get("artist") || "";
-	const initialCoverImage = searchParams?.get("coverImage") || "";
 	const initialOrderStatus = "PENDING";
-
-	const recordIds = initialRecordId
-		.split(",")
-		.map((id) => id.trim())
-		.filter(Boolean);
 
 	const [orderData, setOrderData] = useState<OrderData>({
 		name: "",
@@ -62,6 +70,7 @@ const PlaceOrder: React.FC = () => {
 
 		try {
 			// 1. Create SumUp checkout session.
+			// We pass the recordIds so the backend can generate a checkoutReference.
 			const paymentResponse = await fetch("/api/sumup/createCheckout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -85,7 +94,14 @@ const PlaceOrder: React.FC = () => {
 				const checkoutId = paymentData.id;
 				const generatedOrderId = paymentData.checkout_reference;
 
-				// 2. Create the order in the Google Sheet with the checkout ID included.
+				// 2. Create the order in the Google Sheet.
+				// For Items (display field), if multiple items then use initialDescription (which should be a comma-separated list in the "artist - title" format),
+				// otherwise use the singular format.
+				const itemsField =
+					recordIds.length > 1
+						? initialDescription
+						: `${initialTitle} - ${initialArtist}`;
+
 				const orderResponse = await fetch("/api/createOrder", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -96,11 +112,12 @@ const PlaceOrder: React.FC = () => {
 						description: initialDescription,
 						title: initialTitle,
 						artist: initialArtist,
-						coverImage: initialCoverImage,
-						items: `${initialTitle} - ${initialArtist}`,
+						// For Items column: this is the display value.
+						items: itemsField,
 						orderStatus: initialOrderStatus,
 						orderDate: new Date().toISOString(),
-						checkoutId,
+						checkoutId, // store the SumUp checkout id
+						// New field for Contentful IDs; here we assume recordIds contains them.
 						contentfulIds: recordIds.join(","),
 					}),
 				});
@@ -110,7 +127,7 @@ const PlaceOrder: React.FC = () => {
 					return;
 				}
 
-				// 3. Reserve inventory in Contentful (mark items as unavailable)
+				// 3. Reserve inventory in Contentful.
 				const reserveResponse = await fetch("/api/updateInventory", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -145,17 +162,20 @@ const PlaceOrder: React.FC = () => {
 		<div className="page-container">
 			<h1 className="page-title">Place Your Order</h1>
 			<div className="content-box">
-				{/* Product Summary */}
 				<h2>Order Summary:</h2>
-				<div className="product-summary">
-					{initialCoverImage && (
+				{/* Display all cover images */}
+				<div className="cover-images">
+					{coverImages.map((url, index) => (
 						<Image
-							src={initialCoverImage}
-							alt={initialTitle}
+							key={index}
+							src={url}
+							alt={`Cover image ${index + 1}`}
 							width={200}
 							height={200}
 						/>
-					)}
+					))}
+				</div>
+				<div className="product-summary">
 					<h3>{initialDescription}</h3>
 					<h4>Price: £{initialPrice}</h4>
 				</div>
@@ -166,8 +186,6 @@ const PlaceOrder: React.FC = () => {
 						within 3 to 5 working days.
 					</p>
 				</div>
-
-				{/* Shipping Form */}
 				<form onSubmit={handleSubmit} className="form">
 					<div>
 						<label>Name:</label>
