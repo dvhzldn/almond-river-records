@@ -112,7 +112,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				)}
 
 				<Link href={`/place-order?${queryParams}`}>
-					<button className="payment-button">Buy Now</button>
+					<button className="payment-button">Order Now</button>
 				</Link>
 
 				<button className="basket-button" onClick={handleAddToBasket}>

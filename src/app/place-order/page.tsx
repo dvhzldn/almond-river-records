@@ -123,9 +123,6 @@ const PlaceOrder: React.FC = () => {
 				{/* Product Summary */}
 				<h2>Order Summary:</h2>
 				<div className="product-summary">
-					<h2>{initialTitle}</h2>
-					<h3>{initialArtist}</h3>
-					<p>Price: £{initialPrice}</p>
 					{initialCoverImage && (
 						<Image
 							src={initialCoverImage}
@@ -134,7 +131,15 @@ const PlaceOrder: React.FC = () => {
 							height={200}
 						/>
 					)}
-					<p>{initialDescription}</p>
+					<h3>{initialDescription}</h3>
+					<h4>Price: £{initialPrice}</h4>
+				</div>
+				<div>
+					<p>Enter your details for postage.</p>
+					<p>
+						Your order will be dispatched promptly and should arrive
+						within 3 to 5 working days.
+					</p>
 				</div>
 
 				{/* Shipping Form */}
@@ -209,7 +214,7 @@ const PlaceOrder: React.FC = () => {
 					</div>
 					{error && <p style={{ color: "red" }}>{error}</p>}
 					<button type="submit" disabled={loading}>
-						{loading ? "Submitting..." : "Submit Order"}
+						{loading ? "Submitting..." : "Go to payment"}
 					</button>
 				</form>
 			</div>

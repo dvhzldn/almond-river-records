@@ -7,11 +7,12 @@ import Link from "next/link";
 export default function BasketPage() {
 	const { basket, removeFromBasket, clearBasket } = useBasket();
 
-	const totalPrice = basket.reduce((acc, item) => acc + item.price, 0);
+	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
+	const postagePrice = 7;
+	const totalPrice = subTotalPrice + postagePrice;
 
 	const handleCheckout = async () => {
 		const checkoutTotal = totalPrice;
-
 		const description = basket
 			.map((item) => `${item.artist} - ${item.title}`)
 			.join(", ");
@@ -70,39 +71,45 @@ export default function BasketPage() {
 					<p>Your basket is empty.</p>
 				) : (
 					<>
-						<button className="basket-button" onClick={handleCheckout}>
-							Buy Now
-						</button>
-
 						<div className="basket-list">
 							{basket.map((item) => (
 								<div key={item.id} className="basket-item">
-									<Image
-										src={item.coverImage || defaultImage}
-										alt={item.title}
-										width={120}
-										height={120}
-										className="basket-cover"
-									/>
-
 									<div>
-										<h2>{item.title}</h2>
-										<h3>By {item.artist}</h3>
-										<p>Price: £{item.price}</p>
+										<Image
+											src={item.coverImage || defaultImage}
+											alt={item.title}
+											width={120}
+											height={120}
+											className="basket-cover"
+										/>{" "}
 										<button
-											className="basket-remove"
+											className="remove-button"
 											onClick={() => removeFromBasket(item.id)}
 										>
 											Remove
 										</button>
 									</div>
+
+									<div>
+										<h3>{item.title}</h3>
+										<h3>By {item.artist}</h3>
+										<h2>£{item.price}</h2>
+									</div>
 								</div>
 							))}
 						</div>
 						<div>
-							<h3>Total: £{totalPrice}</h3>
+							<h3>Sub-total: £{subTotalPrice}</h3>
+							<h3>Postage: £{postagePrice}</h3>
+							<br />
+							<h2>
+								Total: <strong>£{totalPrice}</strong>
+							</h2>
 						</div>
-						<button className="basket-button" onClick={clearBasket}>
+						<button className="basket-button" onClick={handleCheckout}>
+							Buy Now
+						</button>
+						<button className="clear-button" onClick={clearBasket}>
 							Clear Basket
 						</button>
 					</>

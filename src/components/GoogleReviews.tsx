@@ -60,10 +60,10 @@ export default function GoogleReviews() {
 			<h2>Customer feedback</h2>
 			<section className="reviews-section">
 				<div className="review-container">
+					<p className="review-text">{currentReview.text}</p>
 					<span className="review-rating">
 						{renderStars(currentReview.rating)}
 					</span>
-					<p className="review-text">{currentReview.text}</p>
 				</div>
 			</section>
 		</div>

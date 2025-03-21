@@ -19,7 +19,7 @@
 	/* New Color Variables */
 	--colour-1: #40798cff;
 	--colour-2: #97f9f9;
-	--colour-3: #975186;
+	--colour-3: #dc0000;
 	--colour-4: #1f363dff;
 	--colour-5: #c8fffd;
 	--colour-6: #1e7508;
@@ -82,6 +82,7 @@ h4 {
 	margin-bottom: 0.1rem;
 }
 
+h4,
 body,
 p,
 a,
@@ -93,7 +94,7 @@ button {
 
 h1 {
 	font-size: 2.6rem;
-	font-weight: 700;
+	font-weight: 500;
 	color: var(--colour-4);
 }
 
@@ -112,7 +113,8 @@ h3 {
 
 h4 {
 	font-size: 1.2rem;
-	color: var(--colour-1);
+	font-weight: 100;
+	color: var(--colour-4);
 }
 
 p {
@@ -142,7 +144,7 @@ p {
 	position: absolute;
 	top: -5px;
 	right: -10px;
-	background-color: red;
+	background-color: var(--colour-3);
 	color: var(--colour-7);
 	font-size: 12px;
 	font-weight: bold;
@@ -450,12 +452,9 @@ li {
 .reviews-section {
 	text-align: center;
 	padding: 0.5rem 0.1rem;
-	background: var(--colour-1);
-	border-radius: var(--border-radius);
-	box-shadow: var(--box-shadow);
-	max-width: 700px;
+	background: var(--colour-7);
+	max-width: 90%;
 	margin: auto;
-	margin-bottom: 2rem;
 }
 
 /* Review Container */
@@ -477,7 +476,7 @@ li {
 .review-text {
 	font-size: 0.9rem;
 	font-weight: 200;
-	color: var(--colour-7);
+	color: var(--colour-4);
 	line-height: 1.2;
 	font-style: italic;
 }
@@ -586,22 +585,39 @@ li {
 .form button,
 .pagination button,
 .payment-button,
-.basket-button {
+.basket-button,
+.remove-button,
+.clear-button {
 	width: 110px;
-	background: var(--colour-4);
-	color: var(--colour-7);
 	border: none;
 	border-radius: var(--border-radius);
 	cursor: pointer;
-	padding: 0.5rem 1rem;
+	padding: 0.3rem 1rem;
 	transition: background 0.3s ease;
+}
+
+.filter-controls button,
+.form button,
+.pagination button,
+.payment-button,
+.basket-button {
+	background: var(--colour-4);
+	color: var(--colour-7);
+}
+
+.clear-filters-button,
+.clear-button {
+	background: var(--colour-3);
+	color: var(--colour-7);
 }
 
 .form button,
 .payment-button,
-.basket-button {
+.basket-button,
+.remove-button,
+.clear-button {
 	display: block;
-	margin: 1rem auto 0;
+	margin: 0.3rem auto 0;
 }
 
 .filter-controls button:hover,
@@ -609,7 +625,8 @@ li {
 .form button:hover,
 .pagination button:hover:enabled,
 .payment-button:hover,
-.basket-button:hover {
+.basket-button:hover,
+.remove-button:hover {
 	background: var(--colour-6);
 	font-weight: bold;
 }
@@ -670,7 +687,7 @@ li {
 
 /* Page Container */
 .page-container {
-	background: #f4f4f4; /* Light background */
+	background: var(--colour-7);
 	padding: 3rem 0;
 	display: flex;
 	flex-direction: column;
@@ -823,9 +840,9 @@ hr {
 		flex-direction: column;
 		position: absolute;
 		top: 100%;
-		left: 0;
-		width: 100%;
-		background: var(--colour-4);
+		left: -25px;
+		width: 200px;
+		background: var(--background);
 		text-align: center;
 		display: none;
 		padding: 2rem 0;
@@ -836,17 +853,16 @@ hr {
 	}
 
 	.nav-links li {
-		text-align: center;
+		text-align: left;
+		padding-left: 2rem;
 	}
 
 	.logo,
 	.record-image,
 	.new-record-image {
-		width: 140px;
-		height: 140px;
-	}
-	.menu ul {
-		gap: 1rem;
+		width: 100%;
+		height: auto;
+		margin: 0;
 	}
 
 	.footer {
