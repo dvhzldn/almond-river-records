@@ -19,20 +19,18 @@ const PlaceOrder: React.FC = () => {
 	);
 
 	useEffect(() => {
-		// On client-side, useSearchParams to get search params
 		const params = new URLSearchParams(window.location.search);
 		setSearchParams(params);
 	}, []);
 
-	// Make sure searchParams is available before accessing its values
 	const initialRecordId = searchParams?.get("recordId") || "";
 	const initialPrice = Number(searchParams?.get("price")) || 0;
 	const initialDescription = searchParams?.get("description") || "";
 	const initialTitle = searchParams?.get("title") || "";
 	const initialArtist = searchParams?.get("artist") || "";
 	const initialCoverImage = searchParams?.get("coverImage") || "";
+	const initialOrderStatus = "PENDING";
 
-	// Support multiple record IDs (comma separated in URL) by converting to an array
 	const recordIds = initialRecordId
 		.split(",")
 		.map((id) => id.trim())
@@ -63,65 +61,71 @@ const PlaceOrder: React.FC = () => {
 		setError(null);
 
 		try {
-			// Create order and save details to Google Sheets
-			const orderResponse = await fetch("/api/createOrder", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					orderId: initialRecordId, // or let the backend generate one
-					...orderData,
-					// Product details plus auto-populated items field:
-					price: initialPrice,
-					description: initialDescription,
-					title: initialTitle,
-					artist: initialArtist,
-					coverImage: initialCoverImage,
-					items: `${initialTitle} - ${initialArtist}`,
-					orderDate: new Date().toISOString(),
-				}),
-			});
-
-			const orderDataResponse = await orderResponse.json();
-			if (!orderResponse.ok) {
-				setError(orderDataResponse.error || "Error creating order");
-				return;
-			}
-			const newOrderId = orderDataResponse.orderId;
-
-			// Reserve the items immediately (mark them as unavailable in Contentful)
-			const reserveResponse = await fetch("/api/updateInventory", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					recordIds,
-					action: "reserve",
-				}),
-			});
-			const reserveData = await reserveResponse.json();
-			if (!reserveResponse.ok) {
-				setError(reserveData.error || "Error reserving inventory items");
-				return;
-			}
-
-			// Immediately create SumUp checkout session
+			// 1. Create SumUp checkout session.
 			const paymentResponse = await fetch("/api/sumup/createCheckout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					amount: initialPrice,
 					description: initialDescription,
-					orderId: newOrderId,
+					recordIds,
 				}),
 			});
-
 			const paymentData = await paymentResponse.json();
 			if (!paymentResponse.ok) {
 				setError(paymentData.error || "Error initiating payment");
 				return;
 			}
 
-			if (paymentData.hosted_checkout_url) {
-				// Redirect immediately to SumUp hosted checkout URL
+			if (
+				paymentData.hosted_checkout_url &&
+				paymentData.id &&
+				paymentData.checkout_reference
+			) {
+				const checkoutId = paymentData.id;
+				const generatedOrderId = paymentData.checkout_reference;
+
+				// 2. Create the order in the Google Sheet with the checkout ID included.
+				const orderResponse = await fetch("/api/createOrder", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						orderId: generatedOrderId,
+						...orderData,
+						price: initialPrice,
+						description: initialDescription,
+						title: initialTitle,
+						artist: initialArtist,
+						coverImage: initialCoverImage,
+						items: `${initialTitle} - ${initialArtist}`,
+						orderStatus: initialOrderStatus,
+						orderDate: new Date().toISOString(),
+						checkoutId,
+						contentfulIds: recordIds.join(","),
+					}),
+				});
+				const orderDataResponse = await orderResponse.json();
+				if (!orderResponse.ok) {
+					setError(orderDataResponse.error || "Error creating order");
+					return;
+				}
+
+				// 3. Reserve inventory in Contentful (mark items as unavailable)
+				const reserveResponse = await fetch("/api/updateInventory", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						recordIds,
+						action: "reserve",
+					}),
+				});
+				const reserveData = await reserveResponse.json();
+				if (!reserveResponse.ok) {
+					setError(reserveData.error || "Error reserving inventory items");
+					return;
+				}
+
+				// 4. Redirect to the SumUp hosted checkout URL.
 				window.location.href = paymentData.hosted_checkout_url;
 			} else {
 				setError("Payment not processed. No checkout link available.");

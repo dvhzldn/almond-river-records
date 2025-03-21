@@ -3,9 +3,19 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		const { amount, description, orderId } = body;
+		const { amount, description, recordIds } = body;
+
+		// Ensure recordIds is an array; if it's a string, split it by comma.
+		const recordIdsArray = Array.isArray(recordIds)
+			? recordIds
+			: recordIds.split(",").map((r: string) => r.trim());
+
+		// Format today's date as YYYY-MM-DD
+		const today = new Date().toISOString().split("T")[0];
+
+		// Generate checkoutReference in the format: ARR-YYYY-MM-DD-RECORDID(S)
+		const checkoutReference = `${today}-${recordIdsArray.join("-")}`;
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
-		const checkoutReference = `ARR-${orderId}-${Date.now()}`;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 
 		// const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success?orderId=${orderId}&title=${encodeURIComponent(

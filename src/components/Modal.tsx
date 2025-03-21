@@ -27,7 +27,6 @@ interface ModalProps {
 }
 
 export default function Modal({ record, onClose }: ModalProps) {
-	// Collect images for Swiper
 	const images: string[] = [];
 	if (record.coverImage) images.push(record.coverImage);
 	if (record.otherImages && record.otherImages.length > 0) {
@@ -66,7 +65,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<h3>{record.artistName.join(", ")}</h3>
 				<h3>£{record.price}</h3>
 
-				{/* Swiper for Images */}
 				{images.length > 0 && (
 					<Swiper
 						modules={[Autoplay, Navigation, Pagination]}

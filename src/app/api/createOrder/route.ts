@@ -3,9 +3,10 @@ import { google } from "googleapis";
 
 export async function POST(req: Request) {
 	try {
-		// Parse the request body
+		// Parse request body
 		const body = await req.json();
 		const {
+			orderDate,
 			orderId,
 			name,
 			email,
@@ -15,11 +16,12 @@ export async function POST(req: Request) {
 			city,
 			postcode,
 			items,
-			paymentStatus,
-			orderDate,
+			orderStatus,
+			checkoutId,
+			contentfulIds,
 		} = body;
 
-		// Decode the base64-encoded credentials and parse them into JSON
+		// Decode base64-encoded credentials and parse into JSON
 		const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
 		const credentials = JSON.parse(
 			Buffer.from(encoded, "base64").toString("utf8")
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
 		const sheets = google.sheets({ version: "v4", auth });
 		const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
 
-		// Append a new row to the spreadsheet with the correct column order
+		// Append new row to spreadsheet
 		await sheets.spreadsheets.values.append({
 			spreadsheetId,
 			range: "Sheet1!A1",
@@ -42,6 +44,7 @@ export async function POST(req: Request) {
 				values: [
 					[
 						orderId,
+						orderDate,
 						name,
 						email,
 						address1,
@@ -50,8 +53,9 @@ export async function POST(req: Request) {
 						city,
 						postcode,
 						typeof items === "string" ? items : JSON.stringify(items),
-						paymentStatus,
-						orderDate,
+						orderStatus,
+						checkoutId,
+						contentfulIds,
 					],
 				],
 			},
