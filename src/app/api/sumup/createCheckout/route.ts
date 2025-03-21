@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 		// 	body.title
 		// )}&artist=${encodeURIComponent(body.artist)}&coverImage=${encodeURIComponent(body.coverImage)}`;
 
-		const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`;
+		const redirectUrl = `https://almond-river-records.vercel.app/payment-success`;
 
 		const response = await fetch("https://api.sumup.com/v0.1/checkouts", {
 			method: "POST",
