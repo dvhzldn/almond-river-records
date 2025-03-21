@@ -17,6 +17,7 @@ interface Record {
 	sleeveCondition: string;
 	inStock: boolean;
 	releaseYear?: number | null;
+	genre: string;
 }
 
 export default function RecordsPage() {
@@ -28,6 +29,8 @@ export default function RecordsPage() {
 	const [condition, setCondition] = useState("");
 	const [artist, setArtist] = useState("");
 	const [artistOptions, setArtistOptions] = useState<string[]>([]);
+	const [genre, setGenre] = useState("");
+	const [genreOptions, setGenreOptions] = useState<string[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
 	const [filtersOpen, setFiltersOpen] = useState(false);
@@ -58,6 +61,25 @@ export default function RecordsPage() {
 		fetchArtists();
 	}, []);
 
+	useEffect(() => {
+		async function fetchGenres() {
+			try {
+				const res = await client.getEntries({
+					content_type: "vinylRecord",
+				});
+				const allGenres = res.items.flatMap((item) => {
+					const fields = item.fields as unknown as IVinylRecordFields;
+					return fields.genre ?? [];
+				});
+				const uniqueGenres = Array.from(new Set(allGenres.filter(Boolean)));
+				setGenreOptions(uniqueGenres);
+			} catch (error) {
+				console.error("Error fetching genres:", error);
+			}
+		}
+		fetchGenres();
+	}, []);
+
 	// Fetch records with filters and pagination
 	const fetchRecords = useCallback(async () => {
 		setLoading(true);
@@ -66,6 +88,7 @@ export default function RecordsPage() {
 		if (priceMin) params.append("priceMin", priceMin);
 		if (priceMax) params.append("priceMax", priceMax);
 		if (condition) params.append("condition", condition);
+		if (genre) params.append("genre", genre);
 		if (artist) params.append("artist", artist); // Pass selected artist
 		params.append("limit", pageSize.toString());
 		params.append("skip", ((page - 1) * pageSize).toString());
@@ -79,7 +102,7 @@ export default function RecordsPage() {
 		} finally {
 			setLoading(false);
 		}
-	}, [search, priceMin, priceMax, condition, artist, page]);
+	}, [search, priceMin, priceMax, condition, artist, genre, page]);
 
 	useEffect(() => {
 		fetchRecords();
@@ -126,6 +149,14 @@ export default function RecordsPage() {
 						<option value="Very Good">Very Good</option>
 						<option value="Good">Good</option>
 					</select>
+					<select value={genre} onChange={(e) => setGenre(e.target.value)}>
+						<option value="">All Genres</option>
+						{genreOptions.map((option) => (
+							<option key={option} value={option}>
+								{option}
+							</option>
+						))}
+					</select>
 					{/* Pricing */}
 					<input
 						type="number"
@@ -164,6 +195,7 @@ export default function RecordsPage() {
 							setCondition("");
 							setArtist("");
 							setPage(1);
+							setGenre("");
 						}}
 					>
 						Clear Filters

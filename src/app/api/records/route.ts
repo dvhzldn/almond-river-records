@@ -25,6 +25,7 @@ export async function GET(req: Request) {
 		: null;
 	const condition = searchParams.get("condition") || "";
 	const artist = searchParams.get("artist") || "";
+	const genre = searchParams.get("genre") || "";
 
 	// Extract pagination parameters (default: limit 20, skip 0)
 	const limitParam = searchParams.get("limit")
@@ -40,6 +41,7 @@ export async function GET(req: Request) {
 		limit: number;
 		skip: number;
 		query?: string;
+		"fields.genre[all]"?: string | string[];
 		"fields.price[gte]"?: number;
 		"fields.price[lte]"?: number;
 		"fields.vinylCondition"?: string;
@@ -75,6 +77,11 @@ export async function GET(req: Request) {
 		params["fields.artistName[in]"] = [artist];
 	}
 
+	// Apply genre filter
+	if (genre) {
+		params["fields.genre[all]"] = genre;
+	}
+
 	try {
 		// Fetch records from Contentful with filters and pagination
 		const res = (await client.getEntries(params)) as unknown as {
@@ -90,6 +97,7 @@ export async function GET(req: Request) {
 				artistName: fields.artistName ?? [],
 				label: fields.label ?? "Unknown Label",
 				price: fields.price ?? 0,
+				genre: fields.genre ?? [],
 				vinylCondition: fields.vinylCondition ?? "Unknown Condition",
 				sleeveCondition: fields.sleeveCondition ?? "Unknown Condition",
 				inStock: fields.inStock ?? false,
