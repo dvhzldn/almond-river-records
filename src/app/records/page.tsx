@@ -1,128 +1,48 @@
 "use client";
-
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Modal from "@/components/Modal";
-import client from "@/lib/contentful";
-import { IVinylRecordFields } from "@/@types/generated/contentful";
+import { useRecords, VinylRecord } from "@/hooks/useRecords";
+import { useContentfulOptions } from "@/hooks/useContentfulOptions";
 import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
 
-interface Record {
-	id: string;
-	title: string;
-	artistName: string[];
-	price: number;
-	vinylCondition: string;
-	coverImage: string | null;
-	label: string;
-	sleeveCondition: string;
-	inStock: boolean;
-	releaseYear?: number | null;
-	genre: string;
-}
-
 export default function RecordsPage() {
-	const [records, setRecords] = useState<Record[]>([]);
-	const [totalRecords, setTotalRecords] = useState<number>(0);
 	const [searchInput, setSearchInput] = useState("");
 	const [search, setSearch] = useState("");
 	const [priceMin, setPriceMin] = useState("");
 	const [priceMax, setPriceMax] = useState("");
 	const [condition, setCondition] = useState("");
 	const [artist, setArtist] = useState("");
-	const [artistOptions, setArtistOptions] = useState<string[]>([]);
 	const [genre, setGenre] = useState("");
-	const [genreOptions, setGenreOptions] = useState<string[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
 	const [filtersOpen, setFiltersOpen] = useState(false);
 	const [page, setPage] = useState(1);
+	const [selectedRecord, setSelectedRecord] = useState<VinylRecord | null>(
+		null
+	);
 	const pageSize = 12;
+
+	const { artistOptions, genreOptions } = useContentfulOptions();
+
+	const { records, totalRecords, loading } = useRecords({
+		search,
+		priceMin,
+		priceMax,
+		condition,
+		artist,
+		genre,
+		page,
+		pageSize,
+	});
 
 	// Hooks for basket actions
 	const { handleAddToBasket } = useAddToBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const { basket } = useBasket();
 
-	// Next.js router for navigation
 	const router = useRouter();
-
-	// Fetch distinct artist options from Contentful
-	useEffect(() => {
-		async function fetchArtists() {
-			try {
-				const res = await client.getEntries({
-					content_type: "vinylRecord",
-					select: ["fields.artistName"],
-				});
-				const allArtists = res.items.flatMap((item) => {
-					const fields = item.fields as unknown as IVinylRecordFields;
-					return fields.artistName || [];
-				});
-				const uniqueArtists = Array.from(new Set(allArtists)).sort((a, b) =>
-					a.localeCompare(b)
-				);
-				setArtistOptions(uniqueArtists);
-			} catch (error) {
-				console.error("Error fetching artists:", error);
-			}
-		}
-		fetchArtists();
-	}, []);
-
-	// Fetch distinct genres from Contentful
-	useEffect(() => {
-		async function fetchGenres() {
-			try {
-				const res = await client.getEntries({
-					content_type: "vinylRecord",
-				});
-				const allGenres = res.items.flatMap((item) => {
-					const fields = item.fields as unknown as IVinylRecordFields;
-					return fields.genre ?? [];
-				});
-				const uniqueGenres = Array.from(
-					new Set(allGenres.filter(Boolean))
-				).sort((a, b) => a.localeCompare(b));
-				setGenreOptions(uniqueGenres);
-			} catch (error) {
-				console.error("Error fetching genres:", error);
-			}
-		}
-		fetchGenres();
-	}, []);
-
-	// Fetch records with filters and pagination
-	const fetchRecords = useCallback(async () => {
-		setLoading(true);
-		const params = new URLSearchParams();
-		if (search) params.append("search", search);
-		if (priceMin) params.append("priceMin", priceMin);
-		if (priceMax) params.append("priceMax", priceMax);
-		if (condition) params.append("condition", condition);
-		if (genre) params.append("genre", genre);
-		if (artist) params.append("artist", artist);
-		params.append("limit", pageSize.toString());
-		params.append("skip", ((page - 1) * pageSize).toString());
-
-		try {
-			const res = await fetch(`/api/records?${params.toString()}`);
-			const data = await res.json();
-			setRecords(data.records);
-			setTotalRecords(data.total); // update total records from API response
-		} catch (error) {
-			console.error("Failed to fetch records:", error);
-		} finally {
-			setLoading(false);
-		}
-	}, [search, priceMin, priceMax, condition, artist, genre, page]);
-
-	useEffect(() => {
-		fetchRecords();
-	}, [fetchRecords]);
 
 	const nextPage = () => setPage((prev) => prev + 1);
 	const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
@@ -130,7 +50,7 @@ export default function RecordsPage() {
 	// Calculate total pages:
 	const totalPages = Math.ceil(totalRecords / pageSize);
 
-	const handleBuy = (record: Record, e: React.MouseEvent) => {
+	const handleBuy = (record: VinylRecord, e: React.MouseEvent) => {
 		e.stopPropagation(); // Prevent triggering card onClick that opens Modal
 
 		handleAddToBasket({
