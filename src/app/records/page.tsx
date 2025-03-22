@@ -12,8 +12,6 @@ import { useBasket } from "@/app/api/context/BasketContext";
 export default function RecordsPage() {
 	const [searchInput, setSearchInput] = useState("");
 	const [search, setSearch] = useState("");
-	const [priceMin, setPriceMin] = useState("");
-	const [priceMax, setPriceMax] = useState("");
 	const [condition, setCondition] = useState("");
 	const [artist, setArtist] = useState("");
 	const [genre, setGenre] = useState("");
@@ -28,8 +26,6 @@ export default function RecordsPage() {
 
 	const { records, totalRecords, loading } = useRecords({
 		search,
-		priceMin,
-		priceMax,
 		condition,
 		artist,
 		genre,
@@ -119,24 +115,6 @@ export default function RecordsPage() {
 						))}
 					</select>
 					<input
-						type="number"
-						placeholder="Min Price"
-						value={priceMin}
-						onChange={(e) => {
-							setPriceMin(e.target.value);
-							setPage(1);
-						}}
-					/>
-					<input
-						type="number"
-						placeholder="Max Price"
-						value={priceMax}
-						onChange={(e) => {
-							setPriceMax(e.target.value);
-							setPage(1);
-						}}
-					/>
-					<input
 						type="text"
 						placeholder="Search all records..."
 						value={searchInput}
@@ -163,8 +141,6 @@ export default function RecordsPage() {
 						onClick={() => {
 							setSearch("");
 							setSearchInput("");
-							setPriceMin("");
-							setPriceMax("");
 							setCondition("");
 							setArtist("");
 							setPage(1);
