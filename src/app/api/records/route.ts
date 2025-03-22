@@ -20,12 +20,6 @@ export async function GET(req: Request) {
 
 	// Extract filters from query params.
 	const searchQuery = searchParams.get("search") || "";
-	const priceMin = searchParams.get("priceMin")
-		? Number(searchParams.get("priceMin"))
-		: null;
-	const priceMax = searchParams.get("priceMax")
-		? Number(searchParams.get("priceMax"))
-		: null;
 	const condition = searchParams.get("condition") || "";
 	const artist = searchParams.get("artist") || "";
 	const artists = searchParams.getAll("artist");
@@ -75,14 +69,6 @@ export async function GET(req: Request) {
 	// Apply search filter via Contentful's full-text search.
 	if (searchQuery) {
 		params.query = searchQuery;
-	}
-
-	// Apply price filters.
-	if (priceMin !== null) {
-		params["fields.price[gte]"] = priceMin;
-	}
-	if (priceMax !== null) {
-		params["fields.price[lte]"] = priceMax;
 	}
 
 	// Apply condition filter.
