@@ -32,8 +32,6 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 		if (!basket.find((existingItem) => existingItem.id === item.id)) {
 			setBasket((prevBasket) => [...prevBasket, item]);
 		} else {
-			// You can add a notification or log here if you'd like
-			alert(`${item.artist} - ${item.title} is already in your basket!`);
 		}
 	};
 

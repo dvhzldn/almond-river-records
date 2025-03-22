@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -11,6 +10,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
+import { useRouter } from "next/navigation";
 
 interface ModalProps {
 	record: {
@@ -39,9 +39,24 @@ export default function Modal({ record, onClose }: ModalProps) {
 	const { basket } = useBasket();
 	const { handleAddToBasket } = useAddToBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
+	const router = useRouter();
 
 	// This check should update when the basket context updates.
 	const isInBasket = basket.some((item) => item.id === record.id);
+
+	const onBuy = () => {
+		if (!isInBasket) {
+			handleAddToBasket({
+				id: record.id,
+				title: record.title,
+				artistName: record.artistName,
+				price: record.price,
+				coverImage: record.coverImage || "",
+			});
+		}
+		onClose();
+		router.push("/basket");
+	};
 
 	const onAddToBasket = () => {
 		handleAddToBasket(
@@ -59,15 +74,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 	const onRemoveFromBasket = () => {
 		handleRemoveFromBasket(record.id);
 	};
-
-	const queryParams = new URLSearchParams({
-		recordId: record.id,
-		price: record.price.toString(),
-		description: `${record.artistName.join(" & ")} - ${record.title}`,
-		title: record.title,
-		artist: record.artistName.join(" & "),
-		coverImage: record.coverImage || "",
-	}).toString();
 
 	return (
 		<div className="backdrop" onClick={onClose}>
@@ -102,11 +108,12 @@ export default function Modal({ record, onClose }: ModalProps) {
 					</Swiper>
 				)}
 				<div className="modal-image-container">
-					<Link href={`/place-order?${queryParams}`}>
-						<button className="buy-button modal-above-image modal-top-left">
-							Buy
-						</button>
-					</Link>
+					<button
+						className="buy-button modal-above-image modal-top-left"
+						onClick={onBuy}
+					>
+						Buy
+					</button>
 					{isInBasket ? (
 						<button
 							className="basket-button modal-above-image modal-top-right"

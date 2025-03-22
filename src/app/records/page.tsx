@@ -130,20 +130,17 @@ export default function RecordsPage() {
 	// Calculate total pages:
 	const totalPages = Math.ceil(totalRecords / pageSize);
 
-	// Handler for the "Buy" button on a record card
 	const handleBuy = (record: Record, e: React.MouseEvent) => {
 		e.stopPropagation(); // Prevent triggering card onClick that opens Modal
-		const queryParams = new URLSearchParams({
-			recordId: record.id,
-			price: record.price.toString(),
-			description: `${record.artistName.join(" & ")} - ${record.title}`,
-			title: record.title,
-			artist: record.artistName.join(" & "),
-			coverImage: record.coverImage || "",
-		}).toString();
 
-		// Navigate to /place-order with the query parameters.
-		router.push(`/place-order?${queryParams}`);
+		handleAddToBasket({
+			id: record.id,
+			title: record.title,
+			artistName: record.artistName,
+			price: record.price,
+			coverImage: record.coverImage || "",
+		});
+		router.push("/basket");
 	};
 
 	return (
@@ -347,7 +344,6 @@ export default function RecordsPage() {
 					</div>
 				)}
 			</div>
-			{/* Pagination Controls */}
 			<div className="pagination">
 				<button onClick={prevPage} disabled={page === 1}>
 					Previous
@@ -363,7 +359,6 @@ export default function RecordsPage() {
 				</button>
 			</div>
 
-			{/* Modal for Record Details */}
 			{selectedRecord && (
 				<Modal
 					record={selectedRecord}
