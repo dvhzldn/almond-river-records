@@ -9,6 +9,8 @@
 
 /* CSS Variables (Custom Properties) */
 :root {
+	color-scheme: light;
+
 	--body-font: "Lato", sans-serif;
 	--heading-font: "Oswald", serif;
 	--background: linear-gradient(to bottom, var(--colour-4), var(--colour-1));
