@@ -141,7 +141,10 @@ export default function RecordsPage() {
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
 					<select
 						value={artist}
-						onChange={(e) => setArtist(e.target.value)}
+						onChange={(e) => {
+							setArtist(e.target.value);
+							setPage(1);
+						}}
 					>
 						<option value="">All Artists</option>
 						{artistOptions.map((option) => (
@@ -152,7 +155,10 @@ export default function RecordsPage() {
 					</select>
 					<select
 						value={condition}
-						onChange={(e) => setCondition(e.target.value)}
+						onChange={(e) => {
+							setCondition(e.target.value);
+							setPage(1);
+						}}
 					>
 						<option value="">All Conditions</option>
 						<option value="Mint">Mint</option>
@@ -161,7 +167,13 @@ export default function RecordsPage() {
 						<option value="Very Good">Very Good</option>
 						<option value="Good">Good</option>
 					</select>
-					<select value={genre} onChange={(e) => setGenre(e.target.value)}>
+					<select
+						value={genre}
+						onChange={(e) => {
+							setGenre(e.target.value);
+							setPage(1);
+						}}
+					>
 						<option value="">All Genres</option>
 						{genreOptions.map((option) => (
 							<option key={option} value={option}>
@@ -173,13 +185,19 @@ export default function RecordsPage() {
 						type="number"
 						placeholder="Min Price"
 						value={priceMin}
-						onChange={(e) => setPriceMin(e.target.value)}
+						onChange={(e) => {
+							setPriceMin(e.target.value);
+							setPage(1);
+						}}
 					/>
 					<input
 						type="number"
 						placeholder="Max Price"
 						value={priceMax}
-						onChange={(e) => setPriceMax(e.target.value)}
+						onChange={(e) => {
+							setPriceMax(e.target.value);
+							setPage(1);
+						}}
 					/>
 					<input
 						type="text"
@@ -189,10 +207,18 @@ export default function RecordsPage() {
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
 								setSearch(searchInput);
+								setPage(1);
 							}
 						}}
 					/>
-					<button onClick={() => setSearch(searchInput)}>Search</button>
+					<button
+						onClick={() => {
+							setSearch(searchInput);
+							setPage(1);
+						}}
+					>
+						Search
+					</button>
 				</div>
 				<div>
 					<button
