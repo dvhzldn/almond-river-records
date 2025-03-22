@@ -206,7 +206,7 @@ export default function RecordsPage() {
 					</button>
 				</div>
 			</div>
-			<div className="content-box">
+			<div className="content-box-grid">
 				{loading ? (
 					<p>Loading...</p>
 				) : records.length === 0 ? (

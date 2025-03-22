@@ -210,6 +210,10 @@ a:hover,
 	color: var(--colour-5);
 }
 
+img.logo {
+	border-radius: 50%;
+}
+
 /* Navigation links (desktop) */
 .nav-links {
 	list-style: none;
@@ -882,6 +886,11 @@ li {
 	border-radius: var(--border-radius);
 }
 
+.content-box-grid {
+	max-width: 1100px;
+	width: 90%;
+}
+
 /* Two-Column Layout */
 .two-column-layout {
 	display: grid;
@@ -982,6 +991,10 @@ hr {
 @media (max-width: 768px) {
 	.content-box {
 		padding: 2rem 0.3rem;
+		width: 95%;
+	}
+	.content-box-grid {
+		padding: 0;
 		width: 95%;
 	}
 	.text-image-container {
