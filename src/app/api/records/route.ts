@@ -8,14 +8,16 @@ type VinylRecordEntry = {
 		id: string;
 		contentTypeId: string;
 	};
-	// We'll cast this field later.
 	fields: unknown;
 };
 
 export async function GET(req: Request) {
 	const { searchParams } = new URL(req.url);
 
-	// Extract filters from query params
+	// Check if we should filter for records created in the last 7 days.
+	const newThisWeek = searchParams.get("newThisWeek");
+
+	// Extract filters from query params.
 	const searchQuery = searchParams.get("search") || "";
 	const priceMin = searchParams.get("priceMin")
 		? Number(searchParams.get("priceMin"))
@@ -29,7 +31,7 @@ export async function GET(req: Request) {
 	const genre = searchParams.get("genre") || "";
 	const genres = searchParams.getAll("genre");
 
-	// Extract pagination parameters (default: limit 20, skip 0)
+	// Extract pagination parameters (default: limit 12, skip 0)
 	const limitParam = searchParams.get("limit")
 		? Number(searchParams.get("limit"))
 		: 12;
@@ -48,12 +50,26 @@ export async function GET(req: Request) {
 		"fields.price[lte]"?: number;
 		"fields.vinylCondition"?: string;
 		"fields.artistName[in]"?: string | string[];
+		order?: string;
+		"fields.quantity[eq]": number;
+		"fields.inStock": boolean;
+		"sys.createdAt[gte]"?: string;
 	};
+
 	const params: RecordsQueryParams = {
 		content_type: "vinylRecord",
 		limit: limitParam,
 		skip: skipParam,
+		"fields.quantity[eq]": 1,
+		"fields.inStock": true, // Use shorthand equality for booleans
 	};
+
+	// If newThisWeek is specified, filter by creation date.
+	if (newThisWeek) {
+		const sevenDaysAgo = new Date();
+		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+		params["sys.createdAt[gte]"] = sevenDaysAgo.toISOString();
+	}
 
 	// Apply search filter via Contentful's full-text search.
 	if (searchQuery) {
@@ -75,28 +91,25 @@ export async function GET(req: Request) {
 
 	// Apply artist filter.
 	if (artist) {
-		// Contentful's [in] operator can accept an array of values.
 		params["fields.artistName[in]"] = [artist];
 	}
-
 	if (artists.length > 0) {
 		params["fields.artistName[in]"] = artists;
 	}
 
-	// Apply genre filter
+	// Apply genre filter.
 	if (genre) {
 		params["fields.genre[all]"] = genre;
 	}
-
 	if (genres.length > 0) {
 		params["fields.genre[all]"] = genres;
 	}
 
-	params["fields.quantity[eq]"] = 1;
-	params["fields.inStock[eq]"] = true;
+	// Sort records by creation date (most recent first)
+	params.order = "-sys.createdAt";
 
 	try {
-		// Fetch records from Contentful with filters and pagination
+		// Fetch records from Contentful with filters and pagination.
 		const res = (await client.getEntries(params)) as unknown as {
 			items: VinylRecordEntry[];
 		};

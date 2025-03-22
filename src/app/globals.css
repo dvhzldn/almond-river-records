@@ -524,6 +524,13 @@ li {
 	border: 2px solid var(--colour-4);
 }
 
+.record-card-slider {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
 .record-image-container {
 	position: relative; /* Needed for absolute positioning of price */
 	display: flex;
@@ -601,6 +608,11 @@ li {
 	height: auto;
 	padding: 0rem;
 	display: block;
+}
+
+.swiper-slide {
+	display: flex;
+	justify-content: center;
 }
 
 /* Button Container */
@@ -982,6 +994,7 @@ hr {
 	.record-image,
 	.new-record-image {
 		width: 100%;
+		display: block;
 		height: auto;
 		margin: 0;
 	}
