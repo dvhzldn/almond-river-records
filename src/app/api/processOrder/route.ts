@@ -20,9 +20,8 @@ export async function POST(request: Request) {
 
 		// Generate a unique checkout reference.
 		const now = new Date();
-		const today = now.toISOString().split("T")[0];
 		const uniqueSuffix = now.getTime();
-		const checkoutReference = `${today}-${uniqueSuffix}`;
+		const checkoutReference = `${uniqueSuffix}`;
 
 		// Compute a simplified description for SumUp.
 		const simpleDescription = `${recordIdsArray.length} x ${recordIdsArray.length === 1 ? "record" : "records"} plus postage.`;

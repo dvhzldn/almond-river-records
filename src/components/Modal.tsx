@@ -1,5 +1,4 @@
 "use client";
-import { useBasket } from "@/app/api/context/BasketContext";
 import Link from "next/link";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,6 +8,10 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Document } from "@contentful/rich-text-types";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import { useAddToBasket } from "@/hooks/useAddToBasket";
+import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
+import { useBasket } from "@/app/api/context/BasketContext";
+
 interface ModalProps {
 	record: {
 		title: string;
@@ -33,17 +36,28 @@ export default function Modal({ record, onClose }: ModalProps) {
 		images.push(...record.otherImages);
 	}
 
-	const { addToBasket } = useBasket();
+	const { basket } = useBasket();
+	const { handleAddToBasket } = useAddToBasket();
+	const { handleRemoveFromBasket } = useRemoveFromBasket();
 
-	const handleAddToBasket = () => {
-		addToBasket({
-			id: record.id,
-			title: record.title,
-			artist: record.artistName.join(" & "),
-			price: record.price,
-			coverImage: record.coverImage || "",
-		});
-		onClose();
+	// This check should update when the basket context updates.
+	const isInBasket = basket.some((item) => item.id === record.id);
+
+	const onAddToBasket = () => {
+		handleAddToBasket(
+			{
+				id: record.id,
+				title: record.title,
+				artistName: record.artistName,
+				price: record.price,
+				coverImage: record.coverImage || "",
+			},
+			onClose
+		);
+	};
+
+	const onRemoveFromBasket = () => {
+		handleRemoveFromBasket(record.id);
 	};
 
 	const queryParams = new URLSearchParams({
@@ -93,12 +107,21 @@ export default function Modal({ record, onClose }: ModalProps) {
 							Order
 						</button>
 					</Link>
-					<button
-						className="basket-button modal-above-image modal-top-right"
-						onClick={handleAddToBasket}
-					>
-						Add to Basket
-					</button>
+					{isInBasket ? (
+						<button
+							className="basket-button modal-above-image modal-top-right"
+							onClick={onRemoveFromBasket}
+						>
+							Remove from Basket
+						</button>
+					) : (
+						<button
+							className="basket-button modal-above-image modal-top-right"
+							onClick={onAddToBasket}
+						>
+							Add to Basket
+						</button>
+					)}
 
 					<p>
 						<strong>Label:</strong> {record.label}
@@ -109,7 +132,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 					<p>
 						<strong>Sleeve Condition:</strong> {record.sleeveCondition}
 					</p>
-
 					<p>
 						<strong>Year:</strong> {record.releaseYear ?? "N/A"}
 					</p>

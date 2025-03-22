@@ -5,6 +5,9 @@ import Image from "next/image";
 import Modal from "@/components/Modal";
 import client from "@/lib/contentful";
 import { IVinylRecordFields } from "@/@types/generated/contentful";
+import { useAddToBasket } from "@/hooks/useAddToBasket"; // Import add hook
+import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket"; // Import remove hook
+import { useBasket } from "@/app/api/context/BasketContext"; // Import basket context
 
 interface Record {
 	id: string;
@@ -36,6 +39,11 @@ export default function RecordsPage() {
 	const [filtersOpen, setFiltersOpen] = useState(false);
 	const [page, setPage] = useState(1);
 	const pageSize = 12;
+
+	// Hooks for basket actions
+	const { handleAddToBasket } = useAddToBasket();
+	const { handleRemoveFromBasket } = useRemoveFromBasket();
+	const { basket } = useBasket();
 
 	// Fetch distinct artist options (deduplicated) from Contentful
 	useEffect(() => {
@@ -173,7 +181,7 @@ export default function RecordsPage() {
 						placeholder="Max Price"
 						value={priceMax}
 						onChange={(e) => setPriceMax(e.target.value)}
-					/>{" "}
+					/>
 					{/* Global Search */}
 					<input
 						type="text"
@@ -213,53 +221,83 @@ export default function RecordsPage() {
 					<p>No records found.</p>
 				) : (
 					<div className="records-grid">
-						{records.map((record) => (
-							<div
-								key={record.id}
-								className="record-card"
-								onClick={() => setSelectedRecord(record)}
-							>
-								<div className="record-image-container">
-									{record.coverImage ? (
-										<Image
-											className="record-image"
-											src={record.coverImage}
-											alt={record.title}
-											width={250}
-											height={250}
-										/>
-									) : (
-										<Image
-											className="record-image"
-											src="/placeholder.jpg"
-											alt="No cover available"
-											width={250}
-											height={250}
-										/>
-									)}
-									<div className="record-price">£{record.price}</div>
-								</div>
-								<div className="record-details">
-									<h3 className="record-title">{record.title}</h3>
-									<h4 className="artist-name">
-										{record.artistName.join(", ")}
-									</h4>
-									<p>Condition: {record.vinylCondition}</p>
-									<p>
-										{/* <strong>
-											Stock:
-											{record.inStock ? "Available" : "Out of Stock"}
-										</strong> */}
-									</p>
-									<div className="record-actions">
-										<button className="grid-buy-button">Buy</button>
-										<button className="grid-basket-button">
-											Add to Basket
-										</button>
+						{records.map((record) => {
+							// Check if the record exists in the basket
+							const isInBasket = basket.some(
+								(item) => item.id === record.id
+							);
+
+							return (
+								<div
+									key={record.id}
+									className="record-card"
+									onClick={() => setSelectedRecord(record)}
+								>
+									<div className="record-image-container">
+										{record.coverImage ? (
+											<Image
+												className="record-image"
+												src={record.coverImage}
+												alt={record.title}
+												width={250}
+												height={250}
+											/>
+										) : (
+											<Image
+												className="record-image"
+												src="/placeholder.jpg"
+												alt="No cover available"
+												width={250}
+												height={250}
+											/>
+										)}
+										<div className="record-price">
+											£{record.price}
+										</div>
+									</div>
+									<div className="record-details">
+										<h3 className="record-title">{record.title}</h3>
+										<h4 className="artist-name">
+											{record.artistName.join(", ")}
+										</h4>
+										<p>Condition: {record.vinylCondition}</p>
+										<div className="record-actions">
+											<button className="grid-buy-button">
+												Buy
+											</button>
+											{isInBasket ? (
+												<button
+													className="grid-basket-button"
+													onClick={(e) => {
+														e.stopPropagation(); // Prevent triggering card onClick
+														handleRemoveFromBasket(record.id);
+													}}
+												>
+													Remove from Basket
+												</button>
+											) : (
+												<button
+													className="grid-basket-button"
+													onClick={(e) => {
+														e.stopPropagation(); // Prevent triggering card onClick
+														handleAddToBasket({
+															id: record.id,
+															title: record.title,
+															artistName: record.artistName,
+															price: record.price,
+															coverImage:
+																record.coverImage || "",
+														});
+													}}
+												>
+													Add to Basket
+												</button>
+											)}
+										</div>
 									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</div>
 				)}
 			</div>

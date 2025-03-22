@@ -1,47 +1,36 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useBasket } from "../api/context/BasketContext";
 import Image from "next/image";
+import { useBasket } from "../api/context/BasketContext";
+import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 
 export default function BasketPage() {
-	const { basket, removeFromBasket, clearBasket } = useBasket();
+	const { basket, clearBasket } = useBasket();
+	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const router = useRouter();
 
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
 	const totalPrice = subTotalPrice + postagePrice;
+	const defaultImage = "/images/almond-river-logo.jpg";
 
 	const handleCheckout = () => {
-		// Build a comma-separated string of record IDs.
-		// (Assuming each basket item has an 'id' that corresponds to its Contentful entry.)
 		const recordIdsParam = basket.map((item) => item.id).join(",");
-
-		// Build a comma-separated string of cover image URLs.
-		// If an item doesn't have a coverImage, use a default.
 		const coverImagesParam = basket
 			.map((item) => item.coverImage || defaultImage)
 			.join(",");
-
-		// Build a description from the basket items.
 		const descriptionParam = basket
 			.map((item) => `${item.artist} - ${item.title}`)
 			.join(", ");
-
-		// Build query parameters.
 		const queryParams = new URLSearchParams({
-			recordIds: recordIdsParam, // use plural "recordIds" for multiple items
+			recordIds: recordIdsParam,
 			price: totalPrice.toString(),
 			description: descriptionParam,
 			coverImages: coverImagesParam,
-			// Optionally, you could pass additional parameters as needed.
 		}).toString();
-
-		// Redirect to PlaceOrder page where the remaining steps occur.
 		router.push(`/place-order?${queryParams}`);
 	};
-
-	const defaultImage = "/images/almond-river-logo.jpg";
 
 	return (
 		<div className="page-container">
@@ -61,10 +50,10 @@ export default function BasketPage() {
 											width={120}
 											height={120}
 											className="basket-cover"
-										/>{" "}
+										/>
 										<button
 											className="remove-button"
-											onClick={() => removeFromBasket(item.id)}
+											onClick={() => handleRemoveFromBasket(item.id)}
 										>
 											Remove
 										</button>
