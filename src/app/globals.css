@@ -353,8 +353,8 @@ li {
 }
 
 .modal-image-container {
-	position: relative; /* Allows absolutely positioned children */
-	margin-bottom: 1rem; /* Optional: spacing below carousel */
+	position: relative;
+	margin-bottom: 1rem;
 }
 
 /* Generic class to ensure buttons float above the image */
@@ -670,8 +670,8 @@ li {
 	position: absolute;
 	top: -50px;
 	right: 0px;
-	/* display: flex; */
-	display: none; /* TODO: Remove to unhide */
+	display: flex;
+	/* display: none; TODO: Remove to unhide */
 	flex-direction: column;
 	gap: 5px;
 }

@@ -42,7 +42,7 @@ const PlaceOrder: React.FC = () => {
 	const initialDescription = searchParams?.get("description") || "";
 	const initialTitle = searchParams?.get("title") || "";
 	const initialArtist = searchParams?.get("artist") || "";
-	const initialOrderStatus = "PENDING";
+	// const initialOrderStatus = "PENDING";
 
 	const [orderData, setOrderData] = useState<OrderData>({
 		name: "",
@@ -69,84 +69,25 @@ const PlaceOrder: React.FC = () => {
 		setError(null);
 
 		try {
-			// 1. Create SumUp checkout session.
-			// We pass the recordIds so the backend can generate a checkoutReference.
-			const paymentResponse = await fetch("/api/sumup/createCheckout", {
+			const response = await fetch("/api/processOrder", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					amount: initialPrice,
-					description: initialDescription,
-					recordIds,
+					description: initialDescription, // full, detailed description
+					recordIds, // record IDs
+					orderData, // customer details
+					initialTitle,
+					initialArtist,
 				}),
 			});
-			const paymentData = await paymentResponse.json();
-			if (!paymentResponse.ok) {
-				setError(paymentData.error || "Error initiating payment");
+			const data = await response.json();
+			if (!response.ok) {
+				setError(data.error || "Error processing order");
 				return;
 			}
-
-			if (
-				paymentData.hosted_checkout_url &&
-				paymentData.id &&
-				paymentData.checkout_reference
-			) {
-				const checkoutId = paymentData.id;
-				const generatedOrderId = paymentData.checkout_reference;
-
-				// 2. Create the order in the Google Sheet.
-				// For Items (display field), if multiple items then use initialDescription (which should be a comma-separated list in the "artist - title" format),
-				// otherwise use the singular format.
-				const itemsField =
-					recordIds.length > 1
-						? initialDescription
-						: `${initialTitle} - ${initialArtist}`;
-
-				const orderResponse = await fetch("/api/createOrder", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						orderId: generatedOrderId,
-						...orderData,
-						price: initialPrice,
-						description: initialDescription,
-						title: initialTitle,
-						artist: initialArtist,
-						// For Items column: this is the display value.
-						items: itemsField,
-						orderStatus: initialOrderStatus,
-						orderDate: new Date().toISOString(),
-						checkoutId, // store the SumUp checkout id
-						// New field for Contentful IDs; here we assume recordIds contains them.
-						contentfulIds: recordIds.join(","),
-					}),
-				});
-				const orderDataResponse = await orderResponse.json();
-				if (!orderResponse.ok) {
-					setError(orderDataResponse.error || "Error creating order");
-					return;
-				}
-
-				// 3. Reserve inventory in Contentful.
-				const reserveResponse = await fetch("/api/updateInventory", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						recordIds,
-						action: "reserve",
-					}),
-				});
-				const reserveData = await reserveResponse.json();
-				if (!reserveResponse.ok) {
-					setError(reserveData.error || "Error reserving inventory items");
-					return;
-				}
-
-				// 4. Redirect to the SumUp hosted checkout URL.
-				window.location.href = paymentData.hosted_checkout_url;
-			} else {
-				setError("Payment not processed. No checkout link available.");
-			}
+			// Redirect to the SumUp hosted checkout URL.
+			window.location.href = data.hosted_checkout_url;
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err.message);
