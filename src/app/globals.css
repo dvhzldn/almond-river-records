@@ -676,39 +676,6 @@ li {
 	gap: 5px;
 }
 
-/* Styling for both buttons */
-.record-actions button {
-	border: none;
-	padding: 4px 6px;
-	font-size: 10px;
-	font-weight: bold;
-	border-radius: 0px;
-	cursor: pointer;
-	transition: background 0.2s ease-in-out;
-	width: auto;
-	text-align: center;
-}
-
-/* Buy Button (Green) */
-.grid-buy-button {
-	background: #28a745;
-	color: white;
-}
-
-.grid-buy-button:hover {
-	background: #218838;
-}
-
-/* Add to Basket Button (Light Blue) */
-.grid-basket-button {
-	background: #007bff;
-	color: white;
-}
-
-.grid-basket-button:hover {
-	background: #0056b3;
-}
-
 .record-title,
 .artist-name {
 	white-space: nowrap;
@@ -755,36 +722,57 @@ li {
 .clear-filters-button,
 .form button,
 .pagination button,
-.payment-button,
-.basket-button,
 .remove-button,
-.clear-button {
+.clear-button,
+.buy-button,
+.basket-button {
 	/* width: 110px; */
+	color: var(--colour-7);
 	border: none;
 	border-radius: var(--border-radius);
 	cursor: pointer;
 	padding: 0.3rem 1rem;
 	transition: background 0.3s ease;
+	transition: box-shadow 0.3s ease;
 }
 
 .filter-controls button,
 .form button,
-.pagination button,
-.payment-button,
-.basket-button {
+.pagination button {
 	background: var(--colour-4);
-	color: var(--colour-7);
 }
 
 .clear-filters-button,
 .clear-button {
 	background: var(--colour-3);
-	color: var(--colour-7);
+}
+
+/* Styling for both buttons */
+.record-actions button {
+	border: none;
+	padding: 4px 6px;
+	font-size: 10px;
+	font-weight: bold;
+	border-radius: 0px;
+	cursor: pointer;
+	transition: background 0.2s ease-in-out;
+	width: auto;
+	text-align: center;
+}
+
+/* Buy Button (Green) */
+.buy-button {
+	background: #28a745;
+}
+
+/* Add to Basket Button (Light Blue) */
+.basket-button,
+.remove-button {
+	background: #007bff;
 }
 
 .form button,
 .payment-button,
-.basket-button,
 .remove-button,
 .clear-button {
 	display: block;
@@ -795,11 +783,12 @@ li {
 .clear-filters-button:hover,
 .form button:hover,
 .pagination button:hover:enabled,
-.payment-button:hover,
-.basket-button:hover,
-.remove-button:hover {
-	background: var(--colour-6);
-	font-weight: bold;
+.remove-button:hover,
+.buy-button:hover,
+.basket-button:hover {
+	font-weight: bolder;
+	box-shadow: 0 0 8px var(--blur);
+	background: black;
 }
 
 .pagination button:disabled {

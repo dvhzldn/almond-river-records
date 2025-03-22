@@ -78,7 +78,7 @@ export default function BasketPage() {
 								Total: <strong>£{totalPrice}</strong>
 							</h2>
 						</div>
-						<button className="basket-button" onClick={handleCheckout}>
+						<button className="buy-button" onClick={handleCheckout}>
 							Buy Now
 						</button>
 					</>

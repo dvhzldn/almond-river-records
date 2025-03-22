@@ -306,14 +306,14 @@ export default function RecordsPage() {
 										<p>Condition: {record.vinylCondition}</p>
 										<div className="record-actions">
 											<button
-												className="grid-buy-button"
+												className="buy-button"
 												onClick={(e) => handleBuy(record, e)}
 											>
 												Buy
 											</button>
 											{isInBasket ? (
 												<button
-													className="grid-basket-button"
+													className="basket-button"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleRemoveFromBasket(record.id);
@@ -323,7 +323,7 @@ export default function RecordsPage() {
 												</button>
 											) : (
 												<button
-													className="grid-basket-button"
+													className="basket-button"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleAddToBasket({

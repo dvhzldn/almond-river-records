@@ -36,7 +36,7 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 
 	return (
 		<div>
-			<h2>New In Stock This Week</h2>
+			<h2>New In The Shop This Week</h2>
 			{records.length === 0 ? (
 				<p>No new records added this week.</p>
 			) : (
