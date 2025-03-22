@@ -87,35 +87,41 @@ export default function Modal({ record, onClose }: ModalProps) {
 						))}
 					</Swiper>
 				)}
-				<p>
-					<strong>Label:</strong> {record.label}
-				</p>
-				<p>
-					<strong>Vinyl Condition:</strong> {record.vinylCondition}
-				</p>
-				<p>
-					<strong>Sleeve Condition:</strong> {record.sleeveCondition}
-				</p>
+				<div className="modal-image-container">
+					<Link href={`/place-order?${queryParams}`}>
+						<button className="payment-button modal-above-image modal-top-left">
+							Order
+						</button>
+					</Link>
+					<button
+						className="basket-button modal-above-image modal-top-right"
+						onClick={handleAddToBasket}
+					>
+						Add to Basket
+					</button>
 
-				<p>
-					<strong>Year:</strong> {record.releaseYear ?? "N/A"}
-				</p>
-				{record.description && (
-					<div>
-						<p>
-							<strong>Description:</strong>
-						</p>
-						{documentToReactComponents(record.description)}
-					</div>
-				)}
+					<p>
+						<strong>Label:</strong> {record.label}
+					</p>
+					<p>
+						<strong>Vinyl Condition:</strong> {record.vinylCondition}
+					</p>
+					<p>
+						<strong>Sleeve Condition:</strong> {record.sleeveCondition}
+					</p>
 
-				<Link href={`/place-order?${queryParams}`}>
-					<button className="payment-button">Order Now</button>
-				</Link>
-
-				<button className="basket-button" onClick={handleAddToBasket}>
-					Add to Basket
-				</button>
+					<p>
+						<strong>Year:</strong> {record.releaseYear ?? "N/A"}
+					</p>
+					{record.description && (
+						<div>
+							<p>
+								<strong>Description:</strong>
+							</p>
+							{documentToReactComponents(record.description)}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

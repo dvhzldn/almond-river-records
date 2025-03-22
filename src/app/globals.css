@@ -346,6 +346,29 @@ li {
 	cursor: pointer;
 }
 
+.modal-image-container {
+	position: relative; /* Allows absolutely positioned children */
+	margin-bottom: 1rem; /* Optional: spacing below carousel */
+}
+
+/* Generic class to ensure buttons float above the image */
+.modal-above-image {
+	position: absolute;
+	z-index: 2; /* Ensure the buttons appear above the Swiper slides */
+}
+
+/* Top-left corner */
+.modal-top-left {
+	top: 2rem;
+	left: 2rem;
+}
+
+/* Top-right corner */
+.modal-top-right {
+	top: 2rem;
+	right: 2rem;
+}
+
 /* Contact Info Layout */
 .contact-info {
 	display: flex;
@@ -730,7 +753,7 @@ li {
 .basket-button,
 .remove-button,
 .clear-button {
-	width: 110px;
+	/* width: 110px; */
 	border: none;
 	border-radius: var(--border-radius);
 	cursor: pointer;
@@ -978,6 +1001,18 @@ hr {
 
 	.modal-image {
 		max-width: 300px;
+	}
+
+	/* Top-left corner */
+	.modal-top-left {
+		top: 4rem;
+		left: 0rem;
+	}
+
+	/* Top-right corner */
+	.modal-top-right {
+		top: 4rem;
+		right: 0rem;
 	}
 
 	/* Show burger icon */
