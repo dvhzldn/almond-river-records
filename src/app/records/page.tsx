@@ -5,9 +5,9 @@ import Image from "next/image";
 import Modal from "@/components/Modal";
 import client from "@/lib/contentful";
 import { IVinylRecordFields } from "@/@types/generated/contentful";
-import { useAddToBasket } from "@/hooks/useAddToBasket"; // Import add hook
-import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket"; // Import remove hook
-import { useBasket } from "@/app/api/context/BasketContext"; // Import basket context
+import { useAddToBasket } from "@/hooks/useAddToBasket";
+import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
+import { useBasket } from "@/app/api/context/BasketContext";
 
 interface Record {
 	id: string;
@@ -25,6 +25,7 @@ interface Record {
 
 export default function RecordsPage() {
 	const [records, setRecords] = useState<Record[]>([]);
+	const [totalRecords, setTotalRecords] = useState<number>(0);
 	const [searchInput, setSearchInput] = useState("");
 	const [search, setSearch] = useState("");
 	const [priceMin, setPriceMin] = useState("");
@@ -45,7 +46,7 @@ export default function RecordsPage() {
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const { basket } = useBasket();
 
-	// Fetch distinct artist options (deduplicated) from Contentful
+	// Fetch distinct artist options from Contentful
 	useEffect(() => {
 		async function fetchArtists() {
 			try {
@@ -53,13 +54,10 @@ export default function RecordsPage() {
 					content_type: "vinylRecord",
 					select: ["fields.artistName"],
 				});
-				// Flatten the arrays (each record may have more than one artist)
 				const allArtists = res.items.flatMap((item) => {
-					// Cast via unknown to satisfy the type
 					const fields = item.fields as unknown as IVinylRecordFields;
 					return fields.artistName || [];
 				});
-				// Deduplicate using a Set
 				const uniqueArtists = Array.from(new Set(allArtists)).sort((a, b) =>
 					a.localeCompare(b)
 				);
@@ -71,6 +69,7 @@ export default function RecordsPage() {
 		fetchArtists();
 	}, []);
 
+	// Fetch distinct genres from Contentful
 	useEffect(() => {
 		async function fetchGenres() {
 			try {
@@ -101,7 +100,7 @@ export default function RecordsPage() {
 		if (priceMax) params.append("priceMax", priceMax);
 		if (condition) params.append("condition", condition);
 		if (genre) params.append("genre", genre);
-		if (artist) params.append("artist", artist); // Pass selected artist
+		if (artist) params.append("artist", artist);
 		params.append("limit", pageSize.toString());
 		params.append("skip", ((page - 1) * pageSize).toString());
 
@@ -109,6 +108,7 @@ export default function RecordsPage() {
 			const res = await fetch(`/api/records?${params.toString()}`);
 			const data = await res.json();
 			setRecords(data.records);
+			setTotalRecords(data.total); // update total records from API response
 		} catch (error) {
 			console.error("Failed to fetch records:", error);
 		} finally {
@@ -123,6 +123,9 @@ export default function RecordsPage() {
 	const nextPage = () => setPage((prev) => prev + 1);
 	const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
+	// Calculate total pages:
+	const totalPages = Math.ceil(totalRecords / pageSize);
+
 	return (
 		<div className="page-container">
 			<h1 className="page-title">Records for Sale</h1>
@@ -135,9 +138,7 @@ export default function RecordsPage() {
 				>
 					{filtersOpen ? "Close Filters" : "Show Filters"}
 				</button>
-				{/* Filter Controls */}
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
-					{/* Artist Dropdown */}
 					<select
 						value={artist}
 						onChange={(e) => setArtist(e.target.value)}
@@ -149,7 +150,6 @@ export default function RecordsPage() {
 							</option>
 						))}
 					</select>
-					{/* Record Condition */}
 					<select
 						value={condition}
 						onChange={(e) => setCondition(e.target.value)}
@@ -169,7 +169,6 @@ export default function RecordsPage() {
 							</option>
 						))}
 					</select>
-					{/* Pricing */}
 					<input
 						type="number"
 						placeholder="Min Price"
@@ -182,7 +181,6 @@ export default function RecordsPage() {
 						value={priceMax}
 						onChange={(e) => setPriceMax(e.target.value)}
 					/>
-					{/* Global Search */}
 					<input
 						type="text"
 						placeholder="Search all records..."
@@ -222,7 +220,6 @@ export default function RecordsPage() {
 				) : (
 					<div className="records-grid">
 						{records.map((record) => {
-							// Check if the record exists in the basket
 							const isInBasket = basket.some(
 								(item) => item.id === record.id
 							);
@@ -269,7 +266,7 @@ export default function RecordsPage() {
 												<button
 													className="grid-basket-button"
 													onClick={(e) => {
-														e.stopPropagation(); // Prevent triggering card onClick
+														e.stopPropagation();
 														handleRemoveFromBasket(record.id);
 													}}
 												>
@@ -279,7 +276,7 @@ export default function RecordsPage() {
 												<button
 													className="grid-basket-button"
 													onClick={(e) => {
-														e.stopPropagation(); // Prevent triggering card onClick
+														e.stopPropagation();
 														handleAddToBasket({
 															id: record.id,
 															title: record.title,
@@ -306,8 +303,13 @@ export default function RecordsPage() {
 				<button onClick={prevPage} disabled={page === 1}>
 					Previous
 				</button>
-				<span>Page {page}</span>
-				<button onClick={nextPage} disabled={records.length < pageSize}>
+				<span>
+					Page {page} of {totalPages}
+				</span>
+				<button
+					onClick={nextPage}
+					disabled={page * pageSize >= totalRecords}
+				>
 					Next
 				</button>
 			</div>

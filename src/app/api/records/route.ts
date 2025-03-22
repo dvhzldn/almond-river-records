@@ -7,6 +7,7 @@ type VinylRecordEntry = {
 	sys: {
 		id: string;
 		contentTypeId: string;
+		createdAt: string;
 	};
 	fields: unknown;
 };
@@ -61,7 +62,7 @@ export async function GET(req: Request) {
 		limit: limitParam,
 		skip: skipParam,
 		"fields.quantity[eq]": 1,
-		"fields.inStock": true, // Use shorthand equality for booleans
+		"fields.inStock": true, // shorthand equality for booleans
 	};
 
 	// If newThisWeek is specified, filter by creation date.
@@ -111,6 +112,7 @@ export async function GET(req: Request) {
 	try {
 		// Fetch records from Contentful with filters and pagination.
 		const res = (await client.getEntries(params)) as unknown as {
+			total: number;
 			items: VinylRecordEntry[];
 		};
 
@@ -144,7 +146,7 @@ export async function GET(req: Request) {
 			};
 		});
 
-		return NextResponse.json({ records });
+		return NextResponse.json({ records, total: res.total });
 	} catch (error) {
 		console.error("Error fetching records:", error);
 		return NextResponse.json(
