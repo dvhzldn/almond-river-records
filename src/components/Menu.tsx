@@ -38,12 +38,12 @@ export default function Menu() {
 					</li>
 					<li>
 						<Link href="/records" onClick={closeMenu}>
-							Records
+							Shop Online
 						</Link>
 					</li>
 					<li>
 						<Link href="/about" onClick={closeMenu}>
-							Shop
+							Our Store
 						</Link>
 					</li>
 					<li>
