@@ -82,7 +82,7 @@ h2,
 h3,
 h4 {
 	font-family: var(--heading-font);
-	margin-bottom: 0.1rem;
+	margin-bottom: 0.3rem;
 }
 
 h4,
@@ -562,6 +562,47 @@ li {
 	position: relative; /* Needed for absolute positioning of buttons */
 }
 
+.featured-record {
+	display: grid;
+	grid-template-columns: 1fr 1fr; /* Two equal columns */
+	gap: 0rem;
+	align-items: center;
+	margin-bottom: 0rem;
+	background: var(--background);
+	padding: 0 1.2rem;
+	box-shadow: var(--box-shadow);
+}
+
+.featured-record-details p,
+.featured-record-details h3,
+.featured-record-details em {
+	color: var(--colour-7);
+	font-weight: 100;
+	line-height: 1.5;
+	text-align: left;
+	margin-bottom: 1rem;
+}
+
+.featured-record-details h3 {
+	margin-bottom: 15px;
+	text-align: center;
+}
+
+.featured-record-details {
+	min-width: 0;
+	overflow-wrap: break-word;
+	padding: 0rem;
+	margin-left: 2rem;
+}
+
+.featured-record-cover {
+	color: var(--colour-7);
+	max-width: 100%;
+	height: auto;
+	padding: 0rem;
+	display: block;
+}
+
 /* Button Container */
 .record-actions {
 	position: absolute;
@@ -849,6 +890,15 @@ hr {
 	.reverse {
 		grid-template-columns: 1fr; /* Single column layout */
 		text-align: center;
+	}
+
+	.featured-record {
+		grid-template-columns: 1fr;
+		padding: 1.5rem;
+	}
+
+	.featured-record-details {
+		margin-left: 0rem;
 	}
 
 	.text-content {

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import NewThisWeek from "@/components/NewThisWeek";
+import AlbumOfTheWeek from "@/components/AlbumOfTheWeek";
 import GoogleReviews from "@/components/GoogleReviews";
 import SpotifyPlaylist from "@/components/SpotifyPlaylist";
 
@@ -20,6 +21,10 @@ export default function Home() {
 				<div>
 					<NewThisWeek />
 				</div>
+				<hr />
+				<div>
+					<AlbumOfTheWeek />
+				</div>{" "}
 				<hr />
 				<div>
 					<h2>What we are listening to</h2>

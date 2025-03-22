@@ -170,35 +170,15 @@ export async function POST(request: Request) {
 			return NextResponse.json({}, { status: 200 });
 		}
 
-		if (payload.event_type === "CHECKOUT_STATUS_CHANGED") {
-			const checkoutId = payload.id;
-
-			// Retrieve checkout details from SumUp
-			const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
-			const sumupResponse = await fetch(
-				`https://api.sumup.com/v0.1/checkouts/${checkoutId}`,
-				{
-					method: "GET",
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				}
-			);
-
-			if (!sumupResponse.ok) {
-				console.error("Failed to verify webhook event with SumUp API");
-				// Return 200 to avoid unnecessary retries from SumUp
-				return NextResponse.json({}, { status: 200 });
-			}
-
-			const checkoutDetails = await sumupResponse.json();
+		// Check for the expected event type
+		if (payload.event_type === "checkout.status.updated") {
+			// In the new payload, details are nested inside "payload"
+			const checkoutDetails = payload.payload;
 			console.log("Verified checkout details:", checkoutDetails);
 
-			// Extract internal order ID from checkout_reference
-			const orderId: string = checkoutDetails.checkout_reference;
+			const orderId: string = checkoutDetails.reference;
 			const checkoutStatus: string = checkoutDetails.status;
 
-			// Update order status in the Google Sheet based on checkout status
 			if (
 				checkoutStatus === "PAID" ||
 				checkoutStatus === "succeeded" ||
@@ -207,11 +187,9 @@ export async function POST(request: Request) {
 				await updateOrderStatus(orderId, "PAID");
 			} else if (checkoutStatus === "FAILED") {
 				await updateOrderStatus(orderId, "FAILED");
-				// If payment failed, retrieve the record IDs from the order's Items column in Google Sheets
 				const recordIds = await getOrderItems(orderId);
 				await releaseInventory(recordIds);
 			} else {
-				// If still pending, update status as "PENDING"
 				await updateOrderStatus(orderId, "PENDING");
 			}
 		}
