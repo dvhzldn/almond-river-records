@@ -22,7 +22,6 @@ const PlaceOrder: React.FC = () => {
 		setSearchParams(params);
 	}, []);
 
-	// Use "recordIds" (plural) if available; otherwise fallback to "recordId"
 	const initialRecordIds =
 		searchParams?.get("recordIds") || searchParams?.get("recordId") || "";
 	const recordIds = initialRecordIds
@@ -30,7 +29,6 @@ const PlaceOrder: React.FC = () => {
 		.map((id) => id.trim())
 		.filter(Boolean);
 
-	// For cover images, use "coverImages" if available; otherwise fallback to "coverImage"
 	const initialCoverImages =
 		searchParams?.get("coverImages") || searchParams?.get("coverImage") || "";
 	const coverImages = initialCoverImages
@@ -42,7 +40,6 @@ const PlaceOrder: React.FC = () => {
 	const initialDescription = searchParams?.get("description") || "";
 	const initialTitle = searchParams?.get("title") || "";
 	const initialArtist = searchParams?.get("artist") || "";
-	// const initialOrderStatus = "PENDING";
 
 	const [orderData, setOrderData] = useState<OrderData>({
 		name: "",
@@ -74,9 +71,9 @@ const PlaceOrder: React.FC = () => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					amount: initialPrice,
-					description: initialDescription, // full, detailed description
-					recordIds, // record IDs
-					orderData, // customer details
+					description: initialDescription,
+					recordIds,
+					orderData,
 					initialTitle,
 					initialArtist,
 				}),
@@ -104,7 +101,6 @@ const PlaceOrder: React.FC = () => {
 			<h1 className="page-title">Place Your Order</h1>
 			<div className="content-box">
 				<h2>Order Summary:</h2>
-				{/* Display all cover images */}
 				<div className="cover-images">
 					{coverImages.map((url, index) => (
 						<Image

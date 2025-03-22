@@ -386,7 +386,7 @@ li {
 .form {
 	background: var(--colour-1);
 	border-radius: var(--border-radius);
-	padding: 1.5rem;
+	padding: 1rem;
 	max-width: 600px;
 	margin: 2rem auto;
 	box-shadow: var(--box-shadow);
