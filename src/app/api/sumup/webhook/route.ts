@@ -62,7 +62,7 @@ async function releaseInventory(recordIds: string[]) {
 		accessToken: process.env.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN as string,
 	});
 	const space = await managementClient.getSpace(
-		process.env.CONTENTFUL_SPACE_ID as string
+		process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID as string
 	);
 	const environment = await space.getEnvironment(
 		process.env.CONTENTFUL_ENVIRONMENT || "master"

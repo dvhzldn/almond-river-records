@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 				.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN as string,
 		});
 		const space = await managementClient.getSpace(
-			process.env.CONTENTFUL_SPACE_ID as string
+			process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID as string
 		);
 		// Use NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT or fallback to "master"
 		const environment = await space.getEnvironment(

@@ -33,7 +33,7 @@ export async function GET(_request: Request) {
 				.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN as string,
 		});
 		const space = await managementClient.getSpace(
-			process.env.CONTENTFUL_SPACE_ID as string
+			process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID as string
 		);
 		const environment = await space.getEnvironment(
 			process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master"
