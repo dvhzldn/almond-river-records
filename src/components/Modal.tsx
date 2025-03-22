@@ -104,7 +104,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				<div className="modal-image-container">
 					<Link href={`/place-order?${queryParams}`}>
 						<button className="payment-button modal-above-image modal-top-left">
-							Order
+							Buy
 						</button>
 					</Link>
 					{isInBasket ? (

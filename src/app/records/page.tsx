@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Modal from "@/components/Modal";
 import client from "@/lib/contentful";
@@ -45,6 +46,9 @@ export default function RecordsPage() {
 	const { handleAddToBasket } = useAddToBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const { basket } = useBasket();
+
+	// Next.js router for navigation
+	const router = useRouter();
 
 	// Fetch distinct artist options from Contentful
 	useEffect(() => {
@@ -125,6 +129,22 @@ export default function RecordsPage() {
 
 	// Calculate total pages:
 	const totalPages = Math.ceil(totalRecords / pageSize);
+
+	// Handler for the "Buy" button on a record card
+	const handleBuy = (record: Record, e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent triggering card onClick that opens Modal
+		const queryParams = new URLSearchParams({
+			recordId: record.id,
+			price: record.price.toString(),
+			description: `${record.artistName.join(" & ")} - ${record.title}`,
+			title: record.title,
+			artist: record.artistName.join(" & "),
+			coverImage: record.coverImage || "",
+		}).toString();
+
+		// Navigate to /place-order with the query parameters.
+		router.push(`/place-order?${queryParams}`);
+	};
 
 	return (
 		<div className="page-container">
@@ -285,7 +305,10 @@ export default function RecordsPage() {
 										</h4>
 										<p>Condition: {record.vinylCondition}</p>
 										<div className="record-actions">
-											<button className="grid-buy-button">
+											<button
+												className="grid-buy-button"
+												onClick={(e) => handleBuy(record, e)}
+											>
 												Buy
 											</button>
 											{isInBasket ? (
