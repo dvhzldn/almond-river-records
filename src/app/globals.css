@@ -615,6 +615,27 @@ li {
 	justify-content: center;
 }
 
+.swiper-button-prev,
+.swiper-button-next {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Move the prev arrow to the left */
+.swiper-button-prev {
+	left: 0;
+}
+
+/* Move the next arrow to the right */
+.swiper-button-next {
+	right: 0;
+}
+
+.swiper {
+	padding: 0 40px;
+}
+
 /* Button Container */
 .record-actions {
 	position: absolute;
