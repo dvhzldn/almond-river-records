@@ -217,12 +217,9 @@ img.logo {
 .nav-links {
 	list-style: none;
 	display: flex;
-	gap: 2.5rem;
+	gap: 2rem;
 	margin: 0 auto;
 	padding: 0;
-}
-
-.nav-links {
 	white-space: nowrap;
 }
 
@@ -980,6 +977,11 @@ hr {
 	.filter-controls {
 		flex-wrap: wrap; /* Prevents odd resizing */
 		justify-content: center;
+	}
+
+	.nav-links li a,
+	li {
+		font-size: 0.8rem;
 	}
 }
 
