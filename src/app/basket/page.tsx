@@ -18,7 +18,8 @@ export default function BasketPage() {
 
 	// Prepare basket details
 	const recordIds = basket.map((item) => item.id);
-	const coverImages = basket.map((item) => item.coverImage || defaultImage);
+	// TODO: Cover images - are these needed in the backend?
+	// const coverImages = basket.map((item) => item.coverImage || defaultImage);
 	const description = basket
 		.map((item) => `${item.artist} - ${item.title}`)
 		.join(", ");
@@ -38,7 +39,8 @@ export default function BasketPage() {
 					amount: totalPrice,
 					description,
 					recordIds,
-					coverImages, // if needed on the backend
+					// TODO: Decide whether cover images are needed in the backend
+					// coverImages,
 					orderData,
 				}),
 			});
