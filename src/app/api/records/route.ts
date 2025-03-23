@@ -46,17 +46,19 @@ export async function GET(req: Request) {
 		"fields.vinylCondition"?: string;
 		"fields.artistName[in]"?: string | string[];
 		order?: string;
-		"fields.quantity[eq]": number;
+		"fields.quantity[gt]": number;
 		"fields.inStock": boolean;
 		"sys.createdAt[gte]"?: string;
+		"fields.sold": boolean;
 	};
 
 	const params: RecordsQueryParams = {
 		content_type: "vinylRecord",
 		limit: limitParam,
 		skip: skipParam,
-		"fields.quantity[eq]": 1,
-		"fields.inStock": true, // shorthand equality for booleans
+		"fields.quantity[gt]": 0,
+		"fields.inStock": true,
+		"fields.sold": false,
 	};
 
 	// If newThisWeek is specified, filter by creation date.
