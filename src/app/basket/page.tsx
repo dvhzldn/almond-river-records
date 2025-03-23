@@ -32,18 +32,21 @@ export default function BasketPage() {
 		setLoading(true);
 		setError(null);
 		try {
-			const response = await fetch("/api/processOrder", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					amount: totalPrice,
-					description,
-					recordIds,
-					// TODO: Decide whether cover images are needed in the backend
-					// coverImages,
-					orderData,
-				}),
-			});
+			const response = await fetch(
+				process.env.NEXT_PUBLIC_BASE_URL + `/api/processOrder`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						amount: totalPrice,
+						description,
+						recordIds,
+						// TODO: Decide whether cover images are needed in the backend
+						// coverImages,
+						orderData,
+					}),
+				}
+			);
 			const data = await response.json();
 			if (!response.ok) {
 				setError(data.error || "Error processing order");
