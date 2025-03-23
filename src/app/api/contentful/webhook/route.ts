@@ -37,18 +37,26 @@ async function fetchAssetUrl(assetId: string): Promise<string> {
 
 export async function POST(request: Request) {
 	try {
-		const reqBody = await request.text();
-		console.log("Webhook payload:", reqBody);
-		const payload = (await request.json()) as ContentfulWebhookPayload;
+		// Read the body once as text, log it, then parse it.
+		const rawBody = await request.text();
+		console.log("Webhook payload:", rawBody);
+		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
+
+		if (!payload.fields) {
+			throw new Error("Payload is missing the 'fields' property");
+		}
+
 		const { sys, fields } = payload;
 		const recordId = sys.id;
 
-		// Cast fields to expected types.
+		// Extract values with appropriate type assertions.
 		const title = (fields.title?.["en-GB"] as string) || null;
 		const sub_title = fields.subTitle
 			? (fields.subTitle["en-GB"] as string)
 			: null;
 		const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
+
+		// Fetch the cover image URL using the asset ID from Contentful.
 		const coverImageRef = fields.coverImage?.["en-GB"] as
 			| { sys: { id: string } }
 			| undefined;
@@ -56,8 +64,8 @@ export async function POST(request: Request) {
 			? await fetchAssetUrl(coverImageRef.sys.id)
 			: "";
 
+		// For simplicity, we set other_images to null (similar approach can be applied if needed).
 		const other_images = null;
-
 		const release_year = (fields.releaseYear?.["en-GB"] as number) || null;
 		const price = (fields.price?.["en-GB"] as number) || 0;
 		const genre = fields.genre ? (fields.genre["en-GB"] as string[]) : null;
@@ -105,7 +113,6 @@ export async function POST(request: Request) {
 			album_of_the_week,
 		};
 
-		// Upsert (insert or update) the record in Supabase.
 		const { error } = await supabase
 			.from("vinyl_records")
 			.upsert(vinylRecordData, { onConflict: "id" });
