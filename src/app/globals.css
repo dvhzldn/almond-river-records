@@ -684,7 +684,6 @@ li {
 	top: -50px;
 	right: 0px;
 	display: flex;
-	/* display: none; TODO: Remove to unhide */
 	flex-direction: column;
 	gap: 5px;
 }
@@ -1138,6 +1137,7 @@ hr {
 	.map iframe {
 		min-height: 150px;
 		height: 200px;
+		padding: 10px;
 	}
 
 	/* Show the toggle button on mobile */
