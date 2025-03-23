@@ -1,5 +1,5 @@
-// /api/contentful-webhook.ts
-import type { NextApiRequest, NextApiResponse } from "next";
+// /app/api/contentful/webhook/route.ts
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ContentfulAsset {
@@ -24,21 +24,13 @@ interface ContentfulWebhookPayload {
 	fields: ContentfulWebhookFields;
 }
 
-export default async function handler(
-	req: NextApiRequest,
-	res: NextApiResponse
-) {
-	if (req.method !== "POST") {
-		res.status(405).json({ error: "Method not allowed" });
-		return;
-	}
-
+export async function POST(request: Request) {
 	try {
-		const payload = req.body as ContentfulWebhookPayload;
+		const payload = (await request.json()) as ContentfulWebhookPayload;
 		const { sys, fields } = payload;
-
 		const recordId = sys.id;
 
+		// Cast fields to expected types.
 		const title = (fields.title?.["en-GB"] as string) || null;
 		const sub_title = fields.subTitle
 			? (fields.subTitle["en-GB"] as string)
@@ -98,18 +90,22 @@ export default async function handler(
 			album_of_the_week,
 		};
 
+		// Upsert (insert or update) the record in Supabase.
 		const { error } = await supabase
 			.from("vinyl_records")
 			.upsert(vinylRecordData, { onConflict: "id" });
 
 		if (error) {
 			console.error("Error upserting vinyl record:", error);
-			return res.status(500).json({ error: "Error upserting vinyl record" });
+			return NextResponse.json(
+				{ error: "Error upserting vinyl record" },
+				{ status: 500 }
+			);
 		}
 
-		res.status(200).json({ message: "Record synced successfully" });
+		return NextResponse.json({ message: "Record synced successfully" });
 	} catch (err: unknown) {
 		console.error("Error processing webhook:", err);
-		res.status(500).json({ error: "Server error" });
+		return NextResponse.json({ error: "Server error" }, { status: 500 });
 	}
 }
