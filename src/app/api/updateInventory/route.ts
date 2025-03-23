@@ -42,13 +42,11 @@ export async function POST(request: Request) {
 					let entry = await environment.getEntry(recordId);
 
 					if (updateAction === "reserve") {
-						// Reserve the item: mark as out of stock and set quantity to 0
+						// Reserve the item: mark quantity to 0
 						entry.fields.quantity = { "en-GB": 0 };
-						entry.fields.inStock = { "en-GB": false };
 					} else if (updateAction === "release") {
-						// Release the item: mark as in stock and reset quantity to 1
+						// Release the item: reset quantity to 1
 						entry.fields.quantity = { "en-GB": 1 };
-						entry.fields.inStock = { "en-GB": true };
 					}
 
 					entry = await entry.update();

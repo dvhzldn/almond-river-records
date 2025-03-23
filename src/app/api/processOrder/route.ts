@@ -5,23 +5,22 @@ import { createClient } from "contentful-management";
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		// Expect fullDescription from the client, which is the detailed description
 		const {
 			amount,
-			description: fullDescription, // full detailed description for the order
+			description: fullDescription,
 			recordIds,
 			orderData, // { name, email, address1, address2, address3, city, postcode }
 		} = body;
 
-		// Ensure recordIds is an array.
 		const recordIdsArray = Array.isArray(recordIds)
 			? recordIds
 			: recordIds.split(",").map((r: string) => r.trim());
 
-		// Generate a unique checkout reference.
+		// Generate checkout reference.
 		const now = new Date();
-		const uniqueSuffix = now.getTime();
-		const checkoutReference = `${uniqueSuffix}`;
+		const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
+		const uniqueSuffix = now.getTime(); // milliseconds timestamp
+		const checkoutReference = `${today}-${recordIdsArray.join("-")}-${uniqueSuffix}`;
 
 		// Compute a description for SumUp.
 		const simpleDescription = `${recordIdsArray.length} x ${recordIdsArray.length === 1 ? "record" : "records"} plus postage.`;
@@ -30,6 +29,8 @@ export async function POST(request: Request) {
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 		const redirectUrl = process.env.SUMUP_REDIRECT_URL;
+		// TODO: REMOVE TEST
+		const returnUrl = process.env.SUMUP_REDIRECT_URL + `/test`;
 
 		// Step 1: Create SumUp checkout session using the simple description.
 		const sumupResponse = await fetch(
@@ -44,11 +45,11 @@ export async function POST(request: Request) {
 					amount,
 					currency: "GBP",
 					checkout_reference: checkoutReference,
-					description: simpleDescription, // simplified description for payment
+					description: simpleDescription,
 					merchant_code,
 					hosted_checkout: { enabled: true },
 					redirect_url: redirectUrl,
-					return_url: redirectUrl,
+					return_url: returnUrl,
 				}),
 			}
 		);
@@ -93,30 +94,42 @@ export async function POST(request: Request) {
 		const orderDate = new Date().toISOString();
 
 		// Append a new row to the spreadsheet.
-		await sheets.spreadsheets.values.append({
-			spreadsheetId,
-			range: "Sheet1!A1",
-			valueInputOption: "RAW",
-			requestBody: {
-				values: [
-					[
-						generatedOrderId,
-						orderDate,
-						orderData.name,
-						orderData.email,
-						orderData.address1,
-						orderData.address2,
-						orderData.address3,
-						orderData.city,
-						orderData.postcode,
-						itemsField,
-						"PENDING",
-						checkoutId,
-						recordIdsArray.join(","),
+		try {
+			const appendResponse = await sheets.spreadsheets.values.append({
+				spreadsheetId,
+				range: "Sheet1!A1",
+				valueInputOption: "RAW",
+				requestBody: {
+					values: [
+						[
+							generatedOrderId,
+							orderDate,
+							orderData.name,
+							orderData.email,
+							orderData.address1,
+							orderData.address2,
+							orderData.address3,
+							orderData.city,
+							orderData.postcode,
+							itemsField,
+							"PENDING",
+							checkoutId,
+							recordIdsArray.join(","),
+						],
 					],
-				],
-			},
-		});
+				},
+			});
+			console.log("Row appended successfully:", appendResponse.data);
+		} catch (err: unknown) {
+			console.error("Error appending row to spreadsheet:", err);
+			return NextResponse.json(
+				{
+					error: "Error appending row to spreadsheet",
+					details: err instanceof Error ? err.message : err,
+				},
+				{ status: 500 }
+			);
+		}
 
 		// Step 3: Reserve inventory in Contentful.
 		const managementClient = createClient({
