@@ -2,10 +2,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
-interface ContentfulAsset {
-	url: string;
-}
-
 interface ContentfulWebhookFields {
 	[key: string]: {
 		"en-GB": unknown;
@@ -26,6 +22,8 @@ interface ContentfulWebhookPayload {
 
 export async function POST(request: Request) {
 	try {
+		const reqBody = await request.text();
+		console.log("Webhook payload:", reqBody);
 		const payload = (await request.json()) as ContentfulWebhookPayload;
 		const { sys, fields } = payload;
 		const recordId = sys.id;
@@ -37,11 +35,18 @@ export async function POST(request: Request) {
 			: null;
 		const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
 		const cover_image =
-			(fields.coverImage?.["en-GB"] as { url: string })?.url || "";
+			((
+				fields.coverImage?.["en-GB"] as {
+					fields: { file: { "en-GB": { url: string } } };
+				}
+			)?.fields?.file?.["en-GB"]?.url as string) || "";
+
 		const other_images = fields.otherImages
-			? ((fields.otherImages["en-GB"] as ContentfulAsset[]) ?? []).map(
-					(asset: ContentfulAsset) => asset.url
-				)
+			? (
+					(fields.otherImages["en-GB"] as Array<{
+						fields: { file: { "en-GB": { url: string } } };
+					}>) ?? []
+				).map((asset) => asset.fields.file["en-GB"].url)
 			: null;
 		const release_year = (fields.releaseYear?.["en-GB"] as number) || null;
 		const price = (fields.price?.["en-GB"] as number) || 0;
