@@ -89,20 +89,6 @@ export default function RecordsPage() {
 						))}
 					</select>
 					<select
-						value={condition}
-						onChange={(e) => {
-							setCondition(e.target.value);
-							setPage(1);
-						}}
-					>
-						<option value="">All Conditions</option>
-						<option value="Mint">Mint</option>
-						<option value="Near Mint">Near Mint</option>
-						<option value="Very Good Plus">Very Good Plus</option>
-						<option value="Very Good">Very Good</option>
-						<option value="Good">Good</option>
-					</select>
-					<select
 						value={genre}
 						onChange={(e) => {
 							setGenre(e.target.value);
@@ -115,6 +101,20 @@ export default function RecordsPage() {
 								{option}
 							</option>
 						))}
+					</select>
+					<select
+						value={condition}
+						onChange={(e) => {
+							setCondition(e.target.value);
+							setPage(1);
+						}}
+					>
+						<option value="">All Conditions</option>
+						<option value="Mint">Mint</option>
+						<option value="Near Mint">Near Mint</option>
+						<option value="Very Good Plus">Very Good Plus</option>
+						<option value="Very Good">Very Good</option>
+						<option value="Good">Good</option>
 					</select>
 					<input
 						type="text"

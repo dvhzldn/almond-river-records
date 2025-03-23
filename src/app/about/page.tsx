@@ -11,16 +11,7 @@ export default function AboutPage() {
 				<div className="two-column-layout">
 					<div className="text-content">
 						<h2>Our Location</h2>
-						<p>
-							Shop address:{" "}
-							<a
-								href="https://maps.app.goo.gl/7PSPh1NSHgHinheM9"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{`253 St John's Rd, Edinburgh EH12 7XD`}
-							</a>
-						</p>
+
 						<p>
 							Almond River Records shop is located in Corstorphine to the
 							west of Edinburgh.
@@ -37,6 +28,15 @@ export default function AboutPage() {
 							allowFullScreen
 							loading="lazy"
 						></iframe>
+						<p>
+							<a
+								href="https://maps.app.goo.gl/7PSPh1NSHgHinheM9"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{`253 St John's Rd, Edinburgh EH12 7XD`}
+							</a>
+						</p>
 					</div>
 				</div>
 
