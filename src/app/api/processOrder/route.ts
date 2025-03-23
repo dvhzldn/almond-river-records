@@ -1,3 +1,4 @@
+// /app/api/processOrder/route.ts
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import { createClient } from "contentful-management";
@@ -5,12 +6,7 @@ import { createClient } from "contentful-management";
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		const {
-			amount,
-			recordIds,
-			orderData, // { name, email, address1, address2, address3, city, postcode }
-		} = body;
-
+		const { amount, recordIds, orderData } = body; // orderData: { name, email, address1, address2, address3, city, postcode }
 		const recordIdsArray = Array.isArray(recordIds)
 			? recordIds
 			: recordIds.split(",").map((r: string) => r.trim());
@@ -22,16 +18,22 @@ export async function POST(request: Request) {
 		const checkoutReference = `${today}-${recordIdsArray.join("-")}-${uniqueSuffix}`;
 
 		// Compute a checkout description for SumUp.
-		const checkoutDescription = `${recordIdsArray.length} x ${recordIdsArray.length === 1 ? "record" : "records"} plus postage.`;
+		const checkoutDescription = `${recordIdsArray.length} x ${
+			recordIdsArray.length === 1 ? "record" : "records"
+		} plus postage.`;
 
 		// SumUp API variables.
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
-		const redirectUrl = process.env.SUMUP_REDIRECT_URL;
-		// TODO: REMOVE TEST
-		const returnUrl = process.env.SUMUP_REDIRECT_URL + `/test`;
+		// Use NEXT_PUBLIC_BASE_URL as the homepage.
+		const homepageUrl = process.env.NEXT_PUBLIC_BASE_URL;
+		// Payment success URL is the base URL plus /payment-success.
+		const paymentSuccessUrl =
+			process.env.NEXT_PUBLIC_BASE_URL + "/payment-success";
+		// Append the checkout reference as a query parameter.
+		const returnUrl = `${paymentSuccessUrl}?checkout_id=${checkoutReference}`;
 
-		// Step 1: Create SumUp checkout session
+		// Step 1: Create SumUp checkout session.
 		const sumupResponse = await fetch(
 			"https://api.sumup.com/v0.1/checkouts",
 			{
@@ -47,8 +49,8 @@ export async function POST(request: Request) {
 					description: checkoutDescription,
 					merchant_code,
 					hosted_checkout: { enabled: true },
-					redirect_url: redirectUrl,
-					return_url: returnUrl,
+					redirect_url: homepageUrl, // Redirect to homepage if user cancels
+					return_url: returnUrl, // Return here on successful payment
 				}),
 			}
 		);
@@ -170,7 +172,7 @@ export async function POST(request: Request) {
 			})
 		);
 
-		// Return the hosted checkout URL and other details.
+		// Return the hosted checkout URL and order details.
 		return NextResponse.json({
 			hosted_checkout_url: paymentData.hosted_checkout_url,
 			checkout_reference: generatedOrderId,

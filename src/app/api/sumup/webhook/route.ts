@@ -1,182 +1,111 @@
+// /app/api/sumup-webhook/route.ts
 import { NextResponse } from "next/server";
-import { google } from "googleapis";
-import { createClient } from "contentful-management";
+import { supabase } from "@/lib/supabaseClient";
 
-// Helper function to update order status in Google Sheets
-async function updateOrderStatus(orderId: string, status: string) {
-	const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
-	const credentials = JSON.parse(
-		Buffer.from(encoded, "base64").toString("utf8")
-	);
+interface OrderItem {
+	vinyl_record_id: string;
+}
 
-	const auth = new google.auth.GoogleAuth({
-		credentials,
-		scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-	});
-
-	const sheets = google.sheets({ version: "v4", auth });
-	const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
-
-	// Get rows from the sheet (range A:R)
-	const getResponse = await sheets.spreadsheets.values.get({
-		spreadsheetId,
-		range: "Sheet1!A:R",
-	});
-
-	const rows = getResponse.data.values;
-	if (!rows || rows.length === 0) {
-		throw new Error("No data found in the spreadsheet.");
+// Update order status in Supabase orders table.
+async function updateOrderStatus(orderReference: string, status: string) {
+	// Here we assume your orders table uses the sumup_checkout_reference as a unique identifier.
+	const { error } = await supabase
+		.from("orders")
+		.update({ sumup_status: status })
+		.eq("sumup_checkout_reference", orderReference);
+	if (error) {
+		console.error("Error updating order status in Supabase:", error);
+		throw error;
 	}
-
-	// Find the row where the first column (orderId) matches the given orderId.
-	let rowNumber: number | null = null;
-	for (let i = 0; i < rows.length; i++) {
-		if (rows[i][0] === orderId) {
-			rowNumber = i + 1; // Row numbers are 1-indexed in Sheets.
-			break;
-		}
-	}
-
-	if (!rowNumber) {
-		throw new Error(`Order ${orderId} not found in the spreadsheet.`);
-	}
-
-	// Update the Payment Status, assuming it is in Column K.
-	await sheets.spreadsheets.values.update({
-		spreadsheetId,
-		range: `Sheet1!K${rowNumber}`,
-		valueInputOption: "RAW",
-		requestBody: {
-			values: [[status]],
-		},
-	});
-
 	console.log(
-		`Updated order ${orderId} status to ${status} in row ${rowNumber}.`
+		`Updated order ${orderReference} status to ${status} in Supabase.`
 	);
 }
 
-// Helper function to release inventory for given record IDs.
-async function releaseInventory(recordIds: string[]) {
-	const managementClient = createClient({
-		accessToken: process.env.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN as string,
-	});
-	const space = await managementClient.getSpace(
-		process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID as string
-	);
-	const environment = await space.getEnvironment(
-		process.env.CONTENTFUL_ENVIRONMENT || "master"
-	);
+// Retrieve vinyl record IDs associated with the order from the order_items table.
+async function getOrderItems(orderReference: string): Promise<string[]> {
+	// Assuming that the orders table's primary key is used in order_items as order_id,
+	// and that you stored the sumup_checkout_reference in the orders table.
+	// First, we need to fetch the order record from Supabase.
+	const { data: orders, error: orderError } = await supabase
+		.from("orders")
+		.select("id")
+		.eq("sumup_checkout_reference", orderReference)
+		.single();
 
+	if (orderError || !orders) {
+		console.error("Error fetching order from Supabase:", orderError);
+		throw orderError || new Error("Order not found");
+	}
+
+	const orderId = orders.id;
+
+	const { data: orderItems, error: orderItemsError } = await supabase
+		.from("order_items")
+		.select("vinyl_record_id")
+		.eq("order_id", orderId);
+
+	if (orderItemsError || !orderItems) {
+		console.error(
+			"Error fetching order items from Supabase:",
+			orderItemsError
+		);
+		throw orderItemsError || new Error("No order items found");
+	}
+
+	return (orderItems as OrderItem[]).map(
+		(item: OrderItem) => item.vinyl_record_id
+	);
+}
+
+// Release inventory by updating the quantity in Supabase vinyl_records table.
+async function releaseInventory(recordIds: string[]) {
 	await Promise.all(
 		recordIds.map(async (recordId: string) => {
-			try {
-				let entry = await environment.getEntry(recordId);
-				entry.fields.quantity = { "en-GB": 1 };
-				entry.fields.inStock = { "en-GB": true };
-
-				entry = await entry.update();
-				await entry.publish();
-
+			const { error } = await supabase
+				.from("vinyl_records")
+				.update({ quantity: 1 })
+				.eq("id", recordId);
+			if (error) {
+				console.error(
+					`Error updating inventory for record ${recordId}:`,
+					error
+				);
+			} else {
 				console.log(`Released inventory for record ${recordId}`);
-			} catch (err: unknown) {
-				if (err instanceof Error) {
-					console.error(
-						`Error releasing inventory for record ${recordId}:`,
-						err
-					);
-				} else {
-					console.error(
-						`Unknown error releasing inventory for record ${recordId}`
-					);
-				}
 			}
 		})
 	);
 }
 
-// Helper function to retrieve record IDs from the order's Items column in Google Sheets.
-// This function assumes:
-// - Column A contains the orderId.
-// - Column J contains a comma-separated list of record IDs.
-async function getOrderItems(orderId: string): Promise<string[]> {
-	const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
-	const credentials = JSON.parse(
-		Buffer.from(encoded, "base64").toString("utf8")
-	);
-	const auth = new google.auth.GoogleAuth({
-		credentials,
-		scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-	});
-	const sheets = google.sheets({ version: "v4", auth });
-	const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
-
-	const getResponse = await sheets.spreadsheets.values.get({
-		spreadsheetId,
-		range: "Sheet1!A:Z",
-	});
-
-	const rows = getResponse.data.values;
-	if (!rows || rows.length === 0) {
-		throw new Error("No data found in the spreadsheet.");
-	}
-
-	let rowNumber: number | null = null;
-	let itemsValue: string | null = null;
-	for (let i = 0; i < rows.length; i++) {
-		if (rows[i][0] === orderId) {
-			rowNumber = i + 1;
-			// Contentful Item IDs are stored in Column M (index 12)
-			itemsValue = rows[i][12];
-			break;
-		}
-	}
-
-	if (!rowNumber || !itemsValue) {
-		throw new Error(`Order ${orderId} not found or Items column is empty.`);
-	}
-
-	// Split the comma-separated record IDs and return them.
-	const recordIds = itemsValue
-		.split(",")
-		.map((id: string) => id.trim())
-		.filter(Boolean);
-	return recordIds;
-}
-
 export async function POST(request: Request) {
 	try {
-		// Parse incoming webhook payload
+		// Parse incoming webhook payload from SumUp
 		const payload = await request.json();
-		console.log("Received webhook payload:", payload);
+		console.log("Received SumUp webhook payload:", payload);
 
-		// Inside your webhook POST handler, before calling SumUp:
+		// Simulated failure condition (for testing purposes)
 		if (payload.id === "simulate-failed") {
-			// Create a dummy checkoutDetails object that simulates a FAILED status.
 			const checkoutDetails = {
-				checkout_reference: "TEST-ORDER-FAILED",
+				reference: "TEST-ORDER-FAILED",
 				status: "FAILED",
 			};
 			console.log("Simulated checkout details:", checkoutDetails);
 
-			// Proceed with updating the order status and releasing inventory.
-			await updateOrderStatus(checkoutDetails.checkout_reference, "FAILED");
-			// Retrieve record IDs from the Google Sheet and release inventory.
-			const recordIds = await getOrderItems(
-				checkoutDetails.checkout_reference
-			);
+			await updateOrderStatus(checkoutDetails.reference, "FAILED");
+			const recordIds = await getOrderItems(checkoutDetails.reference);
 			await releaseInventory(recordIds);
 
 			return NextResponse.json({}, { status: 200 });
 		}
 
-		// Check for the expected event type
+		// Process real SumUp webhook events.
 		if (payload.event_type === "checkout.status.updated") {
-			// In the new payload, details are nested inside "payload"
+			// In the new payload, checkout details are nested inside "payload"
 			const checkoutDetails = payload.payload;
 			console.log("Verified checkout details:", checkoutDetails);
 
-			const orderId: string = checkoutDetails.reference;
+			const orderReference: string = checkoutDetails.reference;
 			const checkoutStatus: string = checkoutDetails.status;
 
 			if (
@@ -184,21 +113,21 @@ export async function POST(request: Request) {
 				checkoutStatus === "succeeded" ||
 				checkoutStatus === "COMPLETED"
 			) {
-				await updateOrderStatus(orderId, "PAID");
+				await updateOrderStatus(orderReference, "PAID");
 			} else if (checkoutStatus === "FAILED") {
-				await updateOrderStatus(orderId, "FAILED");
-				const recordIds = await getOrderItems(orderId);
+				await updateOrderStatus(orderReference, "FAILED");
+				const recordIds = await getOrderItems(orderReference);
 				await releaseInventory(recordIds);
 			} else {
-				await updateOrderStatus(orderId, "PENDING");
+				await updateOrderStatus(orderReference, "PENDING");
 			}
 		}
 
-		// Return an empty 200 response as required by SumUp
+		// Return a 200 OK response as required by SumUp.
 		return NextResponse.json({}, { status: 200 });
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			console.error("Error processing webhook:", error);
+			console.error("Error processing SumUp webhook:", error);
 			return NextResponse.json(
 				{ error: "Server error", details: error.message },
 				{ status: 500 }
