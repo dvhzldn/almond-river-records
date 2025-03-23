@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { google } from "googleapis";
+import { supabase } from "@/lib/supabaseClient";
 import { createClient } from "contentful-management";
 
 export async function POST(request: Request) {
@@ -7,7 +7,6 @@ export async function POST(request: Request) {
 		const body = await request.json();
 		const {
 			amount,
-			description: fullDescription,
 			recordIds,
 			orderData, // { name, email, address1, address2, address3, city, postcode }
 		} = body;
@@ -22,8 +21,8 @@ export async function POST(request: Request) {
 		const uniqueSuffix = now.getTime(); // milliseconds timestamp
 		const checkoutReference = `${today}-${recordIdsArray.join("-")}-${uniqueSuffix}`;
 
-		// Compute a description for SumUp.
-		const simpleDescription = `${recordIdsArray.length} x ${recordIdsArray.length === 1 ? "record" : "records"} plus postage.`;
+		// Compute a checkout description for SumUp.
+		const checkoutDescription = `${recordIdsArray.length} x ${recordIdsArray.length === 1 ? "record" : "records"} plus postage.`;
 
 		// SumUp API variables.
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
@@ -32,7 +31,7 @@ export async function POST(request: Request) {
 		// TODO: REMOVE TEST
 		const returnUrl = process.env.SUMUP_REDIRECT_URL + `/test`;
 
-		// Step 1: Create SumUp checkout session using the simple description.
+		// Step 1: Create SumUp checkout session
 		const sumupResponse = await fetch(
 			"https://api.sumup.com/v0.1/checkouts",
 			{
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
 					amount,
 					currency: "GBP",
 					checkout_reference: checkoutReference,
-					description: simpleDescription,
+					description: checkoutDescription,
 					merchant_code,
 					hosted_checkout: { enabled: true },
 					redirect_url: redirectUrl,
@@ -75,63 +74,44 @@ export async function POST(request: Request) {
 		}
 		const checkoutId = paymentData.id;
 		const generatedOrderId = paymentData.checkout_reference;
+		const orderDate = now.toISOString();
 
-		// Step 2: Create the order in the Google Sheet using the full description.
-		// For the Items field, use the full detailed description.
-		const itemsField = fullDescription;
+		// Step 2: Insert order into Supabase orders table.
+		const orderRecord = {
+			order_date: orderDate,
+			customer_name: orderData.name,
+			customer_email: orderData.email,
+			address1: orderData.address1,
+			address2: orderData.address2,
+			address3: orderData.address3,
+			city: orderData.city,
+			postcode: orderData.postcode,
+			sumup_amount: amount,
+			sumup_checkout_reference: checkoutReference,
+			sumup_date: orderDate,
+			sumup_id: checkoutId,
+			sumup_status: "PENDING",
+			sumup_status_history: [{ status: "PENDING", changed_at: orderDate }],
+			sumup_hosted_checkout_url: paymentData.hosted_checkout_url,
+			sumup_transactions: paymentData.transactions || [],
+		};
 
-		// Setup Google Sheets credentials.
-		const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
-		const credentials = JSON.parse(
-			Buffer.from(encoded, "base64").toString("utf8")
-		);
-		const auth = new google.auth.GoogleAuth({
-			credentials,
-			scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-		});
-		const sheets = google.sheets({ version: "v4", auth });
-		const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
-		const orderDate = new Date().toISOString();
+		const { data: orderInsertData, error: orderInsertError } = await supabase
+			.from("orders")
+			.insert(orderRecord)
+			.select();
 
-		// Append a new row to the spreadsheet.
-		try {
-			const appendResponse = await sheets.spreadsheets.values.append({
-				spreadsheetId,
-				range: "Sheet1!A1",
-				valueInputOption: "RAW",
-				requestBody: {
-					values: [
-						[
-							generatedOrderId,
-							orderDate,
-							orderData.name,
-							orderData.email,
-							orderData.address1,
-							orderData.address2,
-							orderData.address3,
-							orderData.city,
-							orderData.postcode,
-							itemsField,
-							"PENDING",
-							checkoutId,
-							recordIdsArray.join(","),
-						],
-					],
-				},
-			});
-			console.log("Row appended successfully:", appendResponse.data);
-		} catch (err: unknown) {
-			console.error("Error appending row to spreadsheet:", err);
+		if (orderInsertError) {
+			console.error("Error inserting order:", orderInsertError);
 			return NextResponse.json(
-				{
-					error: "Error appending row to spreadsheet",
-					details: err instanceof Error ? err.message : err,
-				},
+				{ error: "Failed to log order. Please try again." },
 				{ status: 500 }
 			);
 		}
+		const newOrder = orderInsertData[0];
+		const orderId = newOrder.id;
 
-		// Step 3: Reserve inventory in Contentful.
+		// Step 3: Fetch vinyl record details from Contentful and build order items.
 		const managementClient = createClient({
 			accessToken: process.env
 				.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN as string,
@@ -143,18 +123,50 @@ export async function POST(request: Request) {
 			process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master"
 		);
 
-		// Update all records concurrently.
+		const orderItemsData = await Promise.all(
+			recordIdsArray.map(async (recordId: string) => {
+				try {
+					const entry = await environment.getEntry(recordId);
+					// Extract a snapshot of the record's key fields.
+					const artistNames = entry.fields.artistName["en-GB"];
+					const title = entry.fields.title["en-GB"];
+					const price = entry.fields.price["en-GB"];
+					return {
+						order_id: orderId,
+						vinyl_record_id: recordId,
+						artist_names: artistNames,
+						title: title,
+						price: price,
+					};
+				} catch (err) {
+					console.error(`Error fetching entry ${recordId}:`, err);
+					return null;
+				}
+			})
+		);
+		const validOrderItems = orderItemsData.filter((item) => item !== null);
+
+		const { error: orderItemsError } = await supabase
+			.from("order_items")
+			.insert(validOrderItems);
+		if (orderItemsError) {
+			console.error("Error inserting order items:", orderItemsError);
+			return NextResponse.json(
+				{ error: "Failed to log order items. Please try again." },
+				{ status: 500 }
+			);
+		}
+
+		// Step 4: Reserve inventory in Contentful.
 		await Promise.all(
 			recordIdsArray.map(async (recordId: string) => {
 				try {
 					let entry = await environment.getEntry(recordId);
-					// Reserve the item: set quantity to 0.
 					entry.fields.quantity = { "en-GB": 0 };
 					entry = await entry.update();
 					await entry.publish();
 				} catch (err: unknown) {
 					console.error(`Error updating record ${recordId}:`, err);
-					// Continue processing even if one entry fails.
 				}
 			})
 		);
