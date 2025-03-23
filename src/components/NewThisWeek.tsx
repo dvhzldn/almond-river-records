@@ -77,9 +77,9 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 					))}
 				</Swiper>
 			)}
-			<div>
+			<div className="view-all-records">
 				<Link href="/records">
-					<h2>
+					<h2 className="view-all-records">
 						<strong>View all records</strong>
 					</h2>
 				</Link>

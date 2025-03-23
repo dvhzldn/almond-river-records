@@ -127,6 +127,14 @@ p {
 	color: var(--colour-4);
 }
 
+.view-all-records {
+	text-transform: uppercase;
+	color: white;
+	background: black;
+	margin: 10px;
+	padding: 5px;
+}
+
 /* Basket */
 
 .basket-wrapper {
