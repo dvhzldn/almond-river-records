@@ -20,6 +20,21 @@ interface ContentfulWebhookPayload {
 	fields: ContentfulWebhookFields;
 }
 
+async function fetchAssetUrl(assetId: string): Promise<string> {
+	const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
+	const environmentId =
+		process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master";
+	const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
+	const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/${environmentId}/assets/${assetId}?access_token=${accessToken}`;
+	const assetResponse = await fetch(url);
+	if (!assetResponse.ok) {
+		console.error("Failed to fetch asset details for", assetId);
+		return "";
+	}
+	const assetData = await assetResponse.json();
+	return assetData.fields?.file?.["en-GB"]?.url || "";
+}
+
 export async function POST(request: Request) {
 	try {
 		const reqBody = await request.text();
@@ -34,20 +49,15 @@ export async function POST(request: Request) {
 			? (fields.subTitle["en-GB"] as string)
 			: null;
 		const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
-		const cover_image =
-			((
-				fields.coverImage?.["en-GB"] as {
-					fields: { file: { "en-GB": { url: string } } };
-				}
-			)?.fields?.file?.["en-GB"]?.url as string) || "";
+		const coverImageRef = fields.coverImage?.["en-GB"] as
+			| { sys: { id: string } }
+			| undefined;
+		const cover_image = coverImageRef
+			? await fetchAssetUrl(coverImageRef.sys.id)
+			: "";
 
-		const other_images = fields.otherImages
-			? (
-					(fields.otherImages["en-GB"] as Array<{
-						fields: { file: { "en-GB": { url: string } } };
-					}>) ?? []
-				).map((asset) => asset.fields.file["en-GB"].url)
-			: null;
+		const other_images = null;
+
 		const release_year = (fields.releaseYear?.["en-GB"] as number) || null;
 		const price = (fields.price?.["en-GB"] as number) || 0;
 		const genre = fields.genre ? (fields.genre["en-GB"] as string[]) : null;
