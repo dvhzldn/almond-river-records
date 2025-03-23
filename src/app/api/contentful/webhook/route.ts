@@ -20,21 +20,6 @@ interface ContentfulWebhookPayload {
 	fields: ContentfulWebhookFields;
 }
 
-async function fetchAssetUrl(assetId: string): Promise<string> {
-	const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
-	const environmentId =
-		process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master";
-	const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
-	const url = `https://cdn.contentful.com/spaces/${spaceId}/environments/${environmentId}/assets/${assetId}?access_token=${accessToken}`;
-	const assetResponse = await fetch(url);
-	if (!assetResponse.ok) {
-		console.error("Failed to fetch asset details for", assetId);
-		return "";
-	}
-	const assetData = await assetResponse.json();
-	return assetData.fields?.file?.["en-GB"]?.url || "";
-}
-
 export async function POST(request: Request) {
 	try {
 		// Read the body once as text, log it, then parse it.
@@ -49,23 +34,24 @@ export async function POST(request: Request) {
 		const { sys, fields } = payload;
 		const recordId = sys.id;
 
-		// Extract values with appropriate type assertions.
 		const title = (fields.title?.["en-GB"] as string) || null;
 		const sub_title = fields.subTitle
 			? (fields.subTitle["en-GB"] as string)
 			: null;
 		const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
 
-		// Fetch the cover image URL using the asset ID from Contentful.
 		const coverImageRef = fields.coverImage?.["en-GB"] as
 			| { sys: { id: string } }
 			| undefined;
-		const cover_image = coverImageRef
-			? await fetchAssetUrl(coverImageRef.sys.id)
-			: "";
+		const cover_image = coverImageRef ? coverImageRef.sys.id : "";
 
-		// For simplicity, we set other_images to null (similar approach can be applied if needed).
-		const other_images = null;
+		const otherImagesArray = fields.otherImages?.["en-GB"] as
+			| Array<{ sys: { id: string } }>
+			| undefined;
+		const other_images = otherImagesArray
+			? otherImagesArray.map((asset) => asset.sys.id)
+			: null;
+
 		const release_year = (fields.releaseYear?.["en-GB"] as number) || null;
 		const price = (fields.price?.["en-GB"] as number) || 0;
 		const genre = fields.genre ? (fields.genre["en-GB"] as string[]) : null;
