@@ -79,13 +79,13 @@ export default function BasketPage() {
 											height={120}
 											className="basket-cover"
 										/>
-										<button
-											className="remove-button"
-											onClick={() => handleRemoveFromBasket(item.id)}
-										>
-											Remove
-										</button>
 									</div>
+									<button
+										className="remove-button"
+										onClick={() => handleRemoveFromBasket(item.id)}
+									>
+										Remove
+									</button>
 									<div>
 										<h3>{item.title}</h3>
 										<h3>By {item.artist}</h3>
@@ -94,10 +94,10 @@ export default function BasketPage() {
 								</div>
 							))}
 						</div>
-						<button className="clear-button" onClick={clearBasket}>
-							Clear
-						</button>
 						<div>
+							<button className="clear-button" onClick={clearBasket}>
+								Clear
+							</button>
 							<hr />
 							<h3>Sub-total: £{subTotalPrice}</h3>
 							<h3>Postage: £{postagePrice}</h3>

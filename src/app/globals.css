@@ -759,6 +759,10 @@ li {
 	background: var(--colour-3);
 }
 
+.remove-button {
+	background: #007bff;
+}
+
 /* Styling for both buttons */
 .record-actions button,
 .modal-above-image {
@@ -814,7 +818,7 @@ li {
 	flex-direction: column;
 	gap: 1.5rem;
 	width: 100%;
-	max-width: 600px;
+	max-width: 80%;
 	margin: auto;
 	text-align: left;
 }
