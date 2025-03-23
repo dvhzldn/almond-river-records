@@ -13,11 +13,11 @@ export interface IVinylRecordFields {
   /** Artist Name */
   artistName: string[];
 
-  /** In Stock */
-  inStock: boolean;
+  /** Cover Image */
+  coverImage: Asset;
 
-  /** Label */
-  label: string;
+  /** Other Image */
+  otherImages?: Asset[] | undefined;
 
   /** Year */
   releaseYear: number;
@@ -52,26 +52,32 @@ export interface IVinylRecordFields {
     | "Poor"
     | "Other";
 
+  /** Label */
+  label: string;
+
+  /** Catalogue Number */
+  catalogueNumber?: string | undefined;
+
   /** Description */
   description?: Document | undefined;
 
   /** Link */
   link?: Document | undefined;
 
-  /** Cover Image */
-  coverImage: Asset;
-
-  /** Other Image */
-  otherImages?: Asset[] | undefined;
-
-  /** Catalogue Number */
-  catalogueNumber?: string | undefined;
-
   /** Barcode */
   barcode?: string | undefined;
 
   /** Quantity */
   quantity: number;
+
+  /** In Stock */
+  inStock: boolean;
+
+  /** Sold */
+  sold: boolean;
+
+  /** Album Of The Week */
+  albumOfTheWeek: boolean;
 }
 
 /** A vinyl record release */

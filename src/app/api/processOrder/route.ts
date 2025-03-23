@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 		const uniqueSuffix = now.getTime();
 		const checkoutReference = `${uniqueSuffix}`;
 
-		// Compute a simplified description for SumUp.
+		// Compute a description for SumUp.
 		const simpleDescription = `${recordIdsArray.length} x ${recordIdsArray.length === 1 ? "record" : "records"} plus postage.`;
 
 		// SumUp API variables.
@@ -135,9 +135,8 @@ export async function POST(request: Request) {
 			recordIdsArray.map(async (recordId: string) => {
 				try {
 					let entry = await environment.getEntry(recordId);
-					// Reserve the item: mark as out of stock and set quantity to 0.
+					// Reserve the item: set quantity to 0.
 					entry.fields.quantity = { "en-GB": 0 };
-					entry.fields.inStock = { "en-GB": false };
 					entry = await entry.update();
 					await entry.publish();
 				} catch (err: unknown) {
