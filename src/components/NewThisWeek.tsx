@@ -79,9 +79,7 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 			)}
 			<div className="view-all-records">
 				<Link href="/records">
-					<h2 className="view-all-records">
-						<strong>View all records</strong>
-					</h2>
+					<h2 className="view-all-records">View all records</h2>
 				</Link>
 			</div>
 			{selectedRecord && (

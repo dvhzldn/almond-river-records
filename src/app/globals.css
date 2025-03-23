@@ -127,12 +127,13 @@ p {
 	color: var(--colour-4);
 }
 
-.view-all-records {
+.view-all-records h2 {
 	text-transform: uppercase;
-	color: white;
-	background: black;
-	margin: 10px;
+	color: var(--colour-7);
+	background: var(--colour-4);
+	margin: 10px 15%;
 	padding: 5px;
+	border: 4px solid var(--colour-2);
 }
 
 /* Basket */
@@ -378,13 +379,13 @@ li {
 /* Top-left corner */
 .modal-top-left {
 	top: 2rem;
-	left: 2rem;
+	left: 5rem;
 }
 
 /* Top-right corner */
 .modal-top-right {
 	top: 2rem;
-	right: 2rem;
+	right: 5rem;
 }
 
 /* Contact Info Layout */
@@ -665,7 +666,7 @@ li {
 
 /* Move the prev arrow to the left */
 .swiper-button-prev {
-	left: 0;
+	left: 1;
 }
 
 /* Move the next arrow to the right */
@@ -1023,16 +1024,26 @@ hr {
 		max-width: 300px;
 	}
 
+	.modal-image-container {
+		position: relative;
+		margin-bottom: 1rem;
+	}
+
+	.modal-above-image {
+		position: absolute;
+		z-index: 2;
+	}
+
 	/* Top-left corner */
 	.modal-top-left {
-		top: 4rem;
-		left: 0rem;
+		top: 5rem;
+		left: 2rem;
 	}
 
 	/* Top-right corner */
 	.modal-top-right {
-		top: 4rem;
-		right: 0rem;
+		top: 5rem;
+		right: 2rem;
 	}
 
 	/* Show burger icon */
