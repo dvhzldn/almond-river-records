@@ -5,8 +5,6 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Document } from "@contentful/rich-text-types";
-import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
@@ -25,7 +23,6 @@ interface ModalProps {
 		coverImage?: string | null;
 		otherImages?: string[];
 		releaseYear?: number | null;
-		description?: Document;
 		id: string;
 	};
 	onClose: () => void;
@@ -85,7 +82,9 @@ export default function Modal({ record, onClose }: ModalProps) {
 				</button>
 				<h2>{record.title}</h2>
 				<h3>{record.artistName.join(", ")}</h3>
-				<h3>£{record.price}</h3>
+				<h3>
+					Price: <strong>£{record.price}</strong>
+				</h3>
 
 				{images.length > 0 && (
 					<Swiper
@@ -146,14 +145,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 					<p>
 						<strong>Year:</strong> {record.releaseYear ?? "N/A"}
 					</p>
-					{record.description && (
-						<div>
-							<p>
-								<strong>Description:</strong>
-							</p>
-							{documentToReactComponents(record.description)}
-						</div>
-					)}
 				</div>
 			</div>
 		</div>
