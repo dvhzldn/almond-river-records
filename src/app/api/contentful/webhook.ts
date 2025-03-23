@@ -1,0 +1,115 @@
+// /api/contentful-webhook.ts
+import type { NextApiRequest, NextApiResponse } from "next";
+import { supabase } from "@/lib/supabaseClient";
+
+interface ContentfulAsset {
+	url: string;
+}
+
+interface ContentfulWebhookFields {
+	[key: string]: {
+		"en-GB": unknown;
+	};
+}
+
+interface ContentfulWebhookPayload {
+	sys: {
+		id: string;
+		contentType?: {
+			sys: {
+				id: string;
+			};
+		};
+	};
+	fields: ContentfulWebhookFields;
+}
+
+export default async function handler(
+	req: NextApiRequest,
+	res: NextApiResponse
+) {
+	if (req.method !== "POST") {
+		res.status(405).json({ error: "Method not allowed" });
+		return;
+	}
+
+	try {
+		const payload = req.body as ContentfulWebhookPayload;
+		const { sys, fields } = payload;
+
+		const recordId = sys.id;
+
+		const title = (fields.title?.["en-GB"] as string) || null;
+		const sub_title = fields.subTitle
+			? (fields.subTitle["en-GB"] as string)
+			: null;
+		const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
+		const cover_image =
+			(fields.coverImage?.["en-GB"] as { url: string })?.url || "";
+		const other_images = fields.otherImages
+			? ((fields.otherImages["en-GB"] as ContentfulAsset[]) ?? []).map(
+					(asset: ContentfulAsset) => asset.url
+				)
+			: null;
+		const release_year = (fields.releaseYear?.["en-GB"] as number) || null;
+		const price = (fields.price?.["en-GB"] as number) || 0;
+		const genre = fields.genre ? (fields.genre["en-GB"] as string[]) : null;
+		const vinyl_condition =
+			(fields.vinylCondition?.["en-GB"] as string) || null;
+		const sleeve_condition =
+			(fields.sleeveCondition?.["en-GB"] as string) || null;
+		const label = (fields.label?.["en-GB"] as string) || null;
+		const catalogue_number = fields.catalogueNumber
+			? (fields.catalogueNumber["en-GB"] as string)
+			: null;
+		const description = fields.description
+			? fields.description["en-GB"]
+			: null;
+		const link = fields.link ? (fields.link["en-GB"] as string) : null;
+		const barcode = fields.barcode
+			? (fields.barcode["en-GB"] as string)
+			: null;
+		const quantity = (fields.quantity?.["en-GB"] as number) || 0;
+		const in_stock = (fields.inStock?.["en-GB"] as boolean) || false;
+		const sold = (fields.sold?.["en-GB"] as boolean) || false;
+		const album_of_the_week =
+			(fields.albumOfTheWeek?.["en-GB"] as boolean) || false;
+
+		const vinylRecordData = {
+			id: recordId,
+			title,
+			sub_title,
+			artist_names,
+			cover_image,
+			other_images,
+			release_year,
+			price,
+			genre,
+			vinyl_condition,
+			sleeve_condition,
+			label,
+			catalogue_number,
+			description,
+			link,
+			barcode,
+			quantity,
+			in_stock,
+			sold,
+			album_of_the_week,
+		};
+
+		const { error } = await supabase
+			.from("vinyl_records")
+			.upsert(vinylRecordData, { onConflict: "id" });
+
+		if (error) {
+			console.error("Error upserting vinyl record:", error);
+			return res.status(500).json({ error: "Error upserting vinyl record" });
+		}
+
+		res.status(200).json({ message: "Record synced successfully" });
+	} catch (err: unknown) {
+		console.error("Error processing webhook:", err);
+		res.status(500).json({ error: "Server error" });
+	}
+}
