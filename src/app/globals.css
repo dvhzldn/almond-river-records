@@ -173,8 +173,7 @@ a,
 
 Link:hover,
 a:hover,
-.hyperLink:hover,
-.nav-links li a:hover {
+.hyperLink:hover {
 	color: var(--colour-2);
 	opacity: 0.9;
 	text-decoration: underline;
@@ -234,6 +233,14 @@ li {
 	color: var(--colour-7);
 	text-decoration: none;
 	transition: color 0.3s ease;
+}
+
+.nav-links li.active a {
+	text-decoration: underline;
+}
+
+.nav-links li a:hover {
+	color: var(--colour-2);
 }
 
 /* Burger Icon - hidden on larger screens */
@@ -1048,6 +1055,10 @@ hr {
 	.nav-links li {
 		text-align: left;
 		padding-left: 2rem;
+	}
+
+	.nav-links li.active a {
+		text-decoration: underline;
 	}
 
 	.logo,

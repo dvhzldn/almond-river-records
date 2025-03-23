@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faShoppingBasket,
@@ -13,9 +14,13 @@ export default function Menu() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { basket } = useBasket();
 	const basketCount = basket.length;
+	const pathname = usePathname();
 
 	const toggleMenu = () => setIsOpen(!isOpen);
 	const closeMenu = () => setIsOpen(false);
+
+	// Helper to determine if the link is active
+	const isActive = (path: string) => pathname === path;
 
 	return (
 		<nav className="menu">
@@ -31,37 +36,37 @@ export default function Menu() {
 
 				{/* Navigation Links (Centered) */}
 				<ul className={isOpen ? "nav-links open" : "nav-links"}>
-					<li>
+					<li className={isActive("/") ? "active" : ""}>
 						<Link href="/" onClick={closeMenu}>
 							Home
 						</Link>
 					</li>
-					<li>
+					<li className={isActive("/records") ? "active" : ""}>
 						<Link href="/records" onClick={closeMenu}>
-							Shop Online
+							Online Shop
 						</Link>
 					</li>
-					<li>
-						<Link href="/about" onClick={closeMenu}>
-							Our Store
-						</Link>
-					</li>
-					<li>
+					<li className={isActive("/record-cleaning") ? "active" : ""}>
 						<Link href="/record-cleaning" onClick={closeMenu}>
 							Record Cleaning
 						</Link>
 					</li>
-					<li>
+					<li className={isActive("/gift-vouchers") ? "active" : ""}>
 						<Link href="/gift-vouchers" onClick={closeMenu}>
 							Gift Vouchers
 						</Link>
 					</li>
-					<li>
+					<li className={isActive("/contact") ? "active" : ""}>
 						<Link href="/contact" onClick={closeMenu}>
 							Get In Touch
 						</Link>
 					</li>
-					<li>
+					<li className={isActive("/about") ? "active" : ""}>
+						<Link href="/about" onClick={closeMenu}>
+							Visit Our Store
+						</Link>
+					</li>
+					<li className={isActive("/help") ? "active" : ""}>
 						<Link href="/help" onClick={closeMenu}>
 							Help
 						</Link>
@@ -74,8 +79,7 @@ export default function Menu() {
 						<FontAwesomeIcon icon={faShoppingBasket} />
 						{basketCount > 0 && (
 							<span className="basket-count">{basketCount}</span>
-						)}{" "}
-						{}
+						)}
 					</Link>
 				</div>
 			</div>
