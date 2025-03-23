@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import Image from "next/image";
 import NewThisWeek from "@/components/NewThisWeek";
 import AlbumOfTheWeek from "@/components/AlbumOfTheWeek";
@@ -6,19 +5,19 @@ import GoogleReviews from "@/components/GoogleReviews";
 import SpotifyPlaylist from "@/components/SpotifyPlaylist";
 
 export default async function Home() {
-	// Await the headers() function to get the Headers object
-	const headersList = await headers();
-	const host = headersList.get("host");
-	const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+	const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
-	const res = await fetch(
-		`${protocol}://${host}/api/records?newThisWeek=true`,
-		{
-			next: { revalidate: 60 },
-		}
-	);
+	const res = await fetch(`${baseURL}/api/records?newThisWeek=true`, {
+		next: { revalidate: 60 },
+	});
+
+	if (!res.ok) {
+		const text = await res.text();
+		console.error("Failed to fetch API:", text);
+		throw new Error(`Failed to fetch: ${res.status}`);
+	}
+
 	const data = await res.json();
-
 	return (
 		<div className="page-container">
 			<h1 className="page-title">Almond River Records</h1>
