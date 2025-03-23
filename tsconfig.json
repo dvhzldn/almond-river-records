@@ -36,7 +36,8 @@
 		"**/*.tsx",
 		"app/**/*.ts",
 		".next/types/**/*.ts",
-		"getContentfulEnvironment.cjs"
+		"getContentfulEnvironment.cjs",
+		"bulkUpdate.js"
 	],
 	"exclude": ["node_modules"]
 }
