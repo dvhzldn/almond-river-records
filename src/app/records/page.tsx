@@ -8,6 +8,8 @@ import { useContentfulOptions } from "@/hooks/useContentfulOptions";
 import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 
 export default function RecordsPage() {
 	const [searchInput, setSearchInput] = useState("");
@@ -206,13 +208,16 @@ export default function RecordsPage() {
 											</button>
 											{isInBasket ? (
 												<button
-													className="basket-button"
+													className="remove-button"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleRemoveFromBasket(record.id);
 													}}
 												>
-													Remove from Basket
+													{`Remove    `}
+													<FontAwesomeIcon
+														icon={faShoppingBasket}
+													/>
 												</button>
 											) : (
 												<button
@@ -229,7 +234,10 @@ export default function RecordsPage() {
 														});
 													}}
 												>
-													Add to Basket
+													Add{"  "}
+													<FontAwesomeIcon
+														icon={faShoppingBasket}
+													/>
 												</button>
 											)}
 										</div>

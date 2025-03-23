@@ -24,7 +24,7 @@
 	--colour-3: #dc0000;
 	--colour-4: #1f363dff;
 	--colour-5: #c8fffd;
-	--colour-6: #1e7508;
+	--colour-6: #32ba10;
 	--colour-7: #ffffff;
 	--blur: rgba(0, 0, 0, 0.2);
 }
@@ -733,7 +733,6 @@ li {
 .clear-button,
 .buy-button,
 .basket-button {
-	/* width: 110px; */
 	color: var(--colour-7);
 	border: none;
 	border-radius: var(--border-radius);
@@ -750,37 +749,36 @@ li {
 }
 
 .clear-filters-button,
-.clear-button {
+.clear-button,
+.remove-button {
 	background: var(--colour-3);
 }
 
 /* Styling for both buttons */
-.record-actions button {
+.record-actions button,
+.modal-above-image {
 	border: none;
-	padding: 4px 6px;
-	font-size: 10px;
-	font-weight: bold;
-	border-radius: 0px;
+	padding: 4px 2px;
+	font-size: 12px;
+	width: 75px;
+	border-radius: var(--border-radius);
 	cursor: pointer;
 	transition: background 0.2s ease-in-out;
-	width: auto;
 	text-align: center;
 }
 
 /* Buy Button (Green) */
 .buy-button {
-	background: #28a745;
+	background: var(--colour-6);
 }
 
 /* Add to Basket Button (Light Blue) */
-.basket-button,
-.remove-button {
+.basket-button {
 	background: #007bff;
 }
 
 .form button,
 .payment-button,
-.remove-button,
 .clear-button {
 	display: block;
 	margin: 0.3rem auto 0;
@@ -792,7 +790,8 @@ li {
 .pagination button:hover:enabled,
 .remove-button:hover,
 .buy-button:hover,
-.basket-button:hover {
+.basket-button:hover,
+.record-actions button:hover {
 	font-weight: bolder;
 	box-shadow: 0 0 8px var(--blur);
 	background: black;

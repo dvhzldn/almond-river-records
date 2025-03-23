@@ -11,6 +11,8 @@ import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 
 interface ModalProps {
 	record: {
@@ -72,7 +74,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 	};
 
 	const onRemoveFromBasket = () => {
-		handleRemoveFromBasket(record.id);
+		handleRemoveFromBasket(record.id, onClose);
 	};
 
 	return (
@@ -116,17 +118,19 @@ export default function Modal({ record, onClose }: ModalProps) {
 					</button>
 					{isInBasket ? (
 						<button
-							className="basket-button modal-above-image modal-top-right"
+							className="remove-button modal-above-image modal-top-right"
 							onClick={onRemoveFromBasket}
 						>
-							Remove from Basket
+							{`Remove    `}
+							<FontAwesomeIcon icon={faShoppingBasket} />
 						</button>
 					) : (
 						<button
 							className="basket-button modal-above-image modal-top-right"
 							onClick={onAddToBasket}
 						>
-							Add to Basket
+							Add{"  "}
+							<FontAwesomeIcon icon={faShoppingBasket} />
 						</button>
 					)}
 
