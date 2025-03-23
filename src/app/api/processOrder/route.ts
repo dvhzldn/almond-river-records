@@ -157,16 +157,15 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Step 4: Reserve inventory in Contentful.
+		// Step 4: Update inventory in Supabase.
 		await Promise.all(
 			recordIdsArray.map(async (recordId: string) => {
-				try {
-					let entry = await environment.getEntry(recordId);
-					entry.fields.quantity = { "en-GB": 0 };
-					entry = await entry.update();
-					await entry.publish();
-				} catch (err: unknown) {
-					console.error(`Error updating record ${recordId}:`, err);
+				const { error } = await supabase
+					.from("vinyl_records")
+					.update({ quantity: 0 })
+					.eq("id", recordId);
+				if (error) {
+					console.error(`Error updating vinyl record ${recordId}:`, error);
 				}
 			})
 		);
