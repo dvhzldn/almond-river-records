@@ -1,4 +1,3 @@
-// /basket/page.tsx
 "use client";
 
 import Image from "next/image";
@@ -13,19 +12,14 @@ export default function BasketPage() {
 
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
-	// const totalPrice = subTotalPrice + postagePrice;
-	const totalPrice = 1;
+	const totalPrice = subTotalPrice + postagePrice;
 	const defaultImage = "/images/almond-river-logo.jpg";
 
-	// Prepare basket details
 	const recordIds = basket.map((item) => item.id);
-	// TODO: Cover images - are these needed in the backend?
-	// const coverImages = basket.map((item) => item.coverImage || defaultImage);
 	const description = basket
 		.map((item) => `${item.artist} - ${item.title}`)
 		.join(", ");
 
-	// Local state for form submission
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -42,8 +36,6 @@ export default function BasketPage() {
 						amount: totalPrice,
 						description,
 						recordIds,
-						// TODO: Decide whether cover images are needed in the backend
-						// coverImages,
 						orderData,
 					}),
 				}
@@ -112,7 +104,6 @@ export default function BasketPage() {
 								Total: <strong>£{totalPrice}</strong>
 							</h2>
 						</div>
-						{/* Render the order form and pass the submission callback */}
 						<OrderForm
 							onSubmit={handleOrderSubmit}
 							loading={loading}

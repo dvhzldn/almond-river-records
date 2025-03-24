@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 		const now = new Date();
 		const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
 		const uniqueSuffix = now.getTime(); // milliseconds timestamp
-		const checkoutReference = `${today}-${recordIdsArray.join("-")}-${uniqueSuffix}`;
+		const checkoutReference = `${today}-${uniqueSuffix}`;
 
 		// Compute a checkout description for SumUp.
 		const checkoutDescription = `${recordIdsArray.length} x ${
@@ -25,13 +25,9 @@ export async function POST(request: Request) {
 		// SumUp API variables.
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
-		// Use NEXT_PUBLIC_BASE_URL as the homepage.
-		// const homepageUrl = process.env.NEXT_PUBLIC_BASE_URL;
-		// Payment success URL is the base URL plus /payment-success.
 		const paymentSuccessUrl =
 			process.env.NEXT_PUBLIC_BASE_URL + "/payment-success";
-		// Append the checkout reference as a query parameter.
-		const returnUrl = `${paymentSuccessUrl}?checkout_id=${checkoutReference}`;
+		const redirectUrl = `${paymentSuccessUrl}?checkout_id=${checkoutReference}`;
 
 		const requestBody = {
 			amount,
@@ -40,11 +36,11 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
-			redirect_url: returnUrl, // Redirect to homepage if user cancels
-			// return_url: returnUrl, // Return here on successful payment
+			redirect_url: redirectUrl, // Redirect to homepage if user cancels. Do not use return_url
 		};
 
-		console.log("Sending request to SumUp API:", requestBody);
+		// Include for testing
+		// console.log("Sending request to SumUp API:", requestBody);
 
 		const sumupResponse = await fetch(
 			"https://api.sumup.com/v0.1/checkouts",
@@ -72,36 +68,6 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// // Step 1: Create SumUp checkout session.
-		// const sumupResponse = await fetch(
-		// 	"https://api.sumup.com/v0.1/checkouts",
-		// 	{
-		// 		method: "POST",
-		// 		headers: {
-		// 			Authorization: `Bearer ${accessToken}`,
-		// 			"Content-Type": "application/json",
-		// 		},
-		// 		body: JSON.stringify({
-		// 			amount,
-		// 			currency: "GBP",
-		// 			checkout_reference: checkoutReference,
-		// 			description: checkoutDescription,
-		// 			merchant_code,
-		// 			hosted_checkout: { enabled: true },
-		// 			redirect_url: homepageUrl, // Redirect to homepage if user cancels
-		// 			return_url: returnUrl, // Return here on successful payment
-		// 		}),
-		// 	}
-		// );
-
-		// if (!sumupResponse.ok) {
-		// 	const errorText = await sumupResponse.text();
-		// 	console.error("SumUp API error:", errorText); // Log the error response to the server console
-		// 	return NextResponse.json(
-		// 		{ error: "Checkout creation failed", details: errorText },
-		// 		{ status: sumupResponse.status }
-		// 	);
-		// }
 		const paymentData = await sumupResponse.json();
 
 		if (
