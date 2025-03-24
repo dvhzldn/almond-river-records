@@ -10,37 +10,9 @@ interface Album {
 	id: string;
 	title: string;
 	artist_names: string[];
-	cover_image_asset?: { id: string; url: string }[];
+	cover_image_url?: string | null; // The cover image will be a URL string
 	description?: Document | string;
 }
-
-// Robust helper function to extract and normalize the cover image URL.
-const getCoverImageUrl = (cover: unknown): string | null => {
-	if (!cover) return null;
-	if (Array.isArray(cover)) {
-		if (cover.length === 0) return null;
-		const first = cover[0];
-		// Ensure the first element exists and has a "url" property.
-		if (first && typeof first === "object" && "url" in first) {
-			const url = (first as { url: string }).url;
-			return typeof url === "string"
-				? url.startsWith("//")
-					? "https:" + url
-					: url
-				: null;
-		}
-		return null;
-	}
-	if (typeof cover === "object" && "url" in cover) {
-		const url = (cover as { url: string }).url;
-		return typeof url === "string"
-			? url.startsWith("//")
-				? "https:" + url
-				: url
-			: null;
-	}
-	return null;
-};
 
 export default function AlbumOfTheWeek() {
 	const [album, setAlbum] = useState<Album | null>(null);
@@ -49,38 +21,60 @@ export default function AlbumOfTheWeek() {
 	useEffect(() => {
 		async function fetchAlbum() {
 			try {
+				// First, fetch the album data from vinyl_records
 				const { data, error } = await supabase
 					.from("vinyl_records")
 					.select(
 						`
-            id,
-            title,
-            artist_names,
-            description,
-            cover_image_asset:contentful_assets!vinyl_records_cover_image_fkey (
-              id,
-              url
-            )
-          `
+						id,
+						title,
+						artist_names,
+						description,
+						cover_image
+					`
 					)
 					.eq("album_of_the_week", true)
-					.single();
+					.single(); // Fetch single album
 
-				if (error) throw error;
-				if (data) setAlbum(data);
+				if (error) {
+					console.error("Error fetching vinyl record data:", error);
+					throw error; // Rethrow error for further handling
+				}
+
+				if (data) {
+					// Now, fetch the cover image based on the cover_image field
+					const { data: coverImageData, error: coverError } =
+						await supabase
+							.from("contentful_assets")
+							.select("url")
+							.eq("id", data.cover_image)
+							.single(); // Fetch single asset
+
+					if (coverError) {
+						console.error("Error fetching cover image data:", coverError);
+						throw coverError; // Rethrow error for further handling
+					}
+
+					// If we have a cover image, set it in the album data
+					const coverImageUrl = coverImageData ? coverImageData.url : null;
+
+					setAlbum({
+						...data,
+						cover_image_url: coverImageUrl,
+					});
+				}
 			} catch (err) {
 				console.error("Error fetching album of the week:", err);
 			} finally {
 				setLoading(false);
 			}
 		}
+
 		fetchAlbum();
 	}, []);
 
 	if (loading) return <p>Loading Album of the Week...</p>;
 	if (!album) return <p>No album available at this time.</p>;
-
-	const coverImageUrl = getCoverImageUrl(album.cover_image_asset);
 
 	return (
 		<section className="album-of-the-week">
@@ -103,9 +97,9 @@ export default function AlbumOfTheWeek() {
 					</div>
 				</div>
 				<div className="record-image-container">
-					{coverImageUrl ? (
+					{album.cover_image_url ? (
 						<Image
-							src={coverImageUrl}
+							src={album.cover_image_url}
 							alt={album.title}
 							className="featured-record-cover"
 							width={400}

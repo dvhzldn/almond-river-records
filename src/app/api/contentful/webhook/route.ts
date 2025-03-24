@@ -42,11 +42,17 @@ const CONTENTFUL_WEBHOOK_SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET!;
 // Utility function to validate webhook signature
 const validateWebhookSignature = async (req: Request, rawBody: string) => {
 	const signature = req.headers.get("X-Contentful-Webhook-Signature");
+	if (!signature) {
+		console.error("No signature header found.");
+		return false;
+	}
+	// Compute the signature using the HMAC SHA256 algorithm
 	const computedSignature = crypto
 		.createHmac("sha256", CONTENTFUL_WEBHOOK_SECRET)
-		.update(rawBody) // Using the raw body to compute the signature
+		.update(rawBody)
 		.digest("hex");
 
+	// Compare the computed signature to the one sent by Contentful
 	return signature === computedSignature;
 };
 
@@ -62,6 +68,7 @@ export async function POST(request: Request) {
 		// Validate the webhook signature
 		const isValid = await validateWebhookSignature(request, rawBody);
 		if (!isValid) {
+			console.error("Invalid webhook signature");
 			return NextResponse.json(
 				{ error: "Invalid webhook signature" },
 				{ status: 403 }
@@ -175,7 +182,7 @@ export async function POST(request: Request) {
 				title,
 				sub_title,
 				artist_names,
-				artist_names_text, // <-- Added field for search
+				artist_names_text,
 				cover_image,
 				other_images,
 				release_year,
