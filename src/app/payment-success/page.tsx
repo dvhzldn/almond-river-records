@@ -2,10 +2,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
-interface PaymentSuccessProps {
-	searchParams: { [key: string]: string | string[] };
-}
-
 interface Order {
 	id: string;
 	customer_name: string;
@@ -36,13 +32,21 @@ interface Asset {
 	url: string;
 }
 
+// Allow searchParams to be either an object or a Promise of one.
+type PaymentSuccessProps = {
+	searchParams:
+		| { [key: string]: string | string[] }
+		| Promise<{ [key: string]: string | string[] }>;
+};
+
 export default async function PaymentSuccess({
 	searchParams,
 }: PaymentSuccessProps) {
-	// Extract checkout_id from query parameters.
-	const checkoutId = Array.isArray(searchParams.checkout_id)
-		? searchParams.checkout_id[0]
-		: searchParams.checkout_id;
+	// Await in case searchParams is a promise.
+	const params = await Promise.resolve(searchParams);
+	const checkoutId = Array.isArray(params.checkout_id)
+		? params.checkout_id[0]
+		: params.checkout_id;
 
 	if (!checkoutId) {
 		return (
