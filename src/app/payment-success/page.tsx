@@ -62,8 +62,13 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Error</h1>
-				<div className="content-box">
-					<p>Error: Unable to retrieve order details.</p>
+				<div className="content-box text">
+					<p>Something went wrong with placing your order.</p>
+					<br />
+					<p>
+						You can try again or contact us if you require further
+						assistant.
+					</p>
 				</div>
 			</div>
 		);
@@ -74,9 +79,13 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Incomplete</h1>
-				<div className="content-box">
+				<div className="content-box text">
 					<p>Your payment was not completed successfully.</p>
-					<p>Please try again or contact support.</p>
+					<br />
+					<p>
+						You can try again or contact us if you require further
+						assistant.
+					</p>
 				</div>
 			</div>
 		);
@@ -141,34 +150,40 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		<div className="page-container">
 			<h1 className="page-title">Payment Successful</h1>
 			<div className="content-box">
-				<h2>Thank you for your purchase, {order.customer_name}!</h2>
-				<p>Order Date: {new Date(order.order_date).toLocaleString()}</p>
-				<p>Order Reference: {order.sumup_checkout_reference}</p>
-				<p>Payment ID: {order.sumup_id}</p>
-				<p>Total Amount: £{order.sumup_amount}</p>
-
-				<h3>Ordered Items:</h3>
-				{orderItemsWithCover.length > 0 ? (
-					<ul>
-						{orderItemsWithCover.map((item) => (
-							<li key={item.vinyl_record_id}>
-								{item.cover_image_url && (
-									<Image
-										src={item.cover_image_url}
-										alt={`Cover image for ${item.title}`}
-										width={100}
-										height={100}
-									/>
-								)}
-								<p>
-									{item.artist_names.join(", ")} – {item.title}
-								</p>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p>No ordered items found.</p>
-				)}
+				<div className="two-column-layout text">
+					<h2>Thank you for your purchase, {order.customer_name}!</h2>
+					<h3>Order reference: {order.sumup_id}</h3>
+					<p>
+						Your order will be processed promptly and dispatched within
+						two working days.
+					</p>
+					<br />
+					<p>We hope you enjoy your records and appreciate your custom!</p>
+				</div>
+				<div className="two-column-layout text">
+					<h3>Ordered Items:</h3>
+					{orderItemsWithCover.length > 0 ? (
+						<ul>
+							{orderItemsWithCover.map((item) => (
+								<li key={item.vinyl_record_id}>
+									{item.cover_image_url && (
+										<Image
+											src={item.cover_image_url}
+											alt={`Cover image for ${item.title}`}
+											width={100}
+											height={100}
+										/>
+									)}
+									<p>
+										{item.artist_names.join(", ")} – {item.title}
+									</p>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p>No ordered items found.</p>
+					)}
+				</div>
 			</div>
 		</div>
 	);
