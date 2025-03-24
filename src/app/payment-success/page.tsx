@@ -1,9 +1,6 @@
 // /app/payment-success/page.tsx
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
-interface PaymentSuccessProps {
-	searchParams: { [key: string]: string | string[] | undefined };
-}
 
 interface Order {
 	id: string;
@@ -37,7 +34,9 @@ interface Asset {
 
 export default async function PaymentSuccess({
 	searchParams,
-}: PaymentSuccessProps) {
+}: {
+	searchParams: { [key: string]: string | string[] };
+}) {
 	// Extract checkout_id from query parameters.
 	const checkoutId = Array.isArray(searchParams.checkout_id)
 		? searchParams.checkout_id[0]
