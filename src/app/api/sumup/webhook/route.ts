@@ -8,7 +8,6 @@ interface OrderItem {
 
 // Update order status in Supabase orders table.
 async function updateOrderStatus(orderReference: string, status: string) {
-	// Here we assume your orders table uses the sumup_checkout_reference as a unique identifier.
 	const { error } = await supabase
 		.from("orders")
 		.update({ sumup_status: status })
@@ -24,9 +23,6 @@ async function updateOrderStatus(orderReference: string, status: string) {
 
 // Retrieve vinyl record IDs associated with the order from the order_items table.
 async function getOrderItems(orderReference: string): Promise<string[]> {
-	// Assuming that the orders table's primary key is used in order_items as order_id,
-	// and that you stored the sumup_checkout_reference in the orders table.
-	// First, we need to fetch the order record from Supabase.
 	const { data: orders, error: orderError } = await supabase
 		.from("orders")
 		.select("id")
@@ -58,13 +54,13 @@ async function getOrderItems(orderReference: string): Promise<string[]> {
 	);
 }
 
-// Release inventory by updating the quantity in Supabase vinyl_records table.
-async function releaseInventory(recordIds: string[]) {
+// Update inventory by setting the quantity to 0 for PAID orders.
+async function updateInventoryForPaid(recordIds: string[]) {
 	await Promise.all(
 		recordIds.map(async (recordId: string) => {
 			const { error } = await supabase
 				.from("vinyl_records")
-				.update({ quantity: 1 })
+				.update({ quantity: 0 })
 				.eq("id", recordId);
 			if (error) {
 				console.error(
@@ -72,7 +68,7 @@ async function releaseInventory(recordIds: string[]) {
 					error
 				);
 			} else {
-				console.log(`Released inventory for record ${recordId}`);
+				console.log(`Inventory updated to 0 for record ${recordId}`);
 			}
 		})
 	);
@@ -80,28 +76,10 @@ async function releaseInventory(recordIds: string[]) {
 
 export async function POST(request: Request) {
 	try {
-		// Parse incoming webhook payload from SumUp
 		const payload = await request.json();
 		console.log("Received SumUp webhook payload:", payload);
 
-		// Simulated failure condition (for testing purposes)
-		if (payload.id === "simulate-failed") {
-			const checkoutDetails = {
-				reference: "TEST-ORDER-FAILED",
-				status: "FAILED",
-			};
-			console.log("Simulated checkout details:", checkoutDetails);
-
-			await updateOrderStatus(checkoutDetails.reference, "FAILED");
-			const recordIds = await getOrderItems(checkoutDetails.reference);
-			await releaseInventory(recordIds);
-
-			return NextResponse.json({}, { status: 200 });
-		}
-
-		// Process real SumUp webhook events.
 		if (payload.event_type === "checkout.status.updated") {
-			// In the new payload, checkout details are nested inside "payload"
 			const checkoutDetails = payload.payload;
 			console.log("Verified checkout details:", checkoutDetails);
 
@@ -114,10 +92,10 @@ export async function POST(request: Request) {
 				checkoutStatus === "COMPLETED"
 			) {
 				await updateOrderStatus(orderReference, "PAID");
+				const recordIds = await getOrderItems(orderReference);
+				await updateInventoryForPaid(recordIds);
 			} else if (checkoutStatus === "FAILED") {
 				await updateOrderStatus(orderReference, "FAILED");
-				const recordIds = await getOrderItems(orderReference);
-				await releaseInventory(recordIds);
 			} else {
 				await updateOrderStatus(orderReference, "PENDING");
 			}

@@ -166,17 +166,18 @@ export async function POST(request: Request) {
 		}
 
 		// Step 4: Update inventory in Supabase.
-		await Promise.all(
-			recordIdsArray.map(async (recordId: string) => {
-				const { error } = await supabase
-					.from("vinyl_records")
-					.update({ quantity: 0 })
-					.eq("id", recordId);
-				if (error) {
-					console.error(`Error updating vinyl record ${recordId}:`, error);
-				}
-			})
-		);
+		// TODO: Removed inventory update until order status is paid
+		// await Promise.all(
+		// 	recordIdsArray.map(async (recordId: string) => {
+		// 		const { error } = await supabase
+		// 			.from("vinyl_records")
+		// 			.update({ quantity: 0 })
+		// 			.eq("id", recordId);
+		// 		if (error) {
+		// 			console.error(`Error updating vinyl record ${recordId}:`, error);
+		// 		}
+		// 	})
+		// );
 
 		// Return the hosted checkout URL and order details.
 		return NextResponse.json({
