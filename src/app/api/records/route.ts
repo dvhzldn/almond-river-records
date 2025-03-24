@@ -110,10 +110,10 @@ export async function GET(request: Request) {
 			query = query.ilike("artist_names_text", `%${artist}%`);
 		}
 
-		// Filter by genre.
 		if (genre) {
-			query = query.or(`genre.is.null,genre.contains.[${genre}]`);
+			query = query.contains("genre", [genre]);
 		}
+
 		const { data, error, count } = await query;
 		if (error) {
 			console.error("Supabase query error:", error);
