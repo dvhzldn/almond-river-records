@@ -42,7 +42,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	if (!checkoutId) {
 		return (
 			<div className="page-container">
-				<h1 className="page-title">Something went wrong...</h1>
+				<h1 className="page-title">Order Incomplete</h1>
 				<div className="content-box">
 					<h4>Error: missing checkout reference.</h4>
 					<br />
@@ -55,6 +55,15 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						</Link>{" "}
 						and we will get back to you.
 					</p>
+					<hr />
+					<Image
+						className="logo"
+						src="/images/almond-river-logo.jpg"
+						alt="Almond River Records logo"
+						width={200}
+						height={200}
+						priority
+					/>
 				</div>
 			</div>
 		);
@@ -82,6 +91,15 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						</Link>{" "}
 						and we will get back to you.
 					</p>
+					<hr />
+					<Image
+						className="logo"
+						src="/images/almond-river-logo.jpg"
+						alt="Almond River Records logo"
+						width={200}
+						height={200}
+						priority
+					/>
 				</div>
 			</div>
 		);
@@ -102,6 +120,15 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						</Link>{" "}
 						and we will get back to you.
 					</p>
+					<hr />
+					<Image
+						className="logo"
+						src="/images/almond-river-logo.jpg"
+						alt="Almond River Records logo"
+						width={200}
+						height={200}
+						priority
+					/>
 				</div>
 			</div>
 		);
@@ -206,6 +233,18 @@ export default async function PaymentSuccess({ params, searchParams }) {
 					) : (
 						<p></p>
 					)}
+				</div>
+				<div>
+					{" "}
+					<hr />
+					<Image
+						className="logo"
+						src="/images/almond-river-logo.jpg"
+						alt="Almond River Records logo"
+						width={200}
+						height={200}
+						priority
+					/>
 				</div>
 			</div>
 		</div>
