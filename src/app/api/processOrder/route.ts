@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 		// Use NEXT_PUBLIC_BASE_URL as the homepage.
-		const homepageUrl = process.env.NEXT_PUBLIC_BASE_URL;
+		// const homepageUrl = process.env.NEXT_PUBLIC_BASE_URL;
 		// Payment success URL is the base URL plus /payment-success.
 		const paymentSuccessUrl =
 			process.env.NEXT_PUBLIC_BASE_URL + "/payment-success";
