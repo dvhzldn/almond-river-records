@@ -2,6 +2,10 @@
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
+interface PaymentSuccessProps {
+	searchParams: { [key: string]: string | string[] };
+}
+
 interface Order {
 	id: string;
 	customer_name: string;
@@ -10,7 +14,7 @@ interface Order {
 	sumup_id: string;
 	sumup_amount: number;
 	sumup_status: string;
-	// other fields as needed...
+	// add additional fields as needed
 }
 
 interface OrderItem {
@@ -34,11 +38,11 @@ interface Asset {
 
 export default async function PaymentSuccess({
 	searchParams,
-}: {
-	searchParams: URLSearchParams;
-}) {
+}: PaymentSuccessProps) {
 	// Extract checkout_id from query parameters.
-	const checkoutId = searchParams.get("checkout_id");
+	const checkoutId = Array.isArray(searchParams.checkout_id)
+		? searchParams.checkout_id[0]
+		: searchParams.checkout_id;
 
 	if (!checkoutId) {
 		return (
