@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
-
 import crypto from "crypto";
 
 interface ContentfulWebhookFields {
@@ -41,13 +40,11 @@ interface AssetFileData {
 const CONTENTFUL_WEBHOOK_SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET!;
 
 // Utility function to validate webhook signature
-const validateWebhookSignature = async (req: Request) => {
-	const rawBody = await req.text(); // Convert the body into a string
+const validateWebhookSignature = async (req: Request, rawBody: string) => {
 	const signature = req.headers.get("X-Contentful-Webhook-Signature");
-
 	const computedSignature = crypto
 		.createHmac("sha256", CONTENTFUL_WEBHOOK_SECRET)
-		.update(rawBody) // Now using the string body
+		.update(rawBody) // Using the raw body to compute the signature
 		.digest("hex");
 
 	return signature === computedSignature;
@@ -55,12 +52,16 @@ const validateWebhookSignature = async (req: Request) => {
 
 export async function POST(request: Request) {
 	try {
+		// Read the request body once
 		const rawBody = await request.text();
 		console.log("Webhook payload:", rawBody);
+
+		// Parse the payload to a JavaScript object
 		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
 
-		// Validate webhook signature
-		if (!validateWebhookSignature(request)) {
+		// Validate the webhook signature
+		const isValid = await validateWebhookSignature(request, rawBody);
+		if (!isValid) {
 			return NextResponse.json(
 				{ error: "Invalid webhook signature" },
 				{ status: 403 }
