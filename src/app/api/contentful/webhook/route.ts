@@ -2,11 +2,9 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import crypto from "crypto";
 
-// Set the webhook secret and signing secret from environment variables
-// const CONTENTFUL_WEBHOOK_SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET!;
+// Use only the signing secret (this should match the signing secret in Contentful's Webhook Request Certification)
 const CONTENTFUL_SIGNING_SECRET = process.env.CONTENTFUL_SIGNING_SECRET!;
 
-// Interface for Contentful Webhook Payload and Fields
 interface ContentfulWebhookFields {
 	[key: string]: {
 		"en-GB": unknown;
@@ -43,26 +41,26 @@ interface AssetFileData {
 
 // Utility function to validate webhook signature using HMAC SHA256
 const validateWebhookSignature = async (req: Request, rawBody: string) => {
-	const signature = req.headers.get("X-Contentful-Webhook-Signature");
+	// Use the lowercase header key to retrieve the signature
+	const signature = req.headers.get("x-contentful-signature");
 
 	if (!signature) {
 		console.error("No signature header found.");
 		return false;
 	}
 
-	// Compute the HMAC SHA256 signature using the signing secret (for verification)
+	// Compute the HMAC SHA256 signature using the signing secret
 	const computedSignature = crypto
 		.createHmac("sha256", CONTENTFUL_SIGNING_SECRET)
 		.update(rawBody)
 		.digest("hex");
 
-	// Compare the Contentful signature with the computed signature
-	if (signature !== computedSignature) {
-		console.error("Signature mismatch. Webhook security validation failed.");
-		return false;
-	}
+	// Log both signatures for debugging purposes (remove these in production)
+	console.log("Computed Signature:", computedSignature);
+	console.log("Contentful Signature:", signature);
 
-	return true;
+	// Compare the computed signature with the signature from Contentful
+	return signature === computedSignature;
 };
 
 export async function POST(request: Request) {
@@ -74,7 +72,7 @@ export async function POST(request: Request) {
 		// Parse the payload
 		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
 
-		// Validate the webhook signature (using the CONTENTFUL_SIGNING_SECRET)
+		// Validate the webhook signature using the signing secret
 		const isValid = await validateWebhookSignature(request, rawBody);
 		if (!isValid) {
 			console.error("Invalid webhook signature");
@@ -92,7 +90,7 @@ export async function POST(request: Request) {
 		const { sys, fields } = payload;
 		const recordId = sys.id;
 
-		// If the payload is for an Asset, upsert into contentful_assets
+		// If the payload is for an Asset, upsert into contentful_assets.
 		if (sys.type === "Asset") {
 			const title = fields.title ? (fields.title["en-GB"] as string) : null;
 			const fileData = fields.file
@@ -122,7 +120,6 @@ export async function POST(request: Request) {
 				updated_at,
 			};
 
-			// Upsert Asset Data into Supabase
 			const { error } = await supabase
 				.from("contentful_assets")
 				.upsert(assetData, { onConflict: "id" });
@@ -137,7 +134,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ message: "Asset synced successfully" });
 		}
 
-		// Otherwise, if the payload is an Entry, assume it is a vinyl record
+		// Otherwise, if the payload is an Entry, assume it is a vinyl record.
 		if (sys.type === "Entry") {
 			const title = (fields.title?.["en-GB"] as string) || null;
 			const sub_title = (fields.subTitle?.["en-GB"] as string) || null;
@@ -179,7 +176,6 @@ export async function POST(request: Request) {
 				album_of_the_week: fields.albumOfTheWeek?.["en-GB"],
 			};
 
-			// Upsert Vinyl Record Data into Supabase
 			const { error } = await supabase
 				.from("vinyl_records")
 				.upsert(vinylRecordData, { onConflict: "id" });
@@ -194,7 +190,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ message: "Record synced successfully" });
 		}
 
-		// If the sys.type is neither Asset nor Entry, return an appropriate response.
+		// If sys.type is neither Asset nor Entry, return an appropriate response.
 		return NextResponse.json(
 			{ message: `Unhandled sys.type: ${sys.type}` },
 			{ status: 400 }
