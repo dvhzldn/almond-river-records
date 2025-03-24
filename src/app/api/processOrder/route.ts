@@ -57,6 +57,7 @@ export async function POST(request: Request) {
 
 		if (!sumupResponse.ok) {
 			const errorText = await sumupResponse.text();
+			console.error("SumUp API error:", errorText); // Log the error response to the server console
 			return NextResponse.json(
 				{ error: "Checkout creation failed", details: errorText },
 				{ status: sumupResponse.status }
