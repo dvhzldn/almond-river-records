@@ -5,9 +5,7 @@ import crypto from "crypto";
 const CONTENTFUL_SIGNING_SECRET = process.env.CONTENTFUL_SIGNING_SECRET!;
 
 interface ContentfulWebhookFields {
-	[key: string]: {
-		"en-GB": unknown;
-	};
+	[key: string]: { "en-GB": unknown };
 }
 
 interface ContentfulWebhookPayload {
@@ -17,9 +15,7 @@ interface ContentfulWebhookPayload {
 		createdAt?: string;
 		updatedAt?: string;
 		contentType?: {
-			sys: {
-				id: string;
-			};
+			sys: { id: string };
 		};
 	};
 	fields: ContentfulWebhookFields;
@@ -38,9 +34,9 @@ interface AssetFileData {
 	contentType: string;
 }
 
-// Utility function to validate webhook signature using HMAC SHA256.
-// Per Contentful’s 2025 docs, the string to sign is constructed as:
-//   <x-contentful-timestamp> + ":" + <rawBody>
+// Updated utility function to validate webhook signature using the full canonical request representation.
+// The canonical string is built as:
+//   <HTTP_METHOD>\n<REQUEST_PATH>\n<CANONICAL_SIGNED_HEADERS>\n<REQUEST_BODY>
 const validateWebhookSignature = (req: Request, rawBuffer: Buffer): boolean => {
 	const signature = req.headers.get("x-contentful-signature")?.trim();
 	const timestamp = (req.headers.get("x-contentful-timestamp") || "").trim();
@@ -50,18 +46,60 @@ const validateWebhookSignature = (req: Request, rawBuffer: Buffer): boolean => {
 		return false;
 	}
 
-	// Construct the string to sign using the exact raw body bytes converted to UTF-8
-	const stringToSign = `${timestamp}:` + rawBuffer.toString("utf8");
+	// (Optional) TTL check: ensure the timestamp is within an acceptable window (e.g. 60 seconds)
+	const currentTime = Date.now();
+	if (Number(timestamp) + 60000 < currentTime) {
+		console.error("Request timestamp is too old.");
+		return false;
+	}
+
+	// Get the HTTP method
+	const method = req.method; // e.g. "POST"
+
+	// Build the request path, including any query string.
+	const urlObj = new URL(req.url);
+	const requestPath = urlObj.pathname + urlObj.search; // already URL encoded as needed
+
+	// Build the canonical signed headers.
+	// The header x-contentful-signed-headers tells you which headers are included.
+	const signedHeadersList = (
+		req.headers.get("x-contentful-signed-headers") || ""
+	)
+		.split(",")
+		.map((h) => h.trim())
+		.filter((h) => h.length > 0);
+
+	// For each signed header, get its value from the request headers,
+	// lowercase the header name, and join with a colon.
+	const canonicalHeaders = signedHeadersList
+		.map((headerName) => {
+			const headerValue = req.headers.get(headerName) || "";
+			return `${headerName.toLowerCase()}:${headerValue}`;
+		})
+		.join(";");
+
+	// The request body as received
+	const requestBody = rawBuffer.toString("utf8");
+
+	// Build the canonical representation
+	const canonicalRequestRepresentation = [
+		method,
+		requestPath,
+		canonicalHeaders,
+		requestBody,
+	].join("\n");
 
 	// Compute the HMAC SHA256 signature using the signing secret
 	const computedSignature = crypto
 		.createHmac("sha256", CONTENTFUL_SIGNING_SECRET)
-		.update(stringToSign)
+		.update(canonicalRequestRepresentation)
 		.digest("hex");
 
-	// Log details for debugging (remove or disable in production)
-	console.log("Timestamp:", timestamp);
-	console.log("String to Sign:", stringToSign);
+	// Debug logging (remove or disable in production)
+	console.log(
+		"Canonical Request Representation:",
+		canonicalRequestRepresentation
+	);
 	console.log("Computed Signature:", computedSignature);
 	console.log("Contentful Signature:", signature);
 
@@ -70,12 +108,12 @@ const validateWebhookSignature = (req: Request, rawBuffer: Buffer): boolean => {
 
 export async function POST(request: Request) {
 	try {
-		// Read the raw body as an arrayBuffer once and convert to Buffer
+		// Read the raw body as an arrayBuffer once and convert to a Buffer
 		const buffer = Buffer.from(await request.arrayBuffer());
 		const rawBody = buffer.toString("utf8");
 		console.log("Webhook Payload:", rawBody);
 
-		// Validate the webhook signature using the raw buffer
+		// Validate the webhook signature using the full canonical representation
 		const isValid = validateWebhookSignature(request, buffer);
 		if (!isValid) {
 			console.error("Invalid webhook signature");
