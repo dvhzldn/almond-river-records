@@ -101,6 +101,8 @@ export async function POST(request: Request) {
 				? (fields.subTitle["en-GB"] as string)
 				: null;
 			const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
+			// Compute a text version for searching.
+			const artist_names_text = artist_names.join(" ");
 
 			// For assets referenced in the entry, store just the asset IDs.
 			const coverImageRef = fields.coverImage?.["en-GB"] as
@@ -146,6 +148,7 @@ export async function POST(request: Request) {
 				title,
 				sub_title,
 				artist_names,
+				artist_names_text, // <-- Added field for search
 				cover_image,
 				other_images,
 				release_year,
@@ -176,7 +179,6 @@ export async function POST(request: Request) {
 			}
 			return NextResponse.json({ message: "Record synced successfully" });
 		}
-
 		// If the sys.type is neither Asset nor Entry, return an appropriate response.
 		return NextResponse.json(
 			{ message: `Unhandled sys.type: ${sys.type}` },

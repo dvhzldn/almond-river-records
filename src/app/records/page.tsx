@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Modal from "@/components/Modal";
 import { useRecords, VinylRecord } from "@/hooks/useRecords";
-import { useContentfulOptions } from "@/hooks/useContentfulOptions";
+import { useSupabaseOptions } from "@/hooks/useSupabaseOptions";
 import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
@@ -22,9 +22,9 @@ export default function RecordsPage() {
 	const [selectedRecord, setSelectedRecord] = useState<VinylRecord | null>(
 		null
 	);
-	const pageSize = 12;
+	const pageSize = 24;
 
-	const { artistOptions, genreOptions } = useContentfulOptions();
+	const { artistOptions, genreOptions } = useSupabaseOptions();
 
 	const { records, totalRecords, loading } = useRecords({
 		search,

@@ -1,142 +1,159 @@
 import { NextResponse } from "next/server";
-import client from "@/lib/contentful";
-import { IVinylRecordFields } from "@/@types/generated/contentful";
+import { supabase } from "@/lib/supabaseClient";
 
-// Extend Contentful Entry Type to Include `contentTypeId`
-type VinylRecordEntry = {
-	sys: {
-		id: string;
-		contentTypeId: string;
-		createdAt: string;
-	};
-	fields: unknown;
+// Helper function to get a normalized cover image URL.
+const getCoverImageUrl = (cover: unknown): string | null => {
+	if (!cover) return null;
+	if (Array.isArray(cover)) {
+		if (cover.length === 0) return null;
+		const url = (cover[0] as { url: string }).url;
+		return url.startsWith("//") ? "https:" + url : url;
+	}
+	if (typeof cover === "object" && "url" in cover) {
+		const url = (cover as { url: string }).url;
+		return url.startsWith("//") ? "https:" + url : url;
+	}
+	return null;
 };
 
-export async function GET(req: Request) {
-	const { searchParams } = new URL(req.url);
-
-	// Check if we should filter for records created in the last 7 days.
-	const newThisWeek = searchParams.get("newThisWeek");
-
-	// Extract filters from query params.
-	const searchQuery = searchParams.get("search") || "";
-	const condition = searchParams.get("condition") || "";
-	const artist = searchParams.get("artist") || "";
-	const artists = searchParams.getAll("artist");
-	const genre = searchParams.get("genre") || "";
-	const genres = searchParams.getAll("genre");
-
-	// Extract pagination parameters (default: limit 12, skip 0)
-	const limitParam = searchParams.get("limit")
-		? Number(searchParams.get("limit"))
-		: 12;
-	const skipParam = searchParams.get("skip")
-		? Number(searchParams.get("skip"))
-		: 0;
-
-	// Build query parameters for Contentful using a custom type.
-	type RecordsQueryParams = {
-		content_type: string;
-		limit: number;
-		skip: number;
-		query?: string;
-		"fields.genre[all]"?: string | string[];
-		"fields.price[gte]"?: number;
-		"fields.price[lte]"?: number;
-		"fields.vinylCondition"?: string;
-		"fields.artistName[in]"?: string | string[];
-		order?: string;
-		"fields.quantity[gt]": number;
-		"fields.inStock": boolean;
-		"sys.createdAt[gte]"?: string;
-		"fields.sold": boolean;
-	};
-
-	const params: RecordsQueryParams = {
-		content_type: "vinylRecord",
-		limit: limitParam,
-		skip: skipParam,
-		"fields.quantity[gt]": 0,
-		"fields.inStock": true,
-		"fields.sold": false,
-	};
-
-	// If newThisWeek is specified, filter by creation date.
-	if (newThisWeek) {
-		const sevenDaysAgo = new Date();
-		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-		params["sys.createdAt[gte]"] = sevenDaysAgo.toISOString();
+// Helper function to normalize an "other image" asset.
+const getOtherImageUrl = (asset: unknown): string | null => {
+	if (!asset) return null;
+	if (Array.isArray(asset)) {
+		if (asset.length === 0) return null;
+		const first = asset[0];
+		if (first && typeof first === "object" && "url" in first) {
+			const url = (first as { url: string }).url;
+			return url.startsWith("//") ? "https:" + url : url;
+		}
+		return null;
 	}
-
-	// Apply search filter via Contentful's full-text search.
-	if (searchQuery) {
-		params.query = searchQuery;
+	if (typeof asset === "object" && "url" in asset) {
+		const url = (asset as { url: string }).url;
+		return url.startsWith("//") ? "https:" + url : url;
 	}
+	return null;
+};
 
-	// Apply condition filter.
-	if (condition) {
-		params["fields.vinylCondition"] = condition;
-	}
-
-	// Apply artist filter.
-	if (artist) {
-		params["fields.artistName[in]"] = [artist];
-	}
-	if (artists.length > 0) {
-		params["fields.artistName[in]"] = artists;
-	}
-
-	// Apply genre filter.
-	if (genre) {
-		params["fields.genre[all]"] = genre;
-	}
-	if (genres.length > 0) {
-		params["fields.genre[all]"] = genres;
-	}
-
-	// Sort records by creation date (most recent first)
-	params.order = "-sys.createdAt";
-
+export async function GET(request: Request) {
 	try {
-		// Fetch records from Contentful with filters and pagination.
-		const res = (await client.getEntries(params)) as unknown as {
-			total: number;
-			items: VinylRecordEntry[];
-		};
+		const { searchParams } = new URL(request.url);
 
-		// Map data properly, casting fields via unknown to satisfy our type.
-		const records = res.items.map((record) => {
-			const fields = record.fields as unknown as IVinylRecordFields;
-			return {
-				id: record.sys.id,
-				title: fields.title ?? "Unknown Title",
-				artistName: fields.artistName ?? [],
-				label: fields.label ?? "Unknown Label",
-				price: fields.price ?? 0,
-				genre: fields.genre ?? [],
-				vinylCondition: fields.vinylCondition ?? "Unknown Condition",
-				sleeveCondition: fields.sleeveCondition ?? "Unknown Condition",
-				inStock: fields.inStock ?? false,
-				releaseYear: fields.releaseYear ?? null,
-				coverImage: fields.coverImage?.fields.file?.url
-					? `https:${fields.coverImage.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
-					: null,
-				otherImages: fields.otherImages
-					? fields.otherImages
-							.map((asset) =>
-								asset.fields.file?.url
-									? `https:${asset.fields.file.url}?w=250&h=250&fit=thumb&fm=webp&q=80`
-									: null
-							)
-							.filter((url) => url !== null)
-					: [],
-				description: fields.description,
-			};
-		});
+		// Retrieve query parameters
+		const newThisWeek = searchParams.get("newThisWeek");
+		const searchQuery = searchParams.get("search") || "";
+		const condition = searchParams.get("condition") || "";
+		const artist = searchParams.get("artist") || "";
+		const artists = searchParams.getAll("artist");
+		const genre = searchParams.get("genre") || "";
+		const genres = searchParams.getAll("genre");
 
-		return NextResponse.json({ records, total: res.total });
-	} catch (error) {
-		console.error("Error fetching records:", error);
+		// Pagination: default limit 24, skip 0
+		const limitParam = searchParams.get("limit")
+			? Number(searchParams.get("limit"))
+			: 24;
+		const skipParam = searchParams.get("skip")
+			? Number(searchParams.get("skip"))
+			: 0;
+
+		// Build the Supabase query.
+		let query = supabase
+			.from("vinyl_records")
+			.select(
+				`
+          id,
+          title,
+          artist_names,
+          price,
+          vinyl_condition,
+          sleeve_condition,
+          label,
+          release_year,
+          genre,
+          cover_image,
+          cover_image_asset:contentful_assets!vinyl_records_cover_image_fkey (
+            id,
+            url
+          ),
+          other_images,
+          other_images_assets:vinyl_record_other_images!vinyl_record_id (
+            asset:contentful_assets!vinyl_record_other_images_asset_id_fkey (
+              id,
+              url
+            )
+          )
+        `,
+				{ count: "exact" }
+			)
+			.eq("in_stock", true)
+			.eq("sold", false)
+			.gt("quantity", 0)
+			.order("created_at", { ascending: false })
+			.range(skipParam, skipParam + limitParam - 1);
+
+		if (newThisWeek) {
+			const sevenDaysAgo = new Date();
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			query = query.gte("created_at", sevenDaysAgo.toISOString());
+		}
+
+		if (searchQuery) {
+			query = query.or(
+				`title.ilike.%${searchQuery}%,artist_names::text.ilike.%${searchQuery}%`
+			);
+		}
+
+		if (condition) {
+			query = query.eq("vinyl_condition", condition);
+		}
+
+		if (artist) {
+			query = query.contains("artist_names", [artist]);
+		} else if (artists.length > 0) {
+			query = query.or(
+				artists.map((a) => `artist_names.cs.{${a}}`).join(",")
+			);
+		}
+
+		if (genre) {
+			query = query.contains("genre", [genre]);
+		} else if (genres.length > 0) {
+			query = query.or(genres.map((g) => `genre.cs.{${g}}`).join(","));
+		}
+
+		const { data, error, count } = await query;
+		if (error) {
+			console.error("Supabase query error:", error);
+			return NextResponse.json(
+				{ error: "Failed to fetch records", details: error.message },
+				{ status: 500 }
+			);
+		}
+
+		const records = (data || []).map((r) => ({
+			id: r.id,
+			title: r.title,
+			artistName: r.artist_names,
+			price: r.price,
+			vinylCondition: r.vinyl_condition,
+			sleeveCondition: r.sleeve_condition,
+			label: r.label,
+			releaseYear: r.release_year,
+			genre: r.genre || [],
+			coverImage: getCoverImageUrl(r.cover_image_asset),
+			otherImages: r.other_images_assets
+				? (Array.isArray(r.other_images_assets)
+						? r.other_images_assets
+						: [r.other_images_assets]
+					)
+						.map((row: { asset: unknown }) => getOtherImageUrl(row.asset))
+						.filter((url): url is string => url !== null)
+				: [],
+		}));
+
+		return NextResponse.json({ records, total: count });
+	} catch (err) {
+		console.error("Error in /api/records route:", err);
 		return NextResponse.json(
 			{ error: "Failed to fetch records" },
 			{ status: 500 }
