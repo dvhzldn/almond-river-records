@@ -10,7 +10,6 @@ interface Order {
 	sumup_id: string;
 	sumup_amount: number;
 	sumup_status: string;
-	// add additional fields as needed...
 }
 
 interface OrderItem {
@@ -24,16 +23,16 @@ interface OrderItem {
 
 interface VinylRecord {
 	id: string;
-	cover_image: string; // asset ID stored in vinyl_records
+	cover_image: string; // This is the ID in contentful_assets
 }
 
 interface Asset {
 	id: string;
-	url: string;
+	url: string; // This is the actual image URL
 }
 
 export default async function PaymentSuccess({ params, searchParams }) {
-	// Mark params as used (if needed) without affecting logic.
+	// Use params if needed (e.g. console.log(params)).
 	void params;
 
 	// Extract checkout_id from searchParams.
@@ -52,7 +51,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
-	// Query the order in Supabase using the checkout reference.
+	// Retrieve the order details from the orders table.
 	const orderRes = await supabase
 		.from("orders")
 		.select("*")
@@ -71,6 +70,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
+	// Only proceed if the payment status is "PAID".
 	if (order.sumup_status !== "PAID") {
 		return (
 			<div className="page-container">
@@ -83,7 +83,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
-	// Query order items for this order.
+	// Retrieve the order items for this order.
 	const orderItemsRes = await supabase
 		.from("order_items")
 		.select("*")
@@ -91,44 +91,46 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	const orderItemsData = orderItemsRes.data as OrderItem[] | null;
 	const orderItems: OrderItem[] = orderItemsData ?? [];
 
-	// If order items exist, fetch cover image URLs from vinyl_records and contentful_assets.
+	// If there are order items, fetch the cover image URLs from contentful_assets.
 	let orderItemsWithCover: OrderItem[] = [];
 	if (orderItems.length > 0) {
-		// Get the vinyl record IDs from order items.
+		// 1) Get the vinyl record IDs from the order items.
 		const recordIds = orderItems.map((item) => item.vinyl_record_id);
 
-		// Query vinyl_records to get the cover_image asset IDs.
+		// 2) Query vinyl_records to get the 'cover_image' (which is actually the asset ID).
 		const vinylRecordsRes = await supabase
 			.from("vinyl_records")
 			.select("id, cover_image")
 			.in("id", recordIds);
+
 		const vinylRecordsData = vinylRecordsRes.data as VinylRecord[] | null;
 		const vinylRecords: VinylRecord[] = vinylRecordsData ?? [];
 
-		// Build a mapping from vinyl_record_id to its cover_image asset ID.
+		// 3) Build a map from vinyl_record_id -> cover_image (asset ID in contentful_assets).
 		const vinylRecordMap: Record<string, string> = {};
-		vinylRecords.forEach((v) => {
-			vinylRecordMap[v.id] = v.cover_image;
+		vinylRecords.forEach((record) => {
+			vinylRecordMap[record.id] = record.cover_image;
 		});
 
-		// Get unique asset IDs.
+		// 4) Collect all unique asset IDs to fetch from contentful_assets.
 		const assetIds = Array.from(new Set(Object.values(vinylRecordMap)));
 
-		// Query contentful_assets to get the URL for each asset.
+		// 5) Query contentful_assets to get the URL for each asset ID.
 		const assetsRes = await supabase
 			.from("contentful_assets")
 			.select("id, url")
 			.in("id", assetIds);
+
 		const assetsData = assetsRes.data as Asset[] | null;
 		const assets: Asset[] = assetsData ?? [];
 
-		// Build a mapping from asset ID to URL.
+		// 6) Create a map from asset ID -> actual image URL.
 		const assetMap: Record<string, string> = {};
 		assets.forEach((asset) => {
 			assetMap[asset.id] = asset.url;
 		});
 
-		// Augment each order item with its cover image URL.
+		// 7) Attach cover_image_url to each order item based on the mapping.
 		orderItemsWithCover = orderItems.map((item) => ({
 			...item,
 			cover_image_url:
@@ -160,7 +162,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 									/>
 								)}
 								<p>
-									{item.artist_names.join(", ")} - {item.title}
+									{item.artist_names.join(", ")} – {item.title}
 								</p>
 							</li>
 						))}

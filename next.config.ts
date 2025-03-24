@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
 				protocol: "http",
 				hostname: "images.ctfassets.net",
 			},
+			{
+				protocol: "https",
+				hostname: "images.contentful.com",
+			},
 		],
 	},
 };
