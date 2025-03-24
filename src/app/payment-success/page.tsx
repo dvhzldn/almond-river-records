@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
-
+import Link from "next/link";
 interface Order {
 	id: string;
 	customer_name: string;
@@ -42,9 +42,19 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	if (!checkoutId) {
 		return (
 			<div className="page-container">
-				<h1 className="page-title">Payment Error</h1>
+				<h1 className="page-title">Something went wrong...</h1>
 				<div className="content-box">
-					<p>Error: Missing checkout reference.</p>
+					<h4>Error: missing checkout reference.</h4>
+					<br />
+					<p>Something went wrong and your order has not been placed.</p>
+					<br /> <br />
+					<p>
+						If you require further assistance, please get in touch through{" "}
+						<Link href="/contact" className="hyperLink">
+							our contact form
+						</Link>{" "}
+						and we will get back to you.
+					</p>
 				</div>
 			</div>
 		);
@@ -62,12 +72,15 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Error</h1>
-				<div className="content-box text">
+				<div className="content-box">
 					<p>Something went wrong with placing your order.</p>
 					<br />
 					<p>
-						You can try again or contact us if you require further
-						assistant.
+						If you require further assistance, please get in touch through{" "}
+						<Link href="/contact" className="hyperLink">
+							our contact form
+						</Link>{" "}
+						and we will get back to you.
 					</p>
 				</div>
 			</div>
@@ -79,12 +92,15 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Incomplete</h1>
-				<div className="content-box text">
-					<p>Your payment was not completed successfully.</p>
+				<div className="content-box">
+					<p>Your payment was not processed successfully.</p>
 					<br />
 					<p>
-						You can try again or contact us if you require further
-						assistant.
+						If you require further assistance, please get in touch through{" "}
+						<Link href="/contact" className="hyperLink">
+							our contact form
+						</Link>{" "}
+						and we will get back to you.
 					</p>
 				</div>
 			</div>
@@ -157,6 +173,13 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						Your order will be processed promptly and dispatched within
 						two working days.
 					</p>
+					<p>
+						If you require further assistance, please get in touch through{" "}
+						<Link href="/contact" className="hyperLink">
+							our contact form
+						</Link>{" "}
+						and we will get back to you.
+					</p>
 					<br />
 					<p>We hope you enjoy your records and appreciate your custom!</p>
 				</div>
@@ -181,7 +204,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 							))}
 						</ul>
 					) : (
-						<p>No ordered items found.</p>
+						<p></p>
 					)}
 				</div>
 			</div>
