@@ -44,9 +44,7 @@ export async function GET(request: Request) {
 		const searchQuery = searchParams.get("search") || "";
 		const condition = searchParams.get("condition") || "";
 		const artist = searchParams.get("artist") || "";
-		const artists = searchParams.getAll("artist");
 		const genre = searchParams.get("genre") || "";
-		const genres = searchParams.getAll("genre");
 
 		// Pagination: default limit 24, skip 0
 		const limitParam = searchParams.get("limit")
@@ -64,6 +62,7 @@ export async function GET(request: Request) {
           id,
           title,
           artist_names,
+		            artist_names_text,
           price,
           vinyl_condition,
           sleeve_condition,
@@ -99,7 +98,7 @@ export async function GET(request: Request) {
 
 		if (searchQuery) {
 			query = query.or(
-				`title.ilike.%${searchQuery}%,artist_names::text.ilike.%${searchQuery}%`
+				`title.ilike.%${searchQuery}%,artist_names_text.ilike.%${searchQuery}%`
 			);
 		}
 
@@ -108,19 +107,13 @@ export async function GET(request: Request) {
 		}
 
 		if (artist) {
-			query = query.contains("artist_names", [artist]);
-		} else if (artists.length > 0) {
-			query = query.or(
-				artists.map((a) => `artist_names.cs.{${a}}`).join(",")
-			);
+			query = query.ilike("artist_names_text", `%${artist}%`);
 		}
 
+		// Filter by genre.
 		if (genre) {
-			query = query.contains("genre", [genre]);
-		} else if (genres.length > 0) {
-			query = query.or(genres.map((g) => `genre.cs.{${g}}`).join(","));
+			query = query.or(`genre.is.null,genre.contains.[${genre}]`);
 		}
-
 		const { data, error, count } = await query;
 		if (error) {
 			console.error("Supabase query error:", error);
