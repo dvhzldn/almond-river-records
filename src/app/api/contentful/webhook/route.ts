@@ -41,9 +41,10 @@ interface AssetFileData {
 }
 
 // Utility function to validate webhook signature using HMAC SHA256.
-// Here we try concatenating rawBody + timestamp.
+// Per Contentful’s 2025 docs, the string to sign is constructed as:
+//   <x-contentful-timestamp> + ":" + <rawBody>
 const validateWebhookSignature = async (req: Request, rawBody: string) => {
-	// Retrieve the signature, timestamp, and signed headers.
+	// Retrieve the signature and timestamp from the headers (header keys are lower-cased)
 	const signature = req.headers.get("x-contentful-signature");
 	const timestamp = req.headers.get("x-contentful-timestamp") || "";
 
@@ -52,8 +53,8 @@ const validateWebhookSignature = async (req: Request, rawBody: string) => {
 		return false;
 	}
 
-	// Build the string to sign by concatenating rawBody and the timestamp.
-	const stringToSign = rawBody + timestamp;
+	// Build the string to sign using the colon separator as specified in the docs.
+	const stringToSign = `${timestamp}:${rawBody}`;
 
 	// Compute the HMAC SHA256 signature using the signing secret
 	const computedSignature = crypto
@@ -61,14 +62,12 @@ const validateWebhookSignature = async (req: Request, rawBody: string) => {
 		.update(stringToSign)
 		.digest("hex");
 
-	// Log the details for debugging (remove these logs in production)
-	console.log("Raw Body:", rawBody);
+	// Log details for debugging (remove or disable in production)
 	console.log("Timestamp:", timestamp);
-	console.log("String to Sign (rawBody + timestamp):", stringToSign);
+	console.log("String to Sign:", stringToSign);
 	console.log("Computed Signature:", computedSignature);
 	console.log("Contentful Signature:", signature);
 
-	// Return true if the computed signature matches the signature from Contentful.
 	return signature === computedSignature;
 };
 
