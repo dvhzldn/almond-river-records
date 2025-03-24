@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
 import crypto from "crypto";
+import { createClient } from "@supabase/supabase-js";
 
+const supabaseService = createClient(
+	process.env.NEXT_PUBLIC_SUPABASE_URL!,
+	process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 const CONTENTFUL_SIGNING_SECRET = process.env.CONTENTFUL_SIGNING_SECRET!;
 
 interface ContentfulWebhookFields {
@@ -162,7 +166,7 @@ export async function POST(request: Request) {
 				updated_at,
 			};
 
-			const { error } = await supabase
+			const { error } = await supabaseService
 				.from("contentful_assets")
 				.upsert(assetData, { onConflict: "id" });
 			if (error) {
@@ -215,7 +219,7 @@ export async function POST(request: Request) {
 				album_of_the_week: fields.albumOfTheWeek?.["en-GB"],
 			};
 
-			const { error } = await supabase
+			const { error } = await supabaseService
 				.from("vinyl_records")
 				.upsert(vinylRecordData, { onConflict: "id" });
 			if (error) {
