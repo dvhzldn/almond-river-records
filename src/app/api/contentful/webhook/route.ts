@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import crypto from "crypto";
 
-// Use only the signing secret (this should match the signing secret in Contentful's Webhook Request Certification)
+// Use the signing secret from your environment.
+// This should match the secret in your Contentful Webhook Request Certification settings.
 const CONTENTFUL_SIGNING_SECRET = process.env.CONTENTFUL_SIGNING_SECRET!;
 
 interface ContentfulWebhookFields {
@@ -39,10 +40,10 @@ interface AssetFileData {
 	contentType: string;
 }
 
-// Utility function to validate the webhook signature.
-// We now build a string to sign by concatenating the x-contentful-timestamp header and the raw request body.
+// Utility function to validate webhook signature using HMAC SHA256.
+// Here we try concatenating rawBody + timestamp.
 const validateWebhookSignature = async (req: Request, rawBody: string) => {
-	// Retrieve the signature and timestamp from the headers.
+	// Retrieve the signature, timestamp, and signed headers.
 	const signature = req.headers.get("x-contentful-signature");
 	const timestamp = req.headers.get("x-contentful-timestamp") || "";
 
@@ -51,8 +52,8 @@ const validateWebhookSignature = async (req: Request, rawBody: string) => {
 		return false;
 	}
 
-	// Build the string to sign: timestamp concatenated with the raw body.
-	const stringToSign = timestamp + rawBody;
+	// Build the string to sign by concatenating rawBody and the timestamp.
+	const stringToSign = rawBody + timestamp;
 
 	// Compute the HMAC SHA256 signature using the signing secret
 	const computedSignature = crypto
@@ -60,10 +61,14 @@ const validateWebhookSignature = async (req: Request, rawBody: string) => {
 		.update(stringToSign)
 		.digest("hex");
 
-	// Log both signatures for debugging (remove these logs in production)
+	// Log the details for debugging (remove these logs in production)
+	console.log("Raw Body:", rawBody);
+	console.log("Timestamp:", timestamp);
+	console.log("String to Sign (rawBody + timestamp):", stringToSign);
 	console.log("Computed Signature:", computedSignature);
 	console.log("Contentful Signature:", signature);
 
+	// Return true if the computed signature matches the signature from Contentful.
 	return signature === computedSignature;
 };
 
@@ -76,7 +81,7 @@ export async function POST(request: Request) {
 		// Parse the payload
 		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
 
-		// Validate the webhook signature using the signing secret
+		// Validate the webhook signature (using the signing secret)
 		const isValid = await validateWebhookSignature(request, rawBody);
 		if (!isValid) {
 			console.error("Invalid webhook signature");
@@ -145,7 +150,6 @@ export async function POST(request: Request) {
 			const artist_names = (fields.artistName?.["en-GB"] as string[]) || [];
 			const artist_names_text = artist_names.join(" ");
 
-			// Extract cover image (asset IDs)
 			const coverImageRef = fields.coverImage?.["en-GB"] as {
 				sys: { id: string };
 			};
