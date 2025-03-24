@@ -8,7 +8,7 @@ const supabaseService = createClient(
 
 interface VinylRecord {
 	id: string;
-	artistName: string;
+	artist_names: string[];
 	title: string;
 	price: number;
 }
@@ -16,7 +16,7 @@ interface VinylRecord {
 interface OrderItem {
 	order_id: number;
 	vinyl_record_id: string;
-	artist_names: string;
+	artist_names: string[];
 	title: string;
 	price: number;
 }
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
 		// Step 3: Fetch vinyl record details from Supabase and build order items.
 		const { data: vinylRecords, error: vinylError } = await supabaseService
 			.from("vinyl_records")
-			.select("id, artistName, title, price")
+			.select("id, artist_names, title, price")
 			.in("id", recordIdsArray);
 
 		if (vinylError) {
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
 			(record: VinylRecord) => ({
 				order_id: orderId,
 				vinyl_record_id: record.id,
-				artist_names: record.artistName,
+				artist_names: record.artist_names,
 				title: record.title,
 				price: record.price,
 			})
