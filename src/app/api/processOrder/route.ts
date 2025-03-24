@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseService = createClient(
+	process.env.NEXT_PUBLIC_SUPABASE_URL!,
+	process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 interface VinylRecord {
 	id: string;
@@ -119,10 +124,8 @@ export async function POST(request: Request) {
 			sumup_transactions: paymentData.transactions || [],
 		};
 
-		const { data: orderInsertData, error: orderInsertError } = await supabase
-			.from("orders")
-			.insert(orderRecord)
-			.select();
+		const { data: orderInsertData, error: orderInsertError } =
+			await supabaseService.from("orders").insert(orderRecord).select();
 
 		if (orderInsertError) {
 			console.error("Error inserting order:", orderInsertError);
@@ -135,7 +138,7 @@ export async function POST(request: Request) {
 		const orderId = newOrder.id;
 
 		// Step 3: Fetch vinyl record details from Supabase and build order items.
-		const { data: vinylRecords, error: vinylError } = await supabase
+		const { data: vinylRecords, error: vinylError } = await supabaseService
 			.from("vinyl_records")
 			.select("id, artistName, title, price")
 			.in("id", recordIdsArray);
@@ -159,7 +162,7 @@ export async function POST(request: Request) {
 			})
 		);
 
-		const { error: orderItemsError } = await supabase
+		const { error: orderItemsError } = await supabaseService
 			.from("order_items")
 			.insert(orderItemsData);
 		if (orderItemsError) {
