@@ -10,7 +10,7 @@ interface Order {
 	sumup_id: string;
 	sumup_amount: number;
 	sumup_status: string;
-	// add additional fields as needed
+	// additional fields as needed...
 }
 
 interface OrderItem {
@@ -32,21 +32,18 @@ interface Asset {
 	url: string;
 }
 
-// Allow searchParams to be either an object or a Promise of one.
-type PaymentSuccessProps = {
-	searchParams:
-		| { [key: string]: string | string[] }
-		| Promise<{ [key: string]: string | string[] }>;
-};
-
+// Define the props to include both `params` and `searchParams`.
 export default async function PaymentSuccess({
+	params,
 	searchParams,
-}: PaymentSuccessProps) {
-	// Await in case searchParams is a promise.
-	const params = await Promise.resolve(searchParams);
-	const checkoutId = Array.isArray(params.checkout_id)
-		? params.checkout_id[0]
-		: params.checkout_id;
+}: {
+	params: {};
+	searchParams: { [key: string]: string | string[] };
+}) {
+	// Extract checkout_id from searchParams.
+	const checkoutId = Array.isArray(searchParams.checkout_id)
+		? searchParams.checkout_id[0]
+		: searchParams.checkout_id;
 
 	if (!checkoutId) {
 		return (
@@ -101,7 +98,7 @@ export default async function PaymentSuccess({
 	// If order items exist, fetch cover image URLs from vinyl_records and contentful_assets.
 	let orderItemsWithCover: OrderItem[] = [];
 	if (orderItems.length > 0) {
-		// Get the vinyl record IDs from order items.
+		// Get vinyl record IDs from order items.
 		const recordIds = orderItems.map((item) => item.vinyl_record_id);
 
 		// Query vinyl_records to get the cover_image asset IDs.
