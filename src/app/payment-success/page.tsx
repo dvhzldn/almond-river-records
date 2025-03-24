@@ -32,13 +32,7 @@ interface Asset {
 	url: string;
 }
 
-export default async function PaymentSuccess({
-	params,
-	searchParams,
-}: {
-	params: object;
-	searchParams: { [key: string]: string | string[] };
-}) {
+export default async function PaymentSuccess({ params, searchParams }) {
 	// Mark params as used (if needed) without affecting logic.
 	void params;
 
