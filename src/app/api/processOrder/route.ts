@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
-import { createClient } from "contentful-management";
+
+interface VinylRecord {
+	id: string;
+	artistName: string;
+	title: string;
+	price: number;
+}
+
+interface OrderItem {
+	order_id: number;
+	vinyl_record_id: string;
+	artist_names: string;
+	title: string;
+	price: number;
+}
 
 export async function POST(request: Request) {
 	try {
@@ -24,6 +38,8 @@ export async function POST(request: Request) {
 		// SumUp API variables.
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
+
+		// Redirect to payment success page with query strings
 		const paymentSuccessUrl =
 			process.env.NEXT_PUBLIC_BASE_URL + "/payment-success";
 		const redirectUrl = `${paymentSuccessUrl}?checkout_id=${checkoutReference}`;
@@ -35,7 +51,7 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
-			redirect_url: redirectUrl, // Redirect to homepage if user cancels. Do not use return_url
+			redirect_url: redirectUrl, // ** Do not use return_url **
 		};
 
 		// Include for testing
@@ -118,44 +134,34 @@ export async function POST(request: Request) {
 		const newOrder = orderInsertData[0];
 		const orderId = newOrder.id;
 
-		// Step 3: Fetch vinyl record details from Contentful and build order items.
-		const managementClient = createClient({
-			accessToken: process.env
-				.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN as string,
-		});
-		const space = await managementClient.getSpace(
-			process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID as string
-		);
-		const environment = await space.getEnvironment(
-			process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master"
-		);
+		// Step 3: Fetch vinyl record details from Supabase and build order items.
+		const { data: vinylRecords, error: vinylError } = await supabase
+			.from("vinyl_records")
+			.select("id, artistName, title, price")
+			.in("id", recordIdsArray);
 
-		const orderItemsData = await Promise.all(
-			recordIdsArray.map(async (recordId: string) => {
-				try {
-					const entry = await environment.getEntry(recordId);
-					// Extract a snapshot of the record's key fields.
-					const artistNames = entry.fields.artistName["en-GB"];
-					const title = entry.fields.title["en-GB"];
-					const price = entry.fields.price["en-GB"];
-					return {
-						order_id: orderId,
-						vinyl_record_id: recordId,
-						artist_names: artistNames,
-						title: title,
-						price: price,
-					};
-				} catch (err) {
-					console.error(`Error fetching entry ${recordId}:`, err);
-					return null;
-				}
+		if (vinylError) {
+			console.error("Error fetching vinyl records:", vinylError);
+			return NextResponse.json(
+				{ error: "Failed to retrieve record details. Please try again." },
+				{ status: 500 }
+			);
+		}
+
+		// Build the order items from the vinyl records data.
+		const orderItemsData: OrderItem[] = vinylRecords.map(
+			(record: VinylRecord) => ({
+				order_id: orderId,
+				vinyl_record_id: record.id,
+				artist_names: record.artistName,
+				title: record.title,
+				price: record.price,
 			})
 		);
-		const validOrderItems = orderItemsData.filter((item) => item !== null);
 
 		const { error: orderItemsError } = await supabase
 			.from("order_items")
-			.insert(validOrderItems);
+			.insert(orderItemsData);
 		if (orderItemsError) {
 			console.error("Error inserting order items:", orderItemsError);
 			return NextResponse.json(
@@ -163,20 +169,6 @@ export async function POST(request: Request) {
 				{ status: 500 }
 			);
 		}
-
-		// Step 4: Update inventory in Supabase.
-		// TODO: Removed inventory update until order status is paid
-		// await Promise.all(
-		// 	recordIdsArray.map(async (recordId: string) => {
-		// 		const { error } = await supabase
-		// 			.from("vinyl_records")
-		// 			.update({ quantity: 0 })
-		// 			.eq("id", recordId);
-		// 		if (error) {
-		// 			console.error(`Error updating vinyl record ${recordId}:`, error);
-		// 		}
-		// 	})
-		// );
 
 		// Return the hosted checkout URL and order details.
 		return NextResponse.json({
