@@ -10,7 +10,7 @@ interface Order {
 	sumup_id: string;
 	sumup_amount: number;
 	sumup_status: string;
-	// additional fields as needed...
+	// add additional fields as needed...
 }
 
 interface OrderItem {
@@ -32,14 +32,16 @@ interface Asset {
 	url: string;
 }
 
-// Define the props to include both `params` and `searchParams`.
 export default async function PaymentSuccess({
 	params,
 	searchParams,
 }: {
-	params: {};
+	params: object;
 	searchParams: { [key: string]: string | string[] };
 }) {
+	// Mark params as used (if needed) without affecting logic.
+	void params;
+
 	// Extract checkout_id from searchParams.
 	const checkoutId = Array.isArray(searchParams.checkout_id)
 		? searchParams.checkout_id[0]
@@ -98,7 +100,7 @@ export default async function PaymentSuccess({
 	// If order items exist, fetch cover image URLs from vinyl_records and contentful_assets.
 	let orderItemsWithCover: OrderItem[] = [];
 	if (orderItems.length > 0) {
-		// Get vinyl record IDs from order items.
+		// Get the vinyl record IDs from order items.
 		const recordIds = orderItems.map((item) => item.vinyl_record_id);
 
 		// Query vinyl_records to get the cover_image asset IDs.
