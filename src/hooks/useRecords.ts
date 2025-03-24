@@ -1,4 +1,3 @@
-// hooks/useRecords.ts
 import { useState, useEffect, useCallback } from "react";
 
 export interface VinylRecord {

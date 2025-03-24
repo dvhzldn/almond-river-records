@@ -1,4 +1,3 @@
-// /app/payment-success/page.tsx
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 

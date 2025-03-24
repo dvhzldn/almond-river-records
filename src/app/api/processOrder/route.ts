@@ -1,4 +1,3 @@
-// /app/api/processOrder/route.ts
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import { createClient } from "contentful-management";
