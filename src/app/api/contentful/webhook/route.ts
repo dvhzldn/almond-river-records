@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
+import crypto from "crypto";
+
 interface ContentfulWebhookFields {
 	[key: string]: {
 		"en-GB": unknown;
@@ -10,7 +12,7 @@ interface ContentfulWebhookFields {
 interface ContentfulWebhookPayload {
 	sys: {
 		id: string;
-		type: string; // "Entry" or "Asset"
+		type: string;
 		createdAt?: string;
 		updatedAt?: string;
 		contentType?: {
@@ -35,11 +37,35 @@ interface AssetFileData {
 	contentType: string;
 }
 
+// Set the webhook secret from environment variables
+const CONTENTFUL_WEBHOOK_SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET!;
+
+// Utility function to validate webhook signature
+const validateWebhookSignature = async (req: Request) => {
+	const rawBody = await req.text(); // Convert the body into a string
+	const signature = req.headers.get("X-Contentful-Webhook-Signature");
+
+	const computedSignature = crypto
+		.createHmac("sha256", CONTENTFUL_WEBHOOK_SECRET)
+		.update(rawBody) // Now using the string body
+		.digest("hex");
+
+	return signature === computedSignature;
+};
+
 export async function POST(request: Request) {
 	try {
 		const rawBody = await request.text();
 		console.log("Webhook payload:", rawBody);
 		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
+
+		// Validate webhook signature
+		if (!validateWebhookSignature(request)) {
+			return NextResponse.json(
+				{ error: "Invalid webhook signature" },
+				{ status: 403 }
+			);
+		}
 
 		if (!payload.fields) {
 			throw new Error("Payload is missing the 'fields' property");
