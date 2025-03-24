@@ -93,7 +93,7 @@ export default function AlbumOfTheWeek() {
 								<p>{album.description}</p>
 							)
 						) : (
-							<p>No description available.</p>
+							<p></p>
 						)}
 					</div>
 				</div>
