@@ -35,12 +35,10 @@ interface Asset {
 export default async function PaymentSuccess({
 	searchParams,
 }: {
-	searchParams: { [key: string]: string | string[] };
+	searchParams: URLSearchParams;
 }) {
 	// Extract checkout_id from query parameters.
-	const checkoutId = Array.isArray(searchParams.checkout_id)
-		? searchParams.checkout_id[0]
-		: searchParams.checkout_id;
+	const checkoutId = searchParams.get("checkout_id");
 
 	if (!checkoutId) {
 		return (
