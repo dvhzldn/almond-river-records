@@ -39,27 +39,31 @@ interface AssetFileData {
 	contentType: string;
 }
 
-// Utility function to validate webhook signature using HMAC SHA256
+// Utility function to validate the webhook signature.
+// We now build a string to sign by concatenating the x-contentful-timestamp header and the raw request body.
 const validateWebhookSignature = async (req: Request, rawBody: string) => {
-	// Use the lowercase header key to retrieve the signature
+	// Retrieve the signature and timestamp from the headers.
 	const signature = req.headers.get("x-contentful-signature");
+	const timestamp = req.headers.get("x-contentful-timestamp") || "";
 
 	if (!signature) {
 		console.error("No signature header found.");
 		return false;
 	}
 
+	// Build the string to sign: timestamp concatenated with the raw body.
+	const stringToSign = timestamp + rawBody;
+
 	// Compute the HMAC SHA256 signature using the signing secret
 	const computedSignature = crypto
 		.createHmac("sha256", CONTENTFUL_SIGNING_SECRET)
-		.update(rawBody)
+		.update(stringToSign)
 		.digest("hex");
 
-	// Log both signatures for debugging purposes (remove these in production)
+	// Log both signatures for debugging (remove these logs in production)
 	console.log("Computed Signature:", computedSignature);
 	console.log("Contentful Signature:", signature);
 
-	// Compare the computed signature with the signature from Contentful
 	return signature === computedSignature;
 };
 
