@@ -60,6 +60,10 @@ export async function POST(request: Request) {
 			if (url && url.startsWith("//")) {
 				url = "https:" + url;
 			}
+			// Replace the domain to use images.ctfassets.net instead of images.contentful.com.
+			if (url && url.includes("images.contentful.com")) {
+				url = url.replace("images.contentful.com", "images.ctfassets.net");
+			}
 			const file_name = fileData?.fileName || null;
 			const content_type = fileData?.contentType || null;
 			const details = fileData?.details || null;
