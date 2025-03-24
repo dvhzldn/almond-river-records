@@ -34,32 +34,33 @@ export default function AlbumOfTheWeek() {
 					`
 					)
 					.eq("album_of_the_week", true)
-					.single(); // Fetch single album
+					.limit(1); // Fetch single album
 
 				if (error) {
 					console.error("Error fetching vinyl record data:", error);
 					throw error; // Rethrow error for further handling
 				}
 
-				if (data) {
+				if (data && data.length > 0) {
+					const albumData = data[0];
+
 					// Now, fetch the cover image based on the cover_image field
 					const { data: coverImageData, error: coverError } =
 						await supabase
 							.from("contentful_assets")
 							.select("url")
-							.eq("id", data.cover_image)
-							.single(); // Fetch single asset
+							.eq("id", albumData.cover_image)
+							.single();
 
 					if (coverError) {
 						console.error("Error fetching cover image data:", coverError);
-						throw coverError; // Rethrow error for further handling
+						throw coverError;
 					}
 
-					// If we have a cover image, set it in the album data
 					const coverImageUrl = coverImageData ? coverImageData.url : null;
 
 					setAlbum({
-						...data,
+						...albumData,
 						cover_image_url: coverImageUrl,
 					});
 				}
