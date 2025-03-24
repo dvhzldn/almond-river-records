@@ -47,10 +47,13 @@ export async function GET() {
 		const data = await response.json();
 
 		if (data.reviews) {
-			cachedReviews = data.reviews.map((review: GoogleReview) => ({
-				rating: review.rating,
-				text: review.text?.text || "",
-			}));
+			// Filter reviews by rating >= 4
+			cachedReviews = data.reviews
+				.filter((review: GoogleReview) => review.rating >= 4)
+				.map((review: GoogleReview) => ({
+					rating: review.rating,
+					text: review.text?.text || "",
+				}));
 
 			lastFetched = now;
 
