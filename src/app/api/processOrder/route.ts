@@ -40,8 +40,8 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
-			redirect_url: homepageUrl, // Redirect to homepage if user cancels
-			return_url: returnUrl, // Return here on successful payment
+			redirect_url: returnUrl, // Redirect to homepage if user cancels
+			// return_url: returnUrl, // Return here on successful payment
 		};
 
 		console.log("Sending request to SumUp API:", requestBody);
