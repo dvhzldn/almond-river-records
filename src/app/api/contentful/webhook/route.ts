@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 import crypto from "crypto";
 
-// Use the signing secret from your environment.
-// This should match the secret in your Contentful Webhook Request Certification settings.
 const CONTENTFUL_SIGNING_SECRET = process.env.CONTENTFUL_SIGNING_SECRET!;
 
 interface ContentfulWebhookFields {
@@ -43,18 +41,17 @@ interface AssetFileData {
 // Utility function to validate webhook signature using HMAC SHA256.
 // Per Contentful’s 2025 docs, the string to sign is constructed as:
 //   <x-contentful-timestamp> + ":" + <rawBody>
-const validateWebhookSignature = async (req: Request, rawBody: string) => {
-	// Retrieve the signature and timestamp from the headers (header keys are lower-cased)
-	const signature = req.headers.get("x-contentful-signature");
-	const timestamp = req.headers.get("x-contentful-timestamp") || "";
+const validateWebhookSignature = (req: Request, rawBuffer: Buffer): boolean => {
+	const signature = req.headers.get("x-contentful-signature")?.trim();
+	const timestamp = (req.headers.get("x-contentful-timestamp") || "").trim();
 
 	if (!signature) {
 		console.error("No signature header found.");
 		return false;
 	}
 
-	// Build the string to sign using the colon separator as specified in the docs.
-	const stringToSign = `${timestamp}:${rawBody}`;
+	// Construct the string to sign using the exact raw body bytes converted to UTF-8
+	const stringToSign = `${timestamp}:` + rawBuffer.toString("utf8");
 
 	// Compute the HMAC SHA256 signature using the signing secret
 	const computedSignature = crypto
@@ -73,15 +70,13 @@ const validateWebhookSignature = async (req: Request, rawBody: string) => {
 
 export async function POST(request: Request) {
 	try {
-		// Read the raw body of the request
-		const rawBody = await request.text();
+		// Read the raw body as an arrayBuffer once and convert to Buffer
+		const buffer = Buffer.from(await request.arrayBuffer());
+		const rawBody = buffer.toString("utf8");
 		console.log("Webhook Payload:", rawBody);
 
-		// Parse the payload
-		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
-
-		// Validate the webhook signature (using the signing secret)
-		const isValid = await validateWebhookSignature(request, rawBody);
+		// Validate the webhook signature using the raw buffer
+		const isValid = validateWebhookSignature(request, buffer);
 		if (!isValid) {
 			console.error("Invalid webhook signature");
 			return NextResponse.json(
@@ -90,7 +85,9 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Ensure the 'fields' property exists
+		// Parse the payload using the rawBody string
+		const payload = JSON.parse(rawBody) as ContentfulWebhookPayload;
+
 		if (!payload.fields) {
 			throw new Error("Payload is missing the 'fields' property");
 		}
@@ -98,7 +95,6 @@ export async function POST(request: Request) {
 		const { sys, fields } = payload;
 		const recordId = sys.id;
 
-		// If the payload is for an Asset, upsert into contentful_assets.
 		if (sys.type === "Asset") {
 			const title = fields.title ? (fields.title["en-GB"] as string) : null;
 			const fileData = fields.file
@@ -138,11 +134,9 @@ export async function POST(request: Request) {
 					{ status: 500 }
 				);
 			}
-
 			return NextResponse.json({ message: "Asset synced successfully" });
 		}
 
-		// Otherwise, if the payload is an Entry, assume it is a vinyl record.
 		if (sys.type === "Entry") {
 			const title = (fields.title?.["en-GB"] as string) || null;
 			const sub_title = (fields.subTitle?.["en-GB"] as string) || null;
@@ -193,11 +187,9 @@ export async function POST(request: Request) {
 					{ status: 500 }
 				);
 			}
-
 			return NextResponse.json({ message: "Record synced successfully" });
 		}
 
-		// If sys.type is neither Asset nor Entry, return an appropriate response.
 		return NextResponse.json(
 			{ message: `Unhandled sys.type: ${sys.type}` },
 			{ status: 400 }
