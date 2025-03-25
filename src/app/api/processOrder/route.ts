@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// Define a proper interface for vinyl records.
+interface VinylRecord {
+	id: string;
+	artist_names: string[];
+	title: string;
+	price: number;
+}
+
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -31,7 +39,9 @@ export async function POST(request: Request) {
 		);
 
 		// Compute a checkout description for SumUp.
-		const checkoutDescription = `${recordIds.length} x ${recordIds.length === 1 ? "record" : "records"} plus postage.`;
+		const checkoutDescription = `${recordIds.length} x ${
+			recordIds.length === 1 ? "record" : "records"
+		} plus postage.`;
 		console.log(
 			"processOrder: Computed checkoutDescription:",
 			checkoutDescription
@@ -48,9 +58,9 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Build the redirect URL (if needed)
-		const paymentSuccessUrl = process.env.NEXT_PUBLIC_BASE_URL; // set to your homepage or appropriate page
-		const redirectUrl = paymentSuccessUrl; // or add parameters if required
+		// Build the redirect URL (set to your homepage or an appropriate page)
+		const paymentSuccessUrl = process.env.NEXT_PUBLIC_BASE_URL;
+		const redirectUrl = paymentSuccessUrl;
 		console.log("processOrder: Using redirectUrl:", redirectUrl);
 
 		const requestBody = {
@@ -60,7 +70,7 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
-			redirect_url: redirectUrl, // Do not use return_url
+			redirect_url: redirectUrl,
 		};
 
 		console.log(
@@ -165,14 +175,44 @@ export async function POST(request: Request) {
 			orderInsertData
 		);
 
-		// Insert order items.
-		const orderId = orderInsertData[0].id;
-		const orderItemsData = recordIds.map((recordId: string) => ({
-			order_id: orderId,
-			vinyl_record_id: recordId,
-		}));
+		// Fetch vinyl record details from Supabase.
+		const { data: vinylRecords, error: vinylError } = await supabaseService
+			.from("vinyl_records")
+			.select("id, artist_names, title, price")
+			.in("id", recordIds);
+		if (vinylError) {
+			console.error(
+				"processOrder: Error fetching vinyl records:",
+				vinylError
+			);
+			return NextResponse.json(
+				{ error: "Failed to retrieve record details" },
+				{ status: 500 }
+			);
+		}
+		console.log("processOrder: Fetched vinyl records:", vinylRecords);
 
+		// Insert order items with complete details.
+		const orderId = orderInsertData[0].id;
+		const orderItemsData = recordIds.map((recordId: string) => {
+			const record = vinylRecords.find(
+				(r: VinylRecord) => r.id === recordId
+			);
+			if (!record) {
+				const errMsg = `processOrder: No vinyl record found for id: ${recordId}`;
+				console.error(errMsg);
+				throw new Error(errMsg);
+			}
+			return {
+				order_id: orderId,
+				vinyl_record_id: recordId,
+				artist_names: record.artist_names,
+				title: record.title,
+				price: record.price,
+			};
+		});
 		console.log("processOrder: Inserting order items:", orderItemsData);
+
 		const { error: orderItemsError } = await supabaseService
 			.from("order_items")
 			.insert(orderItemsData);
