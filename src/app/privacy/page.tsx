@@ -1,4 +1,4 @@
-export default function Returns() {
+export default function Privacy() {
 	return (
 		<div className="page-container">
 			<h1 className="page-title">Privacy Policy</h1>
@@ -86,10 +86,13 @@ export default function Returns() {
 				<h4>8. Contact Us</h4>
 				<p>
 					If you have any questions or concerns about this Privacy Policy
-					or our data practices, please contact us at: Almond River Records
-					253 St Johns Rd, Edinburgh EH12 7XD Email:
-					almondriverrecords@gmail.com Telephone: 07729 421682
+					or our data practices, please contact us at:
 				</p>
+				<br />
+				<p>Almond River Records</p>
+				<p>253 St Johns Rd, Edinburgh EH12 7XD</p>
+				<p>Email: almondriverrecords@gmail.com</p>
+				<p>Telephone: 07729 421682</p>
 			</div>
 		</div>
 	);
