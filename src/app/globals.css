@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Raleway:wght@300;400;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css");
+
+body {
+	font-family: "Poppins", sans-serif;
+	text-align: center;
+	background-color: #181818;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	margin: 0;
+	padding: 20px;
+	box-sizing: border-box;
+	color: #222;
+}
+
+.container {
+	background: white;
+	padding: 25px;
+	border-radius: 10px;
+	width: 100%;
+	max-width: 600px;
+	box-sizing: border-box;
+	margin: auto;
+}
+
+.logo {
+	width: 100%;
+	max-width: 160px;
+	height: auto;
+}
+
+h1 {
+	color: #111;
+	font-size: 2rem;
+	margin-bottom: 5px;
+	font-weight: 700;
+	font-family: "Raleway", sans-serif;
+	line-height: 1.1;
+}
+
+h2 {
+	color: #222;
+	font-size: 1.4rem;
+	margin-bottom: 5px;
+	font-weight: 500;
+	font-family: "Raleway", sans-serif;
+	line-height: 1.4;
+	overflow: hidden;
+	white-space: nowrap;
+	border-right: 0px solid #0073e6;
+	width: max-content;
+	margin: 0 auto;
+	animation: typing 5s steps(48) infinite alternate;
+}
+
+@keyframes typing {
+	0% {
+		width: 0;
+	}
+	50% {
+		width: 100%;
+	}
+}
+
+p {
+	color: #444;
+	font-size: 1.1rem;
+	margin: 2px 0;
+	font-weight: 400;
+	line-height: 1.1;
+}
+
+.social-links a {
+	display: inline-block;
+	margin: 8px;
+	text-decoration: none;
+	color: #0073e6;
+	font-size: 2.2rem;
+	transition: transform 0.2s;
+	cursor: pointer;
+}
+
+.social-links a:hover {
+	transform: scale(1.5);
+}
+
+.map iframe {
+	border-radius: 10px;
+}
+
+.contact {
+	margin-top: 15px;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+	h1 {
+		font-size: 1.6rem;
+	}
+	p {
+		font-size: 1rem;
+	}
+	.social-links a {
+		font-size: 1.8rem;
+	}
+}

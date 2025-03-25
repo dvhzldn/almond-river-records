@@ -1,21 +1,22 @@
-import type { Metadata } from "next";
 import "./globals.css";
-
-export const metadata: Metadata = {
-	title: "Almond River Records",
-	description: "Second hand vinyl record shop in Edinburgh",
-};
+import Head from "next/head";
+import { ReactNode } from "react";
 
 export default function RootLayout({
 	children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{
+	children: ReactNode;
+}>) {
 	return (
 		<html lang="en">
-			<body>
-				<header></header>
-				<main>{children}</main>
-				<footer></footer>
-			</body>
+			<Head>
+				<meta charSet="UTF-8" />
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1.0"
+				/>
+			</Head>
+			<body>{children}</body>
 		</html>
 	);
 }
