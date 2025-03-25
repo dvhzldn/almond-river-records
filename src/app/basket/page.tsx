@@ -18,7 +18,7 @@ export default function BasketPage() {
 	// const totalPrice = subTotalPrice + postagePrice;
 
 	// testing
-	const totalPrice = 2;
+	const totalPrice = 1;
 
 	const recordIds = basket.map((item) => item.id);
 	const description = basket
