@@ -6,6 +6,7 @@ import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import OrderForm, { OrderData } from "@/components/OrderForm";
 import ReturnsPolicyModal from "@/components/ReturnsPolicyModal";
+
 export default function BasketPage() {
 	const { basket, clearBasket } = useBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
@@ -32,30 +33,58 @@ export default function BasketPage() {
 		setLoading(true);
 		setError(null);
 		try {
-			const response = await fetch(
-				process.env.NEXT_PUBLIC_BASE_URL + `/api/processOrder`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						amount: totalPrice,
-						description,
-						recordIds,
-						orderData,
-					}),
-				}
-			);
+			// Construct payload for debugging purposes.
+			const payload = {
+				amount: totalPrice,
+				description,
+				recordIds,
+				orderData,
+			};
+			console.debug("Submitting order with payload:", payload);
+
+			const processOrderUrl =
+				process.env.NEXT_PUBLIC_BASE_URL + `/api/processOrder`;
+
+			// Log the processOrder URL (ensure this value is correct)
+			console.debug("ProcessOrder URL:", processOrderUrl);
+
+			const response = await fetch(processOrderUrl, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+
+			// Log response status and headers for debugging
+			console.debug("Received response status:", response.status);
+			console.debug("Response headers:", response.headers);
+
 			const data = await response.json();
+			console.debug("Response data:", data);
+
 			if (!response.ok) {
+				console.error("Error processing order:", data);
 				setError(data.error || "Error processing order");
 				return;
 			}
+
+			if (!data.hosted_checkout_url) {
+				console.error("Missing hosted_checkout_url in response:", data);
+				setError("No checkout URL returned");
+				return;
+			}
+
+			console.debug(
+				"Redirecting to hosted checkout URL:",
+				data.hosted_checkout_url
+			);
 			// Redirect to the SumUp hosted checkout URL.
 			window.location.href = data.hosted_checkout_url;
 		} catch (err: unknown) {
 			if (err instanceof Error) {
+				console.error("Exception caught during order submission:", err);
 				setError(err.message);
 			} else {
+				console.error("Unexpected error:", err);
 				setError("Unexpected error");
 			}
 		} finally {
@@ -64,7 +93,6 @@ export default function BasketPage() {
 	};
 
 	const [isReturnsPolicyOpen, setReturnsPolicyOpen] = useState(false);
-
 	const openReturnsPolicy = () => setReturnsPolicyOpen(true);
 	const closeReturnsPolicy = () => setReturnsPolicyOpen(false);
 
@@ -151,7 +179,6 @@ export default function BasketPage() {
 									)}
 									for further information.
 								</em>
-
 								<hr />
 							</div>
 							<div className="basket-list">
