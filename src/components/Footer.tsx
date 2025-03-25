@@ -65,7 +65,7 @@ export default function Footer() {
 			</div>
 			<div>
 				<p>
-					<Link href="/returns">Returns Policy</Link>
+					<Link href="/privacy">Privacy Policy</Link>
 				</p>
 				<p>© {new Date().getFullYear()} Almond River Records</p>
 				<p>Made by Dave</p>

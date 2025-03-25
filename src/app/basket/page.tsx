@@ -62,11 +62,11 @@ export default function BasketPage() {
 		<div className="page-container">
 			<h1 className="page-title">Basket</h1>
 			<div className="content-box">
-				<div className="basket-two-column-layout">
+				<>
 					{basket.length === 0 ? (
-						<p>Your basket is empty.</p>
+						<h2>Your basket is empty.</h2>
 					) : (
-						<>
+						<div className="basket-two-column-layout">
 							<div className="basket-list">
 								<h2>Your Items</h2>
 								{basket.map((item) => (
@@ -107,13 +107,22 @@ export default function BasketPage() {
 									<hr />
 								</div>
 								<div className="basket-bill">
-									<h4>Item total: £{subTotalPrice}</h4>
-									<h4>Postage: £{postagePrice}</h4>
-									<br />
-									<h3>
-										Total: <strong>£{totalPrice}</strong>
-									</h3>
+									<div className="bill-line">
+										<h4 className="label">Product total:</h4>
+										<h4 className="amount">£{subTotalPrice}</h4>
+									</div>
+									<div className="bill-line">
+										<h4 className="label">Add Postage:</h4>
+										<h4 className="amount">£{postagePrice}</h4>
+									</div>
+									<div className="bill-line">
+										<h3 className="label">Total:</h3>
+										<h3 className="amount">
+											<strong>£{totalPrice}</strong>
+										</h3>
+									</div>
 								</div>
+								<hr />
 							</div>
 							<div className="basket-list">
 								<h2>Your details</h2>
@@ -123,9 +132,9 @@ export default function BasketPage() {
 									error={error}
 								/>
 							</div>
-						</>
+						</div>
 					)}
-				</div>
+				</>
 			</div>
 		</div>
 	);

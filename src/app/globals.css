@@ -461,7 +461,8 @@ li {
 .order-form input:focus,
 .order-form textarea:focus {
 	outline: none;
-	background: var(--colour-6);
+	border: 1px solid var(--colour-4);
+	background: var(--colour-7);
 }
 
 /* Two-column layout for image & opening hours */
@@ -892,11 +893,21 @@ li {
 }
 
 .basket-bill {
-	margin: auto;
-	padding: 0;
-	gap: 0;
-	max-width: 150px;
-	text-align: center;
+	padding-left: 10%;
+	max-width: 90%;
+}
+
+.bill-line {
+	display: flex;
+	justify-content: space-between;
+}
+
+.bill-line .label {
+	text-align: left;
+}
+
+.bill-line .amount {
+	text-align: right;
 }
 
 /* Results */
@@ -1018,7 +1029,7 @@ hr {
 	border: none;
 	height: 1px;
 	background-color: rgba(0, 0, 0, 0.1);
-	margin: 20px 0;
+	margin: 10px 0;
 }
 
 /* Responsive Adjustments */
