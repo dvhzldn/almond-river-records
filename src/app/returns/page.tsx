@@ -5,7 +5,6 @@ export default function Returns() {
 			<div className="content-box text">
 				<h2>Almond River Records Returns Policy</h2>
 				<br />
-				<h3>Almond River Records Privacy Policy</h3>
 				<h3>Last Updated: March 2025</h3>
 				<p>
 					At Almond River Records, we strive to ensure your satisfaction

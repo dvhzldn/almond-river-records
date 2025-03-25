@@ -5,13 +5,13 @@ export default function Privacy() {
 			<div className="content-box text">
 				<h2>Almond River Records Privacy Policy</h2>
 				<br />
+				<h3>Last Updated: March 2025</h3>
 				<p>
-					Almond River Records Privacy Policy Last Updated: March 2025 At
-					Almond River Records, we are committed to protecting your privacy
-					and ensuring that your personal information is handled in a safe
-					and responsible manner. This policy explains how we collect, use,
-					store, and protect your data when you visit our website or visit
-					our in-person record shop.
+					At Almond River Records, we are committed to protecting your
+					privacy and ensuring that your personal information is handled in
+					a safe and responsible manner. This policy explains how we
+					collect, use, store, and protect your data when you visit our
+					website or visit our in-person record shop.
 				</p>
 				<hr />
 				<h4>1. Information We Collect</h4>
