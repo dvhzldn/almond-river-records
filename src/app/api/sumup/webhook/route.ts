@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
 import { sendOrderConfirmationEmail } from "@/lib/resendClient";
+import { createClient } from "@supabase/supabase-js";
 
 interface OrderItem {
 	vinyl_record_id: string;
 }
 
+const supabaseService = createClient(
+	process.env.NEXT_PUBLIC_SUPABASE_URL!,
+	process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 // Update order status in Supabase orders table.
 async function updateOrderStatus(orderReference: string, status: string) {
-	const { error } = await supabase
+	const { error } = await supabaseService
 		.from("orders")
 		.update({ sumup_status: status })
 		.eq("sumup_checkout_reference", orderReference);
@@ -23,7 +28,7 @@ async function updateOrderStatus(orderReference: string, status: string) {
 
 // Retrieve vinyl record IDs associated with the order from the order_items table.
 async function getOrderItems(orderReference: string): Promise<string[]> {
-	const { data: orders, error: orderError } = await supabase
+	const { data: orders, error: orderError } = await supabaseService
 		.from("orders")
 		.select("id")
 		.eq("sumup_checkout_reference", orderReference)
@@ -36,7 +41,7 @@ async function getOrderItems(orderReference: string): Promise<string[]> {
 
 	const orderId = orders.id;
 
-	const { data: orderItems, error: orderItemsError } = await supabase
+	const { data: orderItems, error: orderItemsError } = await supabaseService
 		.from("order_items")
 		.select("vinyl_record_id")
 		.eq("order_id", orderId);
@@ -58,7 +63,7 @@ async function getOrderItems(orderReference: string): Promise<string[]> {
 async function updateInventoryForPaid(recordIds: string[]) {
 	await Promise.all(
 		recordIds.map(async (recordId: string) => {
-			const { error } = await supabase
+			const { error } = await supabaseService
 				.from("vinyl_records")
 				.update({ quantity: 0 })
 				.eq("id", recordId);
@@ -98,7 +103,7 @@ export async function POST(request: Request) {
 
 				// --- New Code for Sending the Email ---
 				// Fetch the complete order details (make sure orders table has the required fields)
-				const { data: orderData, error: orderError } = await supabase
+				const { data: orderData, error: orderError } = await supabaseService
 					.from("orders")
 					.select("*")
 					.eq("sumup_checkout_reference", orderReference)
@@ -111,7 +116,7 @@ export async function POST(request: Request) {
 
 				// Fetch the associated order items (ensure these include the necessary fields)
 				const { data: orderItemsData, error: orderItemsError } =
-					await supabase
+					await supabaseService
 						.from("order_items")
 						.select("*")
 						.eq("order_id", orderData.id);

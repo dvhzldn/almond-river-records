@@ -45,7 +45,6 @@ export default async function Home() {
 				</div>
 				<hr />
 				<div>
-					<h2>What we are listening to</h2>
 					<SpotifyPlaylist playlistId="2XPOAAUp0mNqNmz7gk2Kfx" />
 				</div>
 				<hr />

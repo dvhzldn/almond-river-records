@@ -1,6 +1,11 @@
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
+
+const supabaseService = createClient(
+	process.env.NEXT_PUBLIC_SUPABASE_URL!,
+	process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 interface Order {
 	id: string;
 	customer_name: string;
@@ -60,8 +65,8 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						className="logo"
 						src="/images/almond-river-logo.jpg"
 						alt="Almond River Records logo"
-						width={200}
-						height={200}
+						width={100}
+						height={100}
 						priority
 					/>
 				</div>
@@ -70,7 +75,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	}
 
 	// Retrieve the order details from the orders table.
-	const orderRes = await supabase
+	const orderRes = await supabaseService
 		.from("orders")
 		.select("*")
 		.eq("sumup_checkout_reference", checkoutId)
@@ -96,8 +101,8 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						className="logo"
 						src="/images/almond-river-logo.jpg"
 						alt="Almond River Records logo"
-						width={200}
-						height={200}
+						width={100}
+						height={100}
 						priority
 					/>
 				</div>
@@ -125,8 +130,8 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						className="logo"
 						src="/images/almond-river-logo.jpg"
 						alt="Almond River Records logo"
-						width={200}
-						height={200}
+						width={100}
+						height={100}
 						priority
 					/>
 				</div>
@@ -135,7 +140,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	}
 
 	// Retrieve the order items for this order.
-	const orderItemsRes = await supabase
+	const orderItemsRes = await supabaseService
 		.from("order_items")
 		.select("*")
 		.eq("order_id", order.id);
@@ -149,7 +154,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		const recordIds = orderItems.map((item) => item.vinyl_record_id);
 
 		// 2) Query vinyl_records to get the 'cover_image' (which is actually the asset ID).
-		const vinylRecordsRes = await supabase
+		const vinylRecordsRes = await supabaseService
 			.from("vinyl_records")
 			.select("id, cover_image")
 			.in("id", recordIds);
@@ -167,7 +172,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		const assetIds = Array.from(new Set(Object.values(vinylRecordMap)));
 
 		// 5) Query contentful_assets to get the URL for each asset ID.
-		const assetsRes = await supabase
+		const assetsRes = await supabaseService
 			.from("contentful_assets")
 			.select("id, url")
 			.in("id", assetIds);
