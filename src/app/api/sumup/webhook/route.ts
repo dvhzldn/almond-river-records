@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 				}
 
 				// If a confirmation email hasn't been sent yet, send it.
-				if (!orderData.email_sent) {
+				if (!orderData.order_confirmation_email_sent) {
 					// Fetch associated order items.
 					const { data: orderItemsData, error: orderItemsError } =
 						await supabaseService
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
 					// Mark the email as sent in the order record.
 					await supabaseService
 						.from("orders")
-						.update({ email_sent: true })
+						.update({ order_confirmation_email_sent: true })
 						.eq("sumup_checkout_reference", orderReference);
 				}
 			} else if (checkoutStatus === "FAILED") {

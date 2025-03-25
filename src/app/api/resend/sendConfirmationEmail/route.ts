@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 		}
 
 		// Check if email was already sent
-		if (order.email_sent) {
+		if (order.order_confirmation_email_sent) {
 			return NextResponse.json({ message: "Email already sent" });
 		}
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 		// Update the order so that email_sent is true
 		await supabaseService
 			.from("orders")
-			.update({ email_sent: true })
+			.update({ order_confirmation_email_sent: true })
 			.eq("sumup_checkout_reference", checkoutId);
 
 		return NextResponse.json({ message: "Email sent successfully" });

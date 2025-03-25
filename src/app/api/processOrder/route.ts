@@ -123,7 +123,7 @@ export async function POST(request: Request) {
 			sumup_status_history: [{ status: "PENDING", changed_at: orderDate }],
 			sumup_hosted_checkout_url: paymentData.hosted_checkout_url,
 			sumup_transactions: paymentData.transactions || [],
-			email_sent: false,
+			order_confirmation_email_sent: false,
 		};
 
 		const { data: orderInsertData, error: orderInsertError } =
