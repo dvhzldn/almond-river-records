@@ -1,3 +1,5 @@
+// File no longer in use
+
 import { useState, useEffect } from "react";
 import client from "@/lib/contentful";
 import { IVinylRecordFields } from "@/@types/generated/contentful";
