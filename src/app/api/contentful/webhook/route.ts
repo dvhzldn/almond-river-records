@@ -71,13 +71,7 @@ const validateWebhookSignature = (req: Request, rawBuffer: Buffer): boolean => {
 	)
 		.split(",")
 		.map((h) => h.trim())
-		.filter(
-			(h) =>
-				h.length > 0 &&
-				!["cf-access-client-id", "cf-access-client-secret"].includes(
-					h.toLowerCase()
-				)
-		);
+		.filter((h) => h.length > 0);
 
 	// For each signed header, get its value from the request headers,
 	// lowercase the header name, and join with a colon.
