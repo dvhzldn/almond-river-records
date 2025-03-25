@@ -59,8 +59,10 @@ export async function sendOrderConfirmationEmail(
     <p>${shippingAddress}</p>
     <p>We will process your order promptly and dispatch within two working days.</p>
     <hr/>
+	<p>Best wishes,</p>
+	<br>
+	<p>Almond River Records</p>
     <div style="text-align:center;">
-      <p>Best wishes,<br>Almond River Records</p>
       <p><img src="https://almondriverrecords.online/images/almond-river-logo.jpg" alt="Almond River Records Logo" style="max-width:200px;" /></p>
     </div>
   `;

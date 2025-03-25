@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendOrderConfirmationEmail } from "@/lib/resendClient";
+//import { sendOrderConfirmationEmail } from "@/lib/resendClient";
 import { createClient } from "@supabase/supabase-js";
 
 interface OrderItem {
@@ -10,21 +10,6 @@ const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-// Update order status in Supabase orders table.
-async function updateOrderStatus(orderReference: string, status: string) {
-	const { error } = await supabaseService
-		.from("orders")
-		.update({ sumup_status: status })
-		.eq("sumup_checkout_reference", orderReference);
-	if (error) {
-		console.error("Error updating order status in Supabase:", error);
-		throw error;
-	}
-	console.log(
-		`Updated order ${orderReference} status to ${status} in Supabase.`
-	);
-}
 
 // Retrieve vinyl record IDs associated with the order from the order_items table.
 async function getOrderItems(orderReference: string): Promise<string[]> {
@@ -56,6 +41,21 @@ async function getOrderItems(orderReference: string): Promise<string[]> {
 
 	return (orderItems as OrderItem[]).map(
 		(item: OrderItem) => item.vinyl_record_id
+	);
+}
+
+// Update order status in Supabase orders table.
+async function updateOrderStatus(orderReference: string, status: string) {
+	const { error } = await supabaseService
+		.from("orders")
+		.update({ sumup_status: status })
+		.eq("sumup_checkout_reference", orderReference);
+	if (error) {
+		console.error("Error updating order status in Supabase:", error);
+		throw error;
+	}
+	console.log(
+		`Updated order ${orderReference} status to ${status} in Supabase.`
 	);
 }
 
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
 				}
 
 				// Send the order confirmation email.
-				await sendOrderConfirmationEmail(orderData, orderItemsData);
+				//				await sendOrderConfirmationEmail(orderData, orderItemsData);
 				// --- End New Code ---
 			} else if (checkoutStatus === "FAILED") {
 				await updateOrderStatus(orderReference, "FAILED");
