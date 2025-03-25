@@ -910,6 +910,16 @@ li {
 	text-align: right;
 }
 
+.returns-policy {
+	background-color: var(--colour-7);
+	border: none;
+	color: var(--colour-4);
+	font-style: italic;
+	text-decoration: underline;
+	font-family: inherit;
+	font-size: 1rem;
+}
+
 /* Results */
 .pagination {
 	display: flex;

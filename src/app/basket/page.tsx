@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import OrderForm, { OrderData } from "@/components/OrderForm";
-import Link from "next/link";
+import ReturnsPolicyModal from "@/components/ReturnsPolicyModal";
 export default function BasketPage() {
 	const { basket, clearBasket } = useBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
@@ -57,6 +57,11 @@ export default function BasketPage() {
 			setLoading(false);
 		}
 	};
+
+	const [isReturnsPolicyOpen, setReturnsPolicyOpen] = useState(false);
+
+	const openReturnsPolicy = () => setReturnsPolicyOpen(true);
+	const closeReturnsPolicy = () => setReturnsPolicyOpen(false);
 
 	return (
 		<div className="page-container">
@@ -126,12 +131,22 @@ export default function BasketPage() {
 								<em>
 									NB: Items can be returned no later than{" "}
 									<strong>30 days</strong> after the date of purchase.
-									Please see{" "}
-									<Link href="/returns" className="hyperLink">
-										our Returns Policy
-									</Link>{" "}
+									Please see our{" "}
+									<button
+										className="returns-policy"
+										onClick={openReturnsPolicy}
+									>
+										Returns Policy
+									</button>{" "}
+									{/* Conditionally render the ReturnsPolicyModal */}
+									{isReturnsPolicyOpen && (
+										<ReturnsPolicyModal
+											onClose={closeReturnsPolicy}
+										/>
+									)}
 									for further information.
 								</em>
+
 								<hr />
 							</div>
 							<div className="basket-list">
