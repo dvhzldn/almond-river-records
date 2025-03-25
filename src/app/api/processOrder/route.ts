@@ -61,6 +61,7 @@ export async function POST(request: Request) {
 		// Build the redirect URL (set to your homepage or an appropriate page)
 		// const paymentSuccessUrl = process.env.NEXT_PUBLIC_BASE_URL;
 		// const redirectUrl = paymentSuccessUrl;
+		const returnUrl = process.env.NEXT_PUBLIC_BASE_URL + `/api/sumup/webhook`;
 		// console.log("processOrder: Using redirectUrl:", redirectUrl);
 
 		const requestBody = {
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
+			return_url: returnUrl,
 			// redirect_url: redirectUrl,
 		};
 
