@@ -5,7 +5,14 @@ import GoogleReviews from "@/components/GoogleReviews";
 import SpotifyPlaylist from "@/components/SpotifyPlaylist";
 
 export default async function Home() {
-	const res = await fetch(`/api/records?newThisWeek=true`, {
+	const base = process.env.NEXT_PUBLIC_BASE_URL;
+	if (!base) {
+		throw new Error("NEXT_PUBLIC_BASE_URL is not defined");
+	}
+
+	const endpoint = new URL("/api/records?newThisWeek=true", base).toString();
+
+	const res = await fetch(endpoint, {
 		next: { revalidate: 60 },
 	});
 
