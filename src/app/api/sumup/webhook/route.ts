@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
-import { sendOrderConfirmationEmail } from "@/lib/resendClient"; // Import the email helper
+import { sendOrderConfirmationEmail } from "@/lib/resendClient";
 
 interface OrderItem {
 	vinyl_record_id: string;

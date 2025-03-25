@@ -10,10 +10,15 @@ export default function BasketPage() {
 	const { basket, clearBasket } = useBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 
+	const defaultImage = "/images/almond-river-logo.jpg";
+
+	// Calculate order price
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
-	const totalPrice = subTotalPrice + postagePrice;
-	const defaultImage = "/images/almond-river-logo.jpg";
+	// const totalPrice = subTotalPrice + postagePrice;
+
+	// testing
+	const totalPrice = 1;
 
 	const recordIds = basket.map((item) => item.id);
 	const description = basket
