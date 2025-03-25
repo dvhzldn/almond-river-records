@@ -59,9 +59,9 @@ export async function POST(request: Request) {
 		}
 
 		// Build the redirect URL (set to your homepage or an appropriate page)
-		const paymentSuccessUrl = process.env.NEXT_PUBLIC_BASE_URL;
-		const redirectUrl = paymentSuccessUrl;
-		console.log("processOrder: Using redirectUrl:", redirectUrl);
+		// const paymentSuccessUrl = process.env.NEXT_PUBLIC_BASE_URL;
+		// const redirectUrl = paymentSuccessUrl;
+		// console.log("processOrder: Using redirectUrl:", redirectUrl);
 
 		const requestBody = {
 			amount,
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
-			redirect_url: redirectUrl,
+			// redirect_url: redirectUrl,
 		};
 
 		console.log(
