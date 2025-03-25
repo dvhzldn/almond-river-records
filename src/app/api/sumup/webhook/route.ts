@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
+import { sendOrderConfirmationEmail } from "@/lib/resendClient"; // Import the email helper
 
 interface OrderItem {
 	vinyl_record_id: string;
@@ -90,9 +91,39 @@ export async function POST(request: Request) {
 				checkoutStatus === "succeeded" ||
 				checkoutStatus === "COMPLETED"
 			) {
+				// Update order status and inventory for PAID orders.
 				await updateOrderStatus(orderReference, "PAID");
 				const recordIds = await getOrderItems(orderReference);
 				await updateInventoryForPaid(recordIds);
+
+				// --- New Code for Sending the Email ---
+				// Fetch the complete order details (make sure orders table has the required fields)
+				const { data: orderData, error: orderError } = await supabase
+					.from("orders")
+					.select("*")
+					.eq("sumup_checkout_reference", orderReference)
+					.single();
+
+				if (orderError || !orderData) {
+					console.error("Error fetching order details:", orderError);
+					throw orderError || new Error("Order not found");
+				}
+
+				// Fetch the associated order items (ensure these include the necessary fields)
+				const { data: orderItemsData, error: orderItemsError } =
+					await supabase
+						.from("order_items")
+						.select("*")
+						.eq("order_id", orderData.id);
+
+				if (orderItemsError || !orderItemsData) {
+					console.error("Error fetching order items:", orderItemsError);
+					throw orderItemsError || new Error("Order items not found");
+				}
+
+				// Send the order confirmation email.
+				await sendOrderConfirmationEmail(orderData, orderItemsData);
+				// --- End New Code ---
 			} else if (checkoutStatus === "FAILED") {
 				await updateOrderStatus(orderReference, "FAILED");
 			} else {
