@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-//import { sendOrderConfirmationEmail } from "@/lib/resendClient";
 import { createClient } from "@supabase/supabase-js";
+import { sendOrderConfirmationEmail } from "@/lib/resendClient";
 
 interface OrderItem {
 	vinyl_record_id: string;
@@ -91,44 +91,45 @@ export async function POST(request: Request) {
 			const orderReference: string = checkoutDetails.reference;
 			const checkoutStatus: string = checkoutDetails.status;
 
-			if (
-				checkoutStatus === "PAID" ||
-				checkoutStatus === "succeeded" ||
-				checkoutStatus === "COMPLETED"
-			) {
+			if (checkoutStatus === "PAID") {
 				// Update order status and inventory for PAID orders.
 				await updateOrderStatus(orderReference, "PAID");
 				const recordIds = await getOrderItems(orderReference);
 				await updateInventoryForPaid(recordIds);
 
-				// --- New Code for Sending the Email ---
-				// Fetch the complete order details (make sure orders table has the required fields)
+				// Fetch complete order details.
 				const { data: orderData, error: orderError } = await supabaseService
 					.from("orders")
 					.select("*")
 					.eq("sumup_checkout_reference", orderReference)
 					.single();
-
 				if (orderError || !orderData) {
 					console.error("Error fetching order details:", orderError);
 					throw orderError || new Error("Order not found");
 				}
 
-				// Fetch the associated order items (ensure these include the necessary fields)
-				const { data: orderItemsData, error: orderItemsError } =
+				// If a confirmation email hasn't been sent yet, send it.
+				if (!orderData.email_sent) {
+					// Fetch associated order items.
+					const { data: orderItemsData, error: orderItemsError } =
+						await supabaseService
+							.from("order_items")
+							.select("*")
+							.eq("order_id", orderData.id);
+					if (orderItemsError || !orderItemsData) {
+						console.error("Error fetching order items:", orderItemsError);
+						throw orderItemsError || new Error("Order items not found");
+					}
+
+					// Send the order confirmation email.
+					await sendOrderConfirmationEmail(orderData, orderItemsData);
+
+					// Mark the email as sent in the order record.
 					await supabaseService
-						.from("order_items")
-						.select("*")
-						.eq("order_id", orderData.id);
-
-				if (orderItemsError || !orderItemsData) {
-					console.error("Error fetching order items:", orderItemsError);
-					throw orderItemsError || new Error("Order items not found");
+						.from("orders")
+						.update({ email_sent: true })
+						.eq("sumup_checkout_reference", orderReference);
 				}
-
-				// Send the order confirmation email.
-				//				await sendOrderConfirmationEmail(orderData, orderItemsData);
-				// --- End New Code ---
 			} else if (checkoutStatus === "FAILED") {
 				await updateOrderStatus(orderReference, "FAILED");
 			} else {

@@ -73,6 +73,9 @@ export async function sendOrderConfirmationEmail(
 			to: order.customer_email,
 			subject: "Order Confirmation",
 			html: htmlContent,
+			headers: {
+				"Idempotency-Key": order.sumup_checkout_reference,
+			},
 		});
 		console.log("Order confirmation email sent:", emailResponse);
 	} catch (error) {

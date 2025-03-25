@@ -139,6 +139,19 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
+	// If the order is PAID and email hasn't been sent yet, trigger sending confirmation email
+	// if (!order.email_sent) {
+	// 	// Call the API endpoint to send the confirmation email
+	// 	await fetch(
+	// 	  `${process.env.NEXT_PUBLIC_BASE_URL}/api/resend/sendConfirmationEmail`,
+	// 	  {
+	// 		method: "POST",
+	// 		headers: { "Content-Type": "application/json" },
+	// 		body: JSON.stringify({ checkoutId: order.sumup_checkout_reference })
+	// 	  }
+	// 	);
+	//   }
+
 	// Retrieve the order items for this order.
 	const orderItemsRes = await supabaseService
 		.from("order_items")

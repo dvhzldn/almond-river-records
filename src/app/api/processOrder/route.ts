@@ -24,18 +24,18 @@ interface OrderItem {
 export async function POST(request: Request) {
 	try {
 		const body = await request.json();
-		const { amount, recordIds, orderData } = body; // orderData: { name, email, address1, address2, address3, city, postcode }
+		const { amount, recordIds, orderData } = body;
 		const recordIdsArray = Array.isArray(recordIds)
 			? recordIds
 			: recordIds.split(",").map((r: string) => r.trim());
 
-		// Generate checkout reference.
+		// Checkout reference.
 		const now = new Date();
 		const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
 		const uniqueSuffix = now.getTime(); // milliseconds timestamp
 		const checkoutReference = `${today}-${uniqueSuffix}`;
 
-		// Compute a checkout description for SumUp.
+		// Checkout description.
 		const checkoutDescription = `${recordIdsArray.length} x ${
 			recordIdsArray.length === 1 ? "record" : "records"
 		} plus postage.`;
@@ -44,10 +44,11 @@ export async function POST(request: Request) {
 		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
 
+		// REMOVED REDIRECT URL FOR NOW
 		// Redirect to payment success page with query strings
-		const paymentSuccessUrl =
-			process.env.NEXT_PUBLIC_BASE_URL + "/payment-success";
-		const redirectUrl = `${paymentSuccessUrl}?checkout_id=${checkoutReference}`;
+		// const paymentSuccessUrl =
+		// 	process.env.NEXT_PUBLIC_BASE_URL + "/payment-success";
+		// const redirectUrl = `${paymentSuccessUrl}?checkout_id=${checkoutReference}&status=PENDING`;
 
 		const requestBody = {
 			amount,
@@ -56,11 +57,11 @@ export async function POST(request: Request) {
 			description: checkoutDescription,
 			merchant_code,
 			hosted_checkout: { enabled: true },
-			redirect_url: redirectUrl, // ** Do not use return_url **
+			// redirect_url: redirectUrl, // ** Do not use return_url **
 		};
 
-		// Include for testing
-		// console.log("Sending request to SumUp API:", requestBody);
+		// For testing
+		console.log("Sending request to SumUp API:", requestBody);
 
 		const sumupResponse = await fetch(
 			"https://api.sumup.com/v0.1/checkouts",
@@ -104,7 +105,7 @@ export async function POST(request: Request) {
 		const generatedOrderId = paymentData.checkout_reference;
 		const orderDate = now.toISOString();
 
-		// Step 2: Insert order into Supabase orders table.
+		// Supabase orders table insert.
 		const orderRecord = {
 			order_date: orderDate,
 			customer_name: orderData.name,
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
 			sumup_status_history: [{ status: "PENDING", changed_at: orderDate }],
 			sumup_hosted_checkout_url: paymentData.hosted_checkout_url,
 			sumup_transactions: paymentData.transactions || [],
+			email_sent: false,
 		};
 
 		const { data: orderInsertData, error: orderInsertError } =
@@ -137,7 +139,7 @@ export async function POST(request: Request) {
 		const newOrder = orderInsertData[0];
 		const orderId = newOrder.id;
 
-		// Step 3: Fetch vinyl record details from Supabase and build order items.
+		// Fetch vinyl record details and build order items.
 		const { data: vinylRecords, error: vinylError } = await supabaseService
 			.from("vinyl_records")
 			.select("id, artist_names, title, price")
@@ -173,7 +175,7 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Return the hosted checkout URL and order details.
+		// Return hosted checkout URL and order details.
 		return NextResponse.json({
 			hosted_checkout_url: paymentData.hosted_checkout_url,
 			checkout_reference: generatedOrderId,
