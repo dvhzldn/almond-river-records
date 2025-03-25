@@ -1,7 +1,3 @@
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_TRANSACTIONAL_API_KEY!);
-
 export interface Order {
 	id: string;
 	customer_name: string;
@@ -34,6 +30,10 @@ export async function sendOrderConfirmationEmail(
 	order: Order,
 	orderItems: OrderItem[]
 ) {
+	// Lazy-load the Resend client when needed.
+	const { Resend } = await import("resend");
+	const resend = new Resend(process.env.RESEND_TRANSACTIONAL_API_KEY!);
+
 	const itemsHtml = orderItems
 		.map(
 			(item) =>
@@ -45,9 +45,7 @@ export async function sendOrderConfirmationEmail(
 
 	const shippingAddress = `${order.address1}${
 		order.address2 ? ", " + order.address2 : ""
-	}${order.address3 ? ", " + order.address3 : ""}, ${order.city}, ${
-		order.postcode
-	}`;
+	}${order.address3 ? ", " + order.address3 : ""}, ${order.city}, ${order.postcode}`;
 
 	const htmlContent = `
     <p>Hi ${order.customer_name},</p>
@@ -61,9 +59,10 @@ export async function sendOrderConfirmationEmail(
     <p>${shippingAddress}</p>
     <p>We will process your order promptly and dispatch within two working days.</p>
     <hr/>
-    <div style="text-align:center;"
-    <p>Best wishes,<br>Almond River Records</p>
+    <div style="text-align:center;">
+      <p>Best wishes,<br>Almond River Records</p>
       <p><img src="https://almondriverrecords.online/images/almond-river-logo.jpg" alt="Almond River Records Logo" style="max-width:200px;" /></p>
+    </div>
   `;
 
 	try {
