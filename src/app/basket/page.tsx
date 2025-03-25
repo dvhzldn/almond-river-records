@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import OrderForm, { OrderData } from "@/components/OrderForm";
-
+import Link from "next/link";
 export default function BasketPage() {
 	const { basket, clearBasket } = useBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
@@ -122,6 +122,16 @@ export default function BasketPage() {
 										</h3>
 									</div>
 								</div>
+								<hr />
+								<em>
+									NB: Items can be returned no later than{" "}
+									<strong>30 days</strong> after the date of purchase.
+									Please see{" "}
+									<Link href="/returns" className="hyperLink">
+										our Returns Policy
+									</Link>{" "}
+									for further information.
+								</em>
 								<hr />
 							</div>
 							<div className="basket-list">
