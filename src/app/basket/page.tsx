@@ -60,57 +60,72 @@ export default function BasketPage() {
 
 	return (
 		<div className="page-container">
-			<h1 className="page-title">Your Basket</h1>
+			<h1 className="page-title">Basket</h1>
 			<div className="content-box">
-				{basket.length === 0 ? (
-					<p>Your basket is empty.</p>
-				) : (
-					<>
-						<div className="basket-list">
-							{basket.map((item) => (
-								<div key={item.id} className="basket-item">
-									<div>
-										<Image
-											src={item.coverImage || defaultImage}
-											alt={item.title}
-											width={120}
-											height={120}
-											className="basket-cover"
-										/>
+				<div className="basket-two-column-layout">
+					{basket.length === 0 ? (
+						<p>Your basket is empty.</p>
+					) : (
+						<>
+							<div className="basket-list">
+								<h2>Your Items</h2>
+								{basket.map((item) => (
+									<div key={item.id} className="basket-item">
+										<div>
+											<Image
+												src={item.coverImage || defaultImage}
+												alt={item.title}
+												width={90}
+												height={90}
+												className="basket-cover"
+											/>
+										</div>
+										<div>
+											<p>
+												<strong>{item.title}</strong>
+											</p>
+											<p>{item.artist}</p>
+											<h4>£{item.price}</h4>
+											<button
+												className="remove-button"
+												onClick={() =>
+													handleRemoveFromBasket(item.id)
+												}
+											>
+												Remove
+											</button>
+										</div>
 									</div>
+								))}
+								<div>
 									<button
-										className="remove-button"
-										onClick={() => handleRemoveFromBasket(item.id)}
+										className="clear-button"
+										onClick={clearBasket}
 									>
-										Remove
-									</button>
-									<div>
-										<h3>{item.title}</h3>
-										<h3>By {item.artist}</h3>
-										<h2>£{item.price}</h2>
-									</div>
+										Empty Basket
+									</button>{" "}
+									<hr />
 								</div>
-							))}
-						</div>
-						<div>
-							<button className="clear-button" onClick={clearBasket}>
-								Clear
-							</button>
-							<hr />
-							<h3>Sub-total: £{subTotalPrice}</h3>
-							<h3>Postage: £{postagePrice}</h3>
-							<br />
-							<h2>
-								Total: <strong>£{totalPrice}</strong>
-							</h2>
-						</div>
-						<OrderForm
-							onSubmit={handleOrderSubmit}
-							loading={loading}
-							error={error}
-						/>
-					</>
-				)}
+								<div className="basket-bill">
+									<h4>Item total: £{subTotalPrice}</h4>
+									<h4>Postage: £{postagePrice}</h4>
+									<br />
+									<h3>
+										Total: <strong>£{totalPrice}</strong>
+									</h3>
+								</div>
+							</div>
+							<div className="basket-list">
+								<h2>Your details</h2>
+								<OrderForm
+									onSubmit={handleOrderSubmit}
+									loading={loading}
+									error={error}
+								/>
+							</div>
+						</>
+					)}
+				</div>
 			</div>
 		</div>
 	);
