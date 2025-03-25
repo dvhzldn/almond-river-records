@@ -17,37 +17,29 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Fetch the order by checkout reference.
-		const { data: order, error: orderError } = await supabaseService
+		// Fetch the order along with its order items in one call
+		const { data: orderData, error: orderError } = await supabaseService
 			.from("orders")
-			.select("*")
+			.select(`*, order_items(*)`)
 			.eq("sumup_checkout_reference", checkoutReference)
 			.single();
-		if (orderError || !order) {
-			console.error("Error fetching order:", orderError);
+
+		if (orderError || !orderData) {
+			console.error("Error fetching order data:", orderError);
 			return NextResponse.json(
 				{ error: "Order not found" },
 				{ status: 404 }
 			);
 		}
 
-		// Fetch associated order items.
-		const { data: orderItems, error: orderItemsError } = await supabaseService
-			.from("order_items")
-			.select("*")
-			.eq("order_id", order.id);
-		if (orderItemsError || !orderItems) {
-			console.error("Error fetching order items:", orderItemsError);
-			return NextResponse.json(
-				{ error: "Order items not found" },
-				{ status: 404 }
-			);
-		}
+		// Extract order and order items from the fetched data
+		const order = orderData;
+		const orderItems = orderData.order_items;
 
 		// Send the order confirmation email if not already sent.
 		if (!order.order_confirmation_email_sent) {
 			await sendOrderConfirmationEmail(order, orderItems);
-			// Mark the email as sent in the order record.
+			// Update the order to mark that the email has been sent.
 			const { error: updateEmailError } = await supabaseService
 				.from("orders")
 				.update({ order_confirmation_email_sent: true })
@@ -58,6 +50,7 @@ export async function POST(request: Request) {
 		}
 
 		// Update inventory for each order item.
+		// You can also consider doing this as a single batch update if desired.
 		for (const item of orderItems) {
 			const { error } = await supabaseService
 				.from("vinyl_records")
