@@ -6,69 +6,207 @@ const supabaseService = createClient(
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-async function updateOrderStatus(orderReference: string, status: string) {
-	const { error } = await supabaseService
-		.from("orders")
-		.update({ sumup_status: status })
-		.eq("sumup_checkout_reference", orderReference);
-	if (error) {
-		console.error("Error updating order status in Supabase:", error);
-		throw error;
-	}
-	console.log(
-		`Updated order ${orderReference} status to ${status} in Supabase.`
-	);
-}
-
 export async function POST(request: Request) {
 	try {
-		const payload = await request.json();
-		console.log("Received SumUp webhook payload:", payload);
+		const body = await request.json();
+		console.log("processOrder: Received request body:", body);
 
-		if (payload.event_type === "checkout.status.updated") {
-			const checkoutDetails = payload.payload;
-			console.log("Verified checkout details:", checkoutDetails);
-
-			const orderReference: string = checkoutDetails.reference;
-			const checkoutStatus: string = checkoutDetails.status;
-
-			if (checkoutStatus === "PAID") {
-				// Update order status to PAID.
-				await updateOrderStatus(orderReference, "PAID");
-
-				// Trigger the order fulfillment endpoint.
-				const fulfillUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/fulfillOrder`;
-				const fulfillRes = await fetch(fulfillUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ checkoutReference: orderReference }),
-				});
-				if (!fulfillRes.ok) {
-					console.error(
-						"Error calling order fulfillment endpoint",
-						await fulfillRes.text()
-					);
-				} else {
-					console.log("Order fulfillment triggered successfully");
-				}
-			} else if (checkoutStatus === "FAILED") {
-				await updateOrderStatus(orderReference, "FAILED");
-			} else {
-				await updateOrderStatus(orderReference, "PENDING");
-			}
+		const { amount, description, recordIds, orderData } = body;
+		if (!amount || !description || !recordIds || !orderData) {
+			console.error("processOrder: Missing required fields in the payload");
+			return NextResponse.json(
+				{ error: "Missing required fields" },
+				{ status: 400 }
+			);
 		}
 
-		// Return a 200 OK response as required by SumUp.
-		return NextResponse.json({}, { status: 200 });
-	} catch (error: unknown) {
-		if (error instanceof Error) {
-			console.error("Error processing SumUp webhook:", error);
+		// Generate checkout reference.
+		const now = new Date();
+		const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
+		const uniqueSuffix = now.getTime(); // milliseconds timestamp
+		const checkoutReference = `${today}-${uniqueSuffix}`;
+		console.log(
+			"processOrder: Generated checkoutReference:",
+			checkoutReference
+		);
+
+		// Compute a checkout description for SumUp.
+		const checkoutDescription = `${recordIds.length} x ${recordIds.length === 1 ? "record" : "records"} plus postage.`;
+		console.log(
+			"processOrder: Computed checkoutDescription:",
+			checkoutDescription
+		);
+
+		// SumUp API variables.
+		const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
+		const merchant_code = process.env.SUMUP_MERCHANT_CODE;
+		if (!accessToken || !merchant_code) {
+			console.error("processOrder: SumUp API key or merchant code not set");
 			return NextResponse.json(
-				{ error: "Server error", details: error.message },
+				{ error: "Missing SumUp configuration" },
+				{ status: 500 }
+			);
+		}
+
+		// Build the redirect URL (if needed)
+		const paymentSuccessUrl = process.env.NEXT_PUBLIC_BASE_URL; // set to your homepage or appropriate page
+		const redirectUrl = paymentSuccessUrl; // or add parameters if required
+		console.log("processOrder: Using redirectUrl:", redirectUrl);
+
+		const requestBody = {
+			amount,
+			currency: "GBP",
+			checkout_reference: checkoutReference,
+			description: checkoutDescription,
+			merchant_code,
+			hosted_checkout: { enabled: true },
+			redirect_url: redirectUrl, // Do not use return_url
+		};
+
+		console.log(
+			"processOrder: Sending request to SumUp with payload:",
+			requestBody
+		);
+
+		// Call SumUp API.
+		const sumupResponse = await fetch(
+			"https://api.sumup.com/v0.1/checkouts",
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(requestBody),
+			}
+		);
+		console.log("processOrder: SumUp response status:", sumupResponse.status);
+
+		const paymentData = await sumupResponse.json();
+		console.log(
+			"processOrder: Received paymentData from SumUp:",
+			paymentData
+		);
+
+		if (!sumupResponse.ok) {
+			console.error("processOrder: SumUp API error:", paymentData);
+			return NextResponse.json(
+				{ error: "Checkout creation failed", details: paymentData },
+				{ status: sumupResponse.status }
+			);
+		}
+
+		if (
+			!paymentData.hosted_checkout_url ||
+			!paymentData.id ||
+			!paymentData.checkout_reference
+		) {
+			console.error(
+				"processOrder: Incomplete paymentData returned from SumUp:",
+				paymentData
+			);
+			return NextResponse.json(
+				{
+					error: "Payment not processed. No checkout URL returned.",
+					details: paymentData,
+				},
+				{ status: 400 }
+			);
+		}
+
+		console.log(
+			"processOrder: SumUp returned hosted_checkout_url:",
+			paymentData.hosted_checkout_url
+		);
+
+		const checkoutId = paymentData.id;
+		const orderDate = now.toISOString();
+
+		// Insert order record into Supabase.
+		const orderRecord = {
+			order_date: orderDate,
+			customer_name: orderData.name,
+			customer_email: orderData.email,
+			address1: orderData.address1,
+			address2: orderData.address2,
+			address3: orderData.address3,
+			city: orderData.city,
+			postcode: orderData.postcode,
+			sumup_amount: amount,
+			sumup_checkout_reference: checkoutReference,
+			sumup_date: orderDate,
+			sumup_id: checkoutId,
+			sumup_status: "PENDING",
+			sumup_status_history: [{ status: "PENDING", changed_at: orderDate }],
+			sumup_hosted_checkout_url: paymentData.hosted_checkout_url,
+			sumup_transactions: paymentData.transactions || [],
+			order_confirmation_email_sent: false,
+		};
+
+		console.log(
+			"processOrder: Inserting order record into Supabase:",
+			orderRecord
+		);
+		const { data: orderInsertData, error: orderInsertError } =
+			await supabaseService.from("orders").insert(orderRecord).select();
+
+		if (orderInsertError) {
+			console.error(
+				"processOrder: Error inserting order record:",
+				orderInsertError
+			);
+			return NextResponse.json(
+				{ error: "Failed to log order. Please try again." },
+				{ status: 500 }
+			);
+		}
+		console.log(
+			"processOrder: Order inserted successfully:",
+			orderInsertData
+		);
+
+		// Insert order items.
+		const orderId = orderInsertData[0].id;
+		const orderItemsData = recordIds.map((recordId: string) => ({
+			order_id: orderId,
+			vinyl_record_id: recordId,
+		}));
+
+		console.log("processOrder: Inserting order items:", orderItemsData);
+		const { error: orderItemsError } = await supabaseService
+			.from("order_items")
+			.insert(orderItemsData);
+
+		if (orderItemsError) {
+			console.error(
+				"processOrder: Error inserting order items:",
+				orderItemsError
+			);
+			return NextResponse.json(
+				{ error: "Failed to log order items. Please try again." },
+				{ status: 500 }
+			);
+		}
+
+		console.log("processOrder: Order items inserted successfully.");
+
+		return NextResponse.json(
+			{
+				hosted_checkout_url: paymentData.hosted_checkout_url,
+				checkout_reference: paymentData.checkout_reference,
+				orderDate,
+			},
+			{ status: 200 }
+		);
+	} catch (err: unknown) {
+		if (err instanceof Error) {
+			console.error("processOrder: Error processing order:", err);
+			return NextResponse.json(
+				{ error: "Server error", details: err.message },
 				{ status: 500 }
 			);
 		} else {
-			console.error("Unexpected error:", error);
+			console.error("processOrder: Unexpected error:", err);
 			return NextResponse.json(
 				{ error: "Server error", details: "An unexpected error occurred." },
 				{ status: 500 }
