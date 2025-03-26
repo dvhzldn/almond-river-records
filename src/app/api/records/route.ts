@@ -109,7 +109,7 @@ export async function GET(request: Request) {
 			label: r.label,
 			releaseYear: r.release_year,
 			genre: r.genre || [],
-			coverImage: r.cover_image_url,
+			coverImageUrl: r.cover_image_url,
 			otherImages: r.other_images ?? [],
 		}));
 

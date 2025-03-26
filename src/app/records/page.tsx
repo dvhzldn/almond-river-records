@@ -54,7 +54,7 @@ export default function RecordsPage() {
 			title: record.title,
 			artistName: record.artistName,
 			price: record.price,
-			coverImage: record.coverImage || "",
+			coverImage: record.coverImageUrl || "",
 		});
 		router.push("/basket");
 	};
@@ -251,7 +251,7 @@ export default function RecordsPage() {
 															title: record.title,
 															artistName: record.artistName,
 															price: record.price,
-															coverImage: record.coverImage,
+															coverImage: record.coverImageUrl,
 														});
 													}}
 												>
