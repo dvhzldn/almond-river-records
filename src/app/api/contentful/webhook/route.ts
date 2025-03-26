@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
+interface Sys {
+	id: string;
+	type: string;
+	createdAt?: string;
+	updatedAt?: string;
+	publishedAt?: string;
+	contentType?: {
+		sys: { id: string };
+	};
+}
+
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -13,15 +24,7 @@ interface ContentfulWebhookFields {
 }
 
 interface ContentfulWebhookPayload {
-	sys: {
-		id: string;
-		type: string;
-		createdAt?: string;
-		updatedAt?: string;
-		contentType?: {
-			sys: { id: string };
-		};
-	};
+	sys: Sys;
 	fields: ContentfulWebhookFields;
 }
 
@@ -195,6 +198,8 @@ export async function POST(request: Request) {
 				[];
 			const other_images = otherImagesArray.map((asset) => asset.sys.id);
 
+			const createdAt = sys.publishedAt || sys.createdAt;
+
 			const vinylRecordData = {
 				id: recordId,
 				title,
@@ -216,6 +221,7 @@ export async function POST(request: Request) {
 				quantity: fields.quantity?.["en-GB"],
 				in_stock: fields.inStock?.["en-GB"],
 				sold: fields.sold?.["en-GB"],
+				created_at: createdAt,
 			};
 
 			const { error } = await supabaseService
