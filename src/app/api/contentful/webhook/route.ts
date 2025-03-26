@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 		const vinylCondition = f.vinylCondition?.["en-GB"] ?? "Unknown";
 		const sleeveCondition = f.sleeveCondition?.["en-GB"] ?? "Unknown";
 		const label = f.label?.["en-GB"] ?? "";
-		const year = f.releaseYear?.["en-GB"] ?? 0;
+		const releaseYear = f.releaseYear?.["en-GB"] ?? 0;
 		const genre = f.genre?.["en-GB"] ?? [];
 		const description = f.description?.["en-GB"] ?? null;
 		const catalogueNumber = f.catalogueNumber?.["en-GB"] ?? null;
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
 			vinyl_condition: vinylCondition,
 			sleeve_condition: sleeveCondition,
 			label,
-			year,
+			release_year: releaseYear,
 			genre,
 			description,
 			catalogue_number: catalogueNumber,
