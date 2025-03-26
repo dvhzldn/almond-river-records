@@ -6,9 +6,10 @@ const supabase = createClient(
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-function constructImageUrl(assetId: string): string {
-	const baseUrl = `https://images.ctfassets.net/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}`;
-	return `${baseUrl}/${assetId}?w=400&h=400&fm=webp&q=70&fit=thumb`;
+function constructImageUrl(filePath: string, optimized = false): string {
+	if (!filePath) return "";
+	const base = `https:${filePath}`;
+	return optimized ? `${base}?w=400&h=400&fm=webp&q=70&fit=thumb` : base;
 }
 
 export async function POST(req: Request) {
@@ -21,13 +22,14 @@ export async function POST(req: Request) {
 			const id = sys.id;
 			const f = payload.fields;
 
+			const file = f.file?.["en-GB"];
 			const asset = {
 				id,
 				title: f.title?.["en-GB"] ?? null,
-				url: constructImageUrl(id),
-				details: f.file?.["en-GB"]?.details ?? null,
-				file_name: f.file?.["en-GB"]?.fileName ?? null,
-				content_type: f.file?.["en-GB"]?.contentType ?? null,
+				url: constructImageUrl(file?.url, false),
+				details: file?.details ?? null,
+				file_name: file?.fileName ?? null,
+				content_type: file?.contentType ?? null,
 				created_at: sys.createdAt ?? new Date().toISOString(),
 				updated_at: sys.updatedAt ?? new Date().toISOString(),
 				revision: sys.revision ?? null,
@@ -85,13 +87,17 @@ export async function POST(req: Request) {
 			other_images: [] as string[],
 		};
 
+		// 💡 Re-add these variables
 		const coverRef = f.coverImage?.["en-GB"];
 		const otherRefs = f.otherImages?.["en-GB"] ?? [];
 
-		if (coverRef?.sys?.id) {
+		const coverAsset = f.coverImage?.["en-GB"];
+		const coverFile = coverAsset?.file?.url;
+
+		if (coverRef?.sys?.id && coverFile) {
 			const assetId = coverRef.sys.id;
 			record.cover_image = assetId;
-			record.cover_image_url = constructImageUrl(assetId);
+			record.cover_image_url = constructImageUrl(coverFile, true);
 		}
 
 		for (const ref of otherRefs) {
