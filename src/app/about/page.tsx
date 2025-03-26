@@ -97,7 +97,7 @@ export default function AboutPage() {
 								and we will get back to you promptly.
 							</p>
 							<p>
-								You can also get in by email at{" "}
+								You can also get in touch by email at{" "}
 								<a
 									href="mailto:almondriverrecords@gmail.com"
 									className="hyperLink"
