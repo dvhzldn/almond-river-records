@@ -7,30 +7,13 @@ const supabase = createClient(
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Optimise Contentful image URL
-function getOptimizedImageUrl(url: string): string {
-	if (!url) return "";
-	if (url.startsWith("//")) url = "https:" + url;
-	return `${url}?w=400&h=400&fm=webp&q=70&fit=thumb`;
-}
+// Construct the optimized Contentful image URL
+function constructImageUrl(assetId: string): string {
+	// Base URL for the Contentful image CDN
+	const baseUrl = `https://images.ctfassets.net/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}`;
 
-// Fetch asset metadata from Contentful
-async function fetchAsset(assetId: string) {
-	try {
-		const res = await fetch(
-			`https://cdn.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/${process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT}/assets/${assetId}`,
-			{
-				headers: {
-					Authorization: `Bearer ${process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}`,
-				},
-			}
-		);
-		if (!res.ok) throw new Error(`Failed to fetch asset ${assetId}`);
-		return await res.json();
-	} catch (err) {
-		console.error(`❌ Error fetching asset ${assetId}:`, err);
-		return null;
-	}
+	// Construct the URL by appending the asset ID and optional query parameters for optimization
+	return `${baseUrl}/${assetId}?w=400&h=400&fm=webp&q=70&fit=thumb`;
 }
 
 export async function POST(req: Request) {
@@ -82,41 +65,15 @@ export async function POST(req: Request) {
 			...otherRefs.map((ref: { sys: { id: string } }) => ref.sys.id),
 		];
 
-		// Insert assets first so foreign key constraints succeed
+		// Construct the URL for the cover image (no need to fetch asset)
+		if (coverRef?.sys?.id) {
+			record.cover_image = coverRef.sys.id;
+			record.cover_image_url = constructImageUrl(coverRef.sys.id);
+		}
+
+		// Process other images if necessary
 		for (const assetId of allImageIds) {
-			console.log(`Fetching asset: ${assetId}`);
-			const asset = await fetchAsset(assetId); // Fetch the asset data from Contentful
-			if (!asset) continue;
-
-			console.log(`Fetched asset data: ${JSON.stringify(asset)}`);
-
-			const file = asset.fields?.file?.["en-GB"];
-			await supabase.from("contentful_assets").upsert(
-				{
-					id: asset.sys.id,
-					title: asset.fields?.title?.["en-GB"] ?? null,
-					url: file?.url ?? null, // Set URL from file data
-					details: file?.details ?? null,
-					file_name: file?.fileName ?? null,
-					content_type: file?.contentType ?? null,
-					created_at: asset.sys?.createdAt ?? null,
-					updated_at: asset.sys?.updatedAt ?? null,
-					revision: asset.sys?.revision ?? null,
-					published_version: asset.sys?.publishedVersion ?? null,
-				},
-				{ onConflict: "id" } // Use upsert to insert or update the asset based on ID
-			);
-
-			if (assetId === coverRef?.sys?.id) {
-				console.log(
-					`Cover image found. Setting cover_image_url for record: ${id}`
-				);
-				// If this is the cover image, set the cover image details
-				record.cover_image = assetId;
-				record.cover_image_url = file?.url
-					? getOptimizedImageUrl(file.url) // Format the URL using the helper function
-					: null;
-			} else {
+			if (assetId !== coverRef?.sys?.id) {
 				record.other_images.push(assetId);
 			}
 		}
