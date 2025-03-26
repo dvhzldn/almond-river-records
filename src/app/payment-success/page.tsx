@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
+import ClearBasketOnSuccess from "@/components/ClearBasketOnSuccess";
 
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -175,42 +176,46 @@ export default async function PaymentSuccess({ params, searchParams }) {
 
 		// --- Step 5: Render Order Success UI ---
 		return (
-			<div className="page-container">
-				<h1 className="page-title">Order complete</h1>
-				<div className="content-box">
-					<h3>Thank you for your purchase!</h3>
-					<br />
-					<p>
-						Your order will be processed promptly and dispatched within
-						two working days.
-					</p>
-					<br />
-					<div>
+			<>
+				<ClearBasketOnSuccess checkoutStatus={checkoutStatus} />
+
+				<div className="page-container">
+					<h1 className="page-title">Order complete</h1>
+					<div className="content-box">
+						<h3>Thank you for your purchase!</h3>
+						<br />
+						<p>
+							Your order will be processed promptly and dispatched within
+							two working days.
+						</p>
+						<br />
 						<div>
-							<p>
-								If you require further assistance, please get in touch
-								through{" "}
-								<Link href="/contact" className="hyperLink">
-									our contact form
-								</Link>{" "}
-								and we will get back to you.
-							</p>
+							<div>
+								<p>
+									If you require further assistance, please get in
+									touch through{" "}
+									<Link href="/contact" className="hyperLink">
+										our contact form
+									</Link>{" "}
+									and we will get back to you.
+								</p>
+							</div>
+						</div>
+						<div>
+							<hr />
+							<Image
+								className="logo"
+								src="/images/almond-river-logo.jpg"
+								alt="Almond River Records logo"
+								width={200}
+								height={200}
+								priority
+							/>
+							<p>Order reference: {order.sumup_id}</p>
 						</div>
 					</div>
-					<div>
-						<hr />
-						<Image
-							className="logo"
-							src="/images/almond-river-logo.jpg"
-							alt="Almond River Records logo"
-							width={200}
-							height={200}
-							priority
-						/>
-						<p>Order reference: {order.sumup_id}</p>
-					</div>
 				</div>
-			</div>
+			</>
 		);
 	} else {
 		// If checkoutStatus is not one of the expected values.
