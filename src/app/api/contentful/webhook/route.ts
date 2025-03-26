@@ -48,19 +48,23 @@ type ContentfulWebhookPayload = {
 	fields: {
 		title: { "en-GB": string };
 		subTitle?: { "en-GB": string };
-		artist: { "en-GB": string[] };
+		artistName: { "en-GB": string[] };
 		price: { "en-GB": number };
-		condition: { "en-GB": string };
+		vinylCondition: { "en-GB": string };
 		sleeveCondition: { "en-GB": string };
 		label: { "en-GB": string };
-		year: { "en-GB": number };
+		releaseYear: { "en-GB": number };
 		genre?: { "en-GB": string[] };
 		description?: { "en-GB": ContentfulDocument };
 		catalogueNumber?: { "en-GB": string };
 		barcode?: { "en-GB": string };
-		slug: { "en-GB": string };
+		slug?: { "en-GB": string };
 		coverImage: { "en-GB": ContentfulAssetRef };
 		otherImages?: { "en-GB": ContentfulImageListRef };
+		quantity?: { "en-GB": number };
+		inStock?: { "en-GB": boolean };
+		sold?: { "en-GB": boolean };
+		albumOfTheWeek?: { "en-GB": boolean };
 	};
 };
 
@@ -69,33 +73,40 @@ export async function POST(req: Request) {
 		const payload = (await req.json()) as ContentfulWebhookPayload;
 		const f = payload.fields;
 
-		const coverImageId = f.coverImage["en-GB"].sys.id;
-		const coverImageUrl = await fetchAssetUrl(coverImageId);
+		const title = f.title?.["en-GB"] ?? "Untitled";
+		const artistNames = f.artistName?.["en-GB"] ?? [];
+
+		const coverImageId = f.coverImage?.["en-GB"]?.sys?.id ?? null;
+		const coverImageUrl = coverImageId
+			? await fetchAssetUrl(coverImageId)
+			: "";
 
 		const otherImageIds =
-			f.otherImages?.["en-GB"].map((img) => img.sys.id) ?? [];
+			f.otherImages?.["en-GB"]?.map((img) => img.sys.id) ?? [];
 
 		const record = {
 			id: payload.sys.id,
-			title: f.title["en-GB"],
+			title,
 			sub_title: f.subTitle?.["en-GB"] ?? null,
-			artist_names: f.artist["en-GB"],
-			artist_names_text: f.artist["en-GB"].join(", "),
-			price: f.price["en-GB"],
-			vinyl_condition: f.condition["en-GB"],
-			sleeve_condition: f.sleeveCondition["en-GB"],
-			label: f.label["en-GB"],
-			release_year: f.year["en-GB"],
+			artist_names: artistNames,
+			artist_names_text: artistNames.join(", "),
+			price: f.price?.["en-GB"] ?? 0,
+			vinyl_condition: f.vinylCondition?.["en-GB"] ?? "Unknown",
+			sleeve_condition: f.sleeveCondition?.["en-GB"] ?? "Unknown",
+			label: f.label?.["en-GB"] ?? "",
+			release_year: f.releaseYear?.["en-GB"] ?? 0,
 			genre: f.genre?.["en-GB"] ?? [],
 			description: f.description?.["en-GB"] ?? null,
 			catalogue_number: f.catalogueNumber?.["en-GB"] ?? null,
 			barcode: f.barcode?.["en-GB"] ?? null,
-			quantity: 1,
-			in_stock: true,
-			sold: false,
-			album_of_the_week: false,
-			album_of_week: false,
-			link: `/records/${f.slug["en-GB"]}`,
+			quantity: f.quantity?.["en-GB"] ?? 1,
+			in_stock: f.inStock?.["en-GB"] ?? true,
+			sold: f.sold?.["en-GB"] ?? false,
+			album_of_the_week: f.albumOfTheWeek?.["en-GB"] ?? false,
+			album_of_week: f.albumOfTheWeek?.["en-GB"] ?? false,
+			link: f.slug?.["en-GB"]
+				? `/records/${f.slug["en-GB"]}`
+				: `/records/${payload.sys.id}`,
 			cover_image: coverImageId,
 			cover_image_url: coverImageUrl,
 			other_images: otherImageIds,
