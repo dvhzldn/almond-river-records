@@ -7,6 +7,7 @@ export interface VinylRecord {
 	price: number;
 	vinylCondition: string;
 	coverImage: string;
+	coverImageUrl: string;
 	label: string;
 	sleeveCondition: string;
 	releaseYear?: number | null;

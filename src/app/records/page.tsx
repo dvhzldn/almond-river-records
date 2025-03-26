@@ -198,10 +198,10 @@ export default function RecordsPage() {
 									onClick={() => setSelectedRecord(record)}
 								>
 									<div className="record-image-container">
-										{record.coverImage ? (
+										{record.coverImageUrl ? (
 											<Image
 												className="record-image"
-												src={record.coverImage}
+												src={record.coverImageUrl}
 												alt={record.title}
 												width={250}
 												height={250}
