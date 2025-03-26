@@ -54,7 +54,8 @@ export default function Help() {
 					<h3>Do you accept records on consignment?</h3>
 					<p className="text">
 						Absolutely. If you have a collection or individual records
-						that you’d like to sell, please get in touch. We offer
+						that you’d like to sell, please{" "}
+						<Link href="/contact">get in touch</Link>. We offer
 						consignment options as well as direct purchase for select
 						items. Our staff can guide you through the process and provide
 						a fair valuation.
