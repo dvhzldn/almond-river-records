@@ -29,17 +29,18 @@ interface OrderItem {
 
 interface VinylRecord {
 	id: string;
-	cover_image: string; // This is the asset ID in contentful_assets
+	cover_image: string;
 }
 
 interface Asset {
 	id: string;
-	url: string; // This is the actual image URL
+	url: string;
 }
 
 export default async function PaymentSuccess({ params, searchParams }) {
+	// We're not using params.
 	void params;
-	// Extract checkoutId from searchParams.
+	// Extract checkoutId (the sumup_checkout_reference) from searchParams.
 	const checkoutId = Array.isArray(searchParams.checkout_id)
 		? searchParams.checkout_id[0]
 		: searchParams.checkout_id;
@@ -72,13 +73,47 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
-	// --- Step 1: Fetch Checkout Status from SumUp ---
+	// Fetch the order details from Supabase using the checkout reference.
+	const orderRes = await supabaseService
+		.from("orders")
+		.select("*")
+		.eq("sumup_checkout_reference", checkoutId)
+		.single();
+	const order = orderRes.data as Order | null;
+	if (orderRes.error || !order) {
+		return (
+			<div className="page-container">
+				<h1 className="page-title">Payment Error</h1>
+				<div className="content-box">
+					<p>Something went wrong with retrieving your order details.</p>
+					<p>
+						Please contact support through{" "}
+						<Link href="/contact" className="hyperLink">
+							our contact form
+						</Link>
+						.
+					</p>
+					<hr />
+					<Image
+						className="logo"
+						src="/images/almond-river-logo.jpg"
+						alt="Almond River Records logo"
+						width={100}
+						height={100}
+						priority
+					/>
+				</div>
+			</div>
+		);
+	}
+
+	// --- Step 1: Call the SumUp API with the sumup_id from the order record ---
+	// Build the URL by appending order.sumup_id to the base URL.
 	const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
 	if (!accessToken) {
 		throw new Error("Missing SumUp access token");
 	}
-
-	const sumupUrl = `https://api.sumup.com/v0.1/checkouts/${checkoutId}`;
+	const sumupUrl = `https://api.sumup.com/v0.1/checkouts/${order.sumup_id}`;
 	console.log("Fetching SumUp checkout status from:", sumupUrl);
 
 	const sumupResponse = await fetch(sumupUrl, {
@@ -104,29 +139,8 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			<div className="page-container">
 				<h1 className="page-title">Payment Pending</h1>
 				<div className="content-box">
-					<h4>Error: payment delayed.</h4>
-
-					<p>
-						Your order is still being processed by our payment provider.
-						You will receive an email when your order has been completed.
-					</p>
-					<br />
-					<p>
-						If you require further assistance, please get in touch through{" "}
-						<Link href="/contact" className="hyperLink">
-							our contact form
-						</Link>{" "}
-						and we will get back to you.
-					</p>
-					<hr />
-					<Image
-						className="logo"
-						src="/images/almond-river-logo.jpg"
-						alt="Almond River Records logo"
-						width={100}
-						height={100}
-						priority
-					/>
+					<h4>Your order and payment is being processed.</h4>
+					<p>Please wait a moment while we complete your order.</p>
 				</div>
 			</div>
 		);
@@ -138,8 +152,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 					<p>
 						Your order has not been placed. Something went wrong with
 						processing your payment.
-					</p>{" "}
-					<br />
+					</p>
 					<p>Please contact support or try again.</p>
 					<hr />
 					<Image
@@ -154,44 +167,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			</div>
 		);
 	} else if (checkoutStatus === "PAID") {
-		// --- Step 3: Fetch Order Details from Supabase ---
-		const orderRes = await supabaseService
-			.from("orders")
-			.select("*")
-			.eq("sumup_checkout_reference", checkoutId)
-			.single();
-		const order = orderRes.data as Order | null;
-		if (orderRes.error || !order) {
-			return (
-				<div className="page-container">
-					<h1 className="page-title">Payment Error</h1>
-					<div className="content-box">
-						<p>
-							Something went wrong with retrieving your order details.
-						</p>{" "}
-						<br />
-						<p>
-							Please contact support through{" "}
-							<Link href="/contact" className="hyperLink">
-								our contact form
-							</Link>
-							.
-						</p>
-						<hr />
-						<Image
-							className="logo"
-							src="/images/almond-river-logo.jpg"
-							alt="Almond River Records logo"
-							width={100}
-							height={100}
-							priority
-						/>
-					</div>
-				</div>
-			);
-		}
-
-		// --- Step 4: Trigger Fulfillment Endpoint (if necessary) ---
+		// --- Step 3: Trigger Fulfillment Endpoint (if necessary) ---
 		if (!order.order_confirmation_email_sent) {
 			try {
 				const fulfillUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/fulfillOrder`;
@@ -216,7 +192,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			}
 		}
 
-		// --- Step 5: Fetch Order Items and Build Display Data ---
+		// --- Step 4: Fetch Order Items and Build Display Data ---
 		const orderItemsRes = await supabaseService
 			.from("order_items")
 			.select("*")
@@ -255,7 +231,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			}));
 		}
 
-		// --- Step 6: Render Order Success UI ---
+		// --- Step 5: Render Order Success UI ---
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Successful</h1>
@@ -321,7 +297,6 @@ export default async function PaymentSuccess({ params, searchParams }) {
 				<h1 className="page-title">Payment Status Unknown</h1>
 				<div className="content-box">
 					<h4>Your payment has not been processed.</h4>
-
 					<p>
 						Unable to determine your payment status. Please contact
 						support.
