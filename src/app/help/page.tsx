@@ -86,9 +86,8 @@ export default function Help() {
 					<h2>How often do you update your stock?</h2>
 					<p className="text">
 						Our inventory is updated almost daily as new finds and rare
-						gems come in. Sign up for our newsletter or follow us on
-						social media to stay informed about new arrivals, special
-						editions, and exclusive offers.
+						gems come in. Follow us on social media to stay informed about
+						new arrivals.
 					</p>
 
 					<h2>Do you host in-store events?</h2>
