@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import Modal from "@/components/Modal";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -77,11 +76,6 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 					))}
 				</Swiper>
 			)}
-			<div className="view-all-records">
-				<Link href="/records">
-					<h2 className="view-all-records">View all records</h2>
-				</Link>
-			</div>
 			{selectedRecord && (
 				<Modal
 					record={selectedRecord}

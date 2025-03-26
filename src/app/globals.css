@@ -19,7 +19,7 @@
 	--footer-height: 180px;
 
 	/* New Color Variables */
-	--colour-1: #40798cff;
+	--colour-1: #40798c;
 	--colour-2: #97f9f9;
 	--colour-3: #dc0000;
 	--colour-4: #1f363dff;
@@ -177,14 +177,12 @@ a,
 	color: var(--colour-1);
 	font-weight: bold;
 	text-decoration: none;
-	transition: opacity 0.3s ease;
 }
 
 Link:hover,
 a:hover,
 .hyperLink:hover {
 	color: var(--colour-6);
-	opacity: 0.9;
 	text-decoration: underline solid;
 }
 
@@ -217,8 +215,19 @@ a:hover,
 	color: var(--colour-5);
 }
 
-img.logo {
+img.logo-home {
 	border-radius: 50%;
+	transition:
+		transform 0.3s ease,
+		box-shadow 0.2s ease,
+		filter 0.3s ease;
+	filter: saturate(80%);
+}
+
+img.logo-home:hover {
+	transform: scale(1.03);
+	box-shadow: 1px 4px 8px 3px rgb(64, 121, 140);
+	filter: saturate(100%);
 }
 
 /* Navigation links (desktop) */

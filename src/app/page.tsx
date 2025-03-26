@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import NewThisWeek from "@/components/NewThisWeek";
 import AlbumOfTheWeek from "@/components/AlbumOfTheWeek";
 import GoogleReviews from "@/components/GoogleReviews";
@@ -27,14 +28,21 @@ export default async function Home() {
 		<div className="page-container">
 			<h1 className="page-title">Almond River Records</h1>
 			<div className="content-box">
-				<Image
-					className="logo"
-					src="/images/almond-river-logo.jpg"
-					alt="Almond River Records logo"
-					width={300}
-					height={300}
-					priority
-				/>
+				<div>
+					<Image
+						className="logo-home"
+						src="/images/almond-river-logo.jpg"
+						alt="Almond River Records logo"
+						width={300}
+						height={300}
+						priority
+					/>{" "}
+					<div className="view-all-records">
+						<Link href="/records">
+							<h2 className="view-all-records">View all records</h2>
+						</Link>
+					</div>
+				</div>
 				<hr />
 				<div>
 					<NewThisWeek records={data.records} />

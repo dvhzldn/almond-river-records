@@ -58,7 +58,7 @@ export default function Menu() {
 					</li> */}
 					<li className={isActive("/about") ? "active" : ""}>
 						<Link href="/about" onClick={closeMenu}>
-							Visit Our Store
+							Visit The Shop
 						</Link>
 					</li>
 					<li className={isActive("/contact") ? "active" : ""}>
