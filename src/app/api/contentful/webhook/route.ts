@@ -42,7 +42,6 @@ export async function POST(req: Request) {
 			return NextResponse.json({ ignored: true }, { status: 200 });
 		}
 
-		// ---- Vinyl Record Fields ----
 		const id = payload.sys.id;
 		const title = f.title?.["en-GB"] ?? "";
 		const subTitle = f.subTitle?.["en-GB"] ?? null;
@@ -55,7 +54,7 @@ export async function POST(req: Request) {
 		const releaseYear = f.releaseYear?.["en-GB"] ?? 0;
 		const genre = f.genre?.["en-GB"] ?? [];
 		const description = f.description?.["en-GB"] ?? null;
-		const link = f.link?.["en-GB"] ?? null; // ⬅️ fixed
+		const link = f.link?.["en-GB"] ?? null;
 		const catalogueNumber = f.catalogueNumber?.["en-GB"] ?? null;
 		const barcode = f.barcode?.["en-GB"] ?? null;
 		const quantity = f.quantity?.["en-GB"] ?? 1;
@@ -63,19 +62,17 @@ export async function POST(req: Request) {
 		const sold = f.sold?.["en-GB"] ?? false;
 		const albumOfTheWeek = f.albumOfTheWeek?.["en-GB"] ?? false;
 
-		// ---- Image Handling ----
+		// Cover image
 		const coverImageRef = f.coverImage?.["en-GB"];
 		const coverImageId = coverImageRef?.sys?.id ?? null;
-		const coverImageUrl = coverImageRef?.fields?.file?.["en-GB"]?.url
-			? getOptimizedImageUrl(coverImageRef.fields.file["en-GB"].url)
-			: "";
+		let coverImageUrl = "";
 
+		// Other images
 		const otherImageRefs = f.otherImages?.["en-GB"] ?? [];
 		const otherImageIds = (otherImageRefs as { sys: { id: string } }[]).map(
 			(img) => img.sys.id
 		);
 
-		// ---- Insert Assets ----
 		const allAssetIds = [coverImageId, ...otherImageIds].filter(Boolean);
 
 		for (const assetId of allAssetIds) {
@@ -97,10 +94,14 @@ export async function POST(req: Request) {
 					},
 					{ onConflict: "id" }
 				);
+
+				// Update coverImageUrl if this asset matches
+				if (asset.sys.id === coverImageId && file?.url) {
+					coverImageUrl = getOptimizedImageUrl(file.url);
+				}
 			}
 		}
 
-		// ---- Insert Vinyl Record ----
 		const vinylRecord = {
 			id,
 			title,
@@ -114,14 +115,14 @@ export async function POST(req: Request) {
 			release_year: releaseYear,
 			genre,
 			description,
-			link, // ⬅️ stored as jsonb from Contentful
+			link,
 			catalogue_number: catalogueNumber,
 			barcode,
 			quantity,
 			in_stock: inStock,
 			sold,
 			album_of_the_week: albumOfTheWeek,
-			album_of_week: albumOfTheWeek, // legacy duplicate
+			album_of_week: albumOfTheWeek,
 			cover_image: coverImageId,
 			cover_image_url: coverImageUrl,
 			other_images: otherImageIds,
