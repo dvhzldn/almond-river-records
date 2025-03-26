@@ -76,6 +76,7 @@ export async function POST(req: Request) {
 		const f = payload.fields;
 		const id = sys.id;
 
+		// Build base record object
 		const record = {
 			id,
 			title: f.title?.["en-GB"] ?? "",
@@ -102,9 +103,11 @@ export async function POST(req: Request) {
 			other_images: [] as string[],
 		};
 
+		// Extract references
 		const coverRef = f.coverImage?.["en-GB"];
 		const otherRefs = f.otherImages?.["en-GB"] ?? [];
 
+		// ✅ Fetch and assign cover image
 		if (coverRef?.sys?.id) {
 			const assetId = coverRef.sys.id;
 			const asset = await fetchContentfulAsset(assetId);
@@ -128,10 +131,11 @@ export async function POST(req: Request) {
 				);
 			}
 
+			// Required values
 			record.cover_image = assetId;
 			record.cover_image_url = constructImageUrl(filePath, true);
 
-			// Also upsert into contentful_assets
+			// Optional: upsert asset to contentful_assets table
 			await supabase.from("contentful_assets").upsert(
 				{
 					id: asset.sys.id,
@@ -149,12 +153,25 @@ export async function POST(req: Request) {
 			);
 		}
 
+		// 🚨 Guard against missing required image fields
+		if (!record.cover_image || !record.cover_image_url) {
+			console.error(
+				"❌ Missing cover_image or cover_image_url — cannot insert vinyl record."
+			);
+			return NextResponse.json(
+				{ error: "Missing cover_image or cover_image_url" },
+				{ status: 400 }
+			);
+		}
+
+		// Add other image references (if any)
 		for (const ref of otherRefs) {
 			if (ref?.sys?.id && ref.sys.id !== record.cover_image) {
 				record.other_images.push(ref.sys.id);
 			}
 		}
 
+		// ✅ Insert vinyl record
 		const { error } = await supabase
 			.from("vinyl_records")
 			.upsert(record, { onConflict: "id" });
@@ -164,7 +181,7 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: error.message }, { status: 500 });
 		}
 
-		console.log(`✅ Record ${id} processed successfully.`);
+		console.log(`✅ Record ${id} inserted/updated successfully.`);
 		return NextResponse.json({ success: true }, { status: 200 });
 	} catch (err) {
 		console.error("❌ Webhook error:", err);
