@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Supabase client using service role key (to bypass RLS)
+// Supabase client using service role key
 const supabase = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -14,7 +14,7 @@ function getOptimizedImageUrl(url: string): string {
 	return `${url}?w=400&h=400&fm=webp&q=70&fit=thumb`;
 }
 
-// Fetch full asset info from Contentful CDN
+// Fetch full asset data from Contentful
 async function fetchAssetData(assetId: string) {
 	try {
 		const res = await fetch(
@@ -25,10 +25,10 @@ async function fetchAssetData(assetId: string) {
 				},
 			}
 		);
-		if (!res.ok) throw new Error("Failed to fetch asset");
+		if (!res.ok) throw new Error(`Asset fetch failed: ${res.status}`);
 		return await res.json();
 	} catch (err) {
-		console.error(`Failed to fetch asset ${assetId}:`, err);
+		console.error(`❌ Error fetching asset ${assetId}:`, err);
 		return null;
 	}
 }
@@ -38,12 +38,11 @@ export async function POST(req: Request) {
 		const payload = await req.json();
 		const f = payload.fields;
 
-		// Exit early if it's not a vinylRecord
 		if (payload.sys?.contentType?.sys?.id !== "vinylRecord") {
 			return NextResponse.json({ ignored: true }, { status: 200 });
 		}
 
-		// Parse Contentful fields
+		// ---- Vinyl Record Fields ----
 		const id = payload.sys.id;
 		const title = f.title?.["en-GB"] ?? "";
 		const subTitle = f.subTitle?.["en-GB"] ?? null;
@@ -56,6 +55,7 @@ export async function POST(req: Request) {
 		const releaseYear = f.releaseYear?.["en-GB"] ?? 0;
 		const genre = f.genre?.["en-GB"] ?? [];
 		const description = f.description?.["en-GB"] ?? null;
+		const link = f.link?.["en-GB"] ?? null; // ⬅️ fixed
 		const catalogueNumber = f.catalogueNumber?.["en-GB"] ?? null;
 		const barcode = f.barcode?.["en-GB"] ?? null;
 		const quantity = f.quantity?.["en-GB"] ?? 1;
@@ -63,38 +63,36 @@ export async function POST(req: Request) {
 		const sold = f.sold?.["en-GB"] ?? false;
 		const albumOfTheWeek = f.albumOfTheWeek?.["en-GB"] ?? false;
 
-		// Cover image
+		// ---- Image Handling ----
 		const coverImageRef = f.coverImage?.["en-GB"];
 		const coverImageId = coverImageRef?.sys?.id ?? null;
-		const coverImageUrl = coverImageId
-			? getOptimizedImageUrl(
-					coverImageRef.fields?.file?.["en-GB"]?.url || ""
-				)
+		const coverImageUrl = coverImageRef?.fields?.file?.["en-GB"]?.url
+			? getOptimizedImageUrl(coverImageRef.fields.file["en-GB"].url)
 			: "";
 
-		// Other images
 		const otherImageRefs = f.otherImages?.["en-GB"] ?? [];
 		const otherImageIds = (otherImageRefs as { sys: { id: string } }[]).map(
 			(img) => img.sys.id
 		);
 
-		// Insert contentful_assets (cover image and others)
+		// ---- Insert Assets ----
 		const allAssetIds = [coverImageId, ...otherImageIds].filter(Boolean);
 
 		for (const assetId of allAssetIds) {
 			const asset = await fetchAssetData(assetId);
 			if (asset) {
+				const file = asset.fields?.file?.["en-GB"];
 				await supabase.from("contentful_assets").upsert(
 					{
 						id: asset.sys.id,
 						title: asset.fields?.title?.["en-GB"] ?? null,
-						url: asset.fields?.file?.["en-GB"]?.url ?? null,
-						details: asset.fields?.file?.["en-GB"]?.details ?? null,
-						file_name: asset.fields?.file?.["en-GB"]?.fileName ?? null,
-						content_type:
-							asset.fields?.file?.["en-GB"]?.contentType ?? null,
+						url: file?.url ?? null,
+						details: file?.details ?? null,
+						file_name: file?.fileName ?? null,
+						content_type: file?.contentType ?? null,
 						created_at: asset.sys?.createdAt ?? null,
 						updated_at: asset.sys?.updatedAt ?? null,
+						revision: asset.sys?.revision ?? null,
 						published_version: asset.sys?.publishedVersion ?? null,
 					},
 					{ onConflict: "id" }
@@ -102,7 +100,7 @@ export async function POST(req: Request) {
 			}
 		}
 
-		// Insert or update vinyl_records
+		// ---- Insert Vinyl Record ----
 		const vinylRecord = {
 			id,
 			title,
@@ -116,14 +114,14 @@ export async function POST(req: Request) {
 			release_year: releaseYear,
 			genre,
 			description,
+			link, // ⬅️ stored as jsonb from Contentful
 			catalogue_number: catalogueNumber,
 			barcode,
 			quantity,
 			in_stock: inStock,
 			sold,
 			album_of_the_week: albumOfTheWeek,
-			album_of_week: albumOfTheWeek, // legacy duplicate?
-			link: `/records/${id}`,
+			album_of_week: albumOfTheWeek, // legacy duplicate
 			cover_image: coverImageId,
 			cover_image_url: coverImageUrl,
 			other_images: otherImageIds,
@@ -134,13 +132,13 @@ export async function POST(req: Request) {
 			.upsert(vinylRecord, { onConflict: "id" });
 
 		if (error) {
-			console.error("Supabase insert error:", error);
+			console.error("❌ Supabase insert error:", error);
 			return NextResponse.json({ error: error.message }, { status: 500 });
 		}
 
 		return NextResponse.json({ success: true }, { status: 200 });
 	} catch (err) {
-		console.error("Contentful webhook error:", err);
+		console.error("❌ Webhook handler error:", err);
 		if (err instanceof Error) {
 			return NextResponse.json({ error: err.message }, { status: 500 });
 		}
