@@ -3,17 +3,16 @@ import { useState, useEffect, useCallback } from "react";
 export interface VinylRecord {
 	id: string;
 	title: string;
-	artistName: string[]; // Supabase returns array
+	artistName: string[];
 	price: number;
 	vinylCondition: string;
-	coverImage: string;
-	coverImageUrl: string;
-	label: string;
 	sleeveCondition: string;
+	label: string;
 	releaseYear?: number | null;
 	genre: string[];
 	inStock: boolean;
 	otherImages?: string[];
+	coverImageUrl: string;
 }
 
 interface UseRecordsParams {
