@@ -37,7 +37,6 @@
 		"contentful-typescript-codegen": "^3.4.0",
 		"eslint": "^9",
 		"eslint-config-next": "15.2.2",
-		"ts-node": "^10.9.2",
-		"typescript": "^5"
+		"typescript": "^5.8.2"
 	}
 }
