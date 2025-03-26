@@ -30,13 +30,6 @@ async function fetchAssetUrl(assetId: string): Promise<string | null> {
 
 type ContentfulAssetRef = {
 	sys: { id: string };
-	fields: {
-		file: {
-			"en-GB": {
-				url: string;
-			};
-		};
-	};
 };
 
 type ContentfulImageListRef = {
@@ -48,17 +41,17 @@ type ContentfulWebhookPayload = {
 	fields: {
 		title: { "en-GB": string };
 		subTitle?: { "en-GB": string };
-		artistName: { "en-GB": string[] };
+		artist: { "en-GB": string[] };
 		price: { "en-GB": number };
-		vinylCondition: { "en-GB": string };
+		condition: { "en-GB": string };
 		sleeveCondition: { "en-GB": string };
 		label: { "en-GB": string };
-		releaseYear: { "en-GB": number };
+		year: { "en-GB": number };
 		genre?: { "en-GB": string[] };
 		description?: { "en-GB": ContentfulDocument };
 		catalogueNumber?: { "en-GB": string };
 		barcode?: { "en-GB": string };
-		slug?: { "en-GB": string };
+		slug: { "en-GB": string };
 		coverImage: { "en-GB": ContentfulAssetRef };
 		otherImages?: { "en-GB": ContentfulImageListRef };
 		quantity?: { "en-GB": number };
@@ -73,8 +66,9 @@ export async function POST(req: Request) {
 		const payload = (await req.json()) as ContentfulWebhookPayload;
 		const f = payload.fields;
 
-		const title = f.title?.["en-GB"] ?? "Untitled";
-		const artistNames = f.artistName?.["en-GB"] ?? [];
+		const title = f.title?.["en-GB"];
+		const artistNames = f.artist?.["en-GB"] ?? [];
+		const artistText = artistNames.join(", ");
 
 		const coverImageId = f.coverImage?.["en-GB"]?.sys?.id ?? null;
 		const coverImageUrl = coverImageId
@@ -89,12 +83,12 @@ export async function POST(req: Request) {
 			title,
 			sub_title: f.subTitle?.["en-GB"] ?? null,
 			artist_names: artistNames,
-			artist_names_text: artistNames.join(", "),
+			artist_names_text: artistText,
 			price: f.price?.["en-GB"] ?? 0,
-			vinyl_condition: f.vinylCondition?.["en-GB"] ?? "Unknown",
+			vinyl_condition: f.condition?.["en-GB"] ?? "Unknown",
 			sleeve_condition: f.sleeveCondition?.["en-GB"] ?? "Unknown",
 			label: f.label?.["en-GB"] ?? "",
-			release_year: f.releaseYear?.["en-GB"] ?? 0,
+			release_year: f.year?.["en-GB"] ?? 0,
 			genre: f.genre?.["en-GB"] ?? [],
 			description: f.description?.["en-GB"] ?? null,
 			catalogue_number: f.catalogueNumber?.["en-GB"] ?? null,
@@ -104,9 +98,7 @@ export async function POST(req: Request) {
 			sold: f.sold?.["en-GB"] ?? false,
 			album_of_the_week: f.albumOfTheWeek?.["en-GB"] ?? false,
 			album_of_week: f.albumOfTheWeek?.["en-GB"] ?? false,
-			link: f.slug?.["en-GB"]
-				? `/records/${f.slug["en-GB"]}`
-				: `/records/${payload.sys.id}`,
+			link: `/records/${f.slug?.["en-GB"] ?? payload.sys.id}`,
 			cover_image: coverImageId,
 			cover_image_url: coverImageUrl,
 			other_images: otherImageIds,
