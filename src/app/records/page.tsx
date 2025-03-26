@@ -64,6 +64,7 @@ export default function RecordsPage() {
 		searchInput.trim() !== "" ||
 		condition.trim() !== "" ||
 		artist.trim() !== "" ||
+		decade.trim() !== "" ||
 		genre.trim() !== "";
 
 	return (
@@ -170,6 +171,7 @@ export default function RecordsPage() {
 								setCondition("");
 								setArtist("");
 								setGenre("");
+								setDecade("");
 								setPage(1);
 							}}
 						>
