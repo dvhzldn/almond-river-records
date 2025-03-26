@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,12 +15,24 @@ export default function Menu() {
 	const { basket } = useBasket();
 	const basketCount = basket.length;
 	const pathname = usePathname();
+	const [animateBasket, setAnimateBasket] = useState(false);
 
 	const toggleMenu = () => setIsOpen(!isOpen);
 	const closeMenu = () => setIsOpen(false);
 
 	// Helper to determine if the link is active
 	const isActive = (path: string) => pathname === path;
+
+	// Trigger basket animation when basketCount changes
+	useEffect(() => {
+		if (basketCount > 0) {
+			setAnimateBasket(true);
+			const timer = setTimeout(() => {
+				setAnimateBasket(false);
+			}, 500); // duration should match your CSS animation duration
+			return () => clearTimeout(timer);
+		}
+	}, [basketCount]);
 
 	return (
 		<nav className="menu">
@@ -47,15 +59,15 @@ export default function Menu() {
 						</Link>
 					</li>
 					{/* <li className={isActive("/record-cleaning") ? "active" : ""}>
-						<Link href="/record-cleaning" onClick={closeMenu}>
-							Record Cleaning
-						</Link>
-					</li>
-					<li className={isActive("/gift-vouchers") ? "active" : ""}>
-						<Link href="/gift-vouchers" onClick={closeMenu}>
-							Gift Vouchers
-						</Link>
-					</li> */}
+            <Link href="/record-cleaning" onClick={closeMenu}>
+              Record Cleaning
+            </Link>
+          </li>
+          <li className={isActive("/gift-vouchers") ? "active" : ""}>
+            <Link href="/gift-vouchers" onClick={closeMenu}>
+              Gift Vouchers
+            </Link>
+          </li> */}
 					<li className={isActive("/about") ? "active" : ""}>
 						<Link href="/about" onClick={closeMenu}>
 							Visit The Shop
@@ -74,7 +86,7 @@ export default function Menu() {
 				</ul>
 
 				{/* Basket Icon (Right - Always Visible) */}
-				<div className="basket-wrapper">
+				<div className={`basket-wrapper ${animateBasket ? "animate" : ""}`}>
 					<Link href="/basket" className="basket-link">
 						<FontAwesomeIcon icon={faShoppingBasket} />
 						{basketCount > 0 && (

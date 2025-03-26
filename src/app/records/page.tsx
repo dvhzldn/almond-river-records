@@ -234,7 +234,7 @@ export default function RecordsPage() {
 											</button>
 											{isInBasket ? (
 												<button
-													className="remove-button"
+													className="remove-button-grid"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleRemoveFromBasket(record.id);

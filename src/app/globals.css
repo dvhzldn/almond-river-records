@@ -145,6 +145,22 @@ p {
 	transform: translateY(-50%);
 }
 
+.basket-wrapper.animate {
+	animation: rotate 0.5s;
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+	}
+	50% {
+		transform: rotate(-25deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+
 .basket-link {
 	position: relative;
 	display: flex;
@@ -851,6 +867,10 @@ li {
 	font-weight: bolder;
 	box-shadow: 0 0 8px var(--blur);
 	background: black;
+}
+
+.remove-button-grid:hover {
+	color: white;
 }
 
 .pagination button:disabled {
