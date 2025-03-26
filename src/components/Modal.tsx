@@ -20,7 +20,7 @@ interface ModalProps {
 		price: number;
 		vinylCondition: string;
 		sleeveCondition: string;
-		coverImage?: string | null;
+		coverImageUrl?: string;
 		otherImages?: string[];
 		releaseYear?: number | null;
 		id: string;
@@ -30,7 +30,7 @@ interface ModalProps {
 
 export default function Modal({ record, onClose }: ModalProps) {
 	const images: string[] = [];
-	if (record.coverImage) images.push(record.coverImage);
+	if (record.coverImageUrl) images.push(record.coverImageUrl);
 	if (record.otherImages && record.otherImages.length > 0) {
 		images.push(...record.otherImages);
 	}
@@ -50,7 +50,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				title: record.title,
 				artistName: record.artistName,
 				price: record.price,
-				coverImage: record.coverImage || "",
+				coverImage: record.coverImageUrl || "",
 			});
 		}
 		onClose();
@@ -64,7 +64,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 				title: record.title,
 				artistName: record.artistName,
 				price: record.price,
-				coverImage: record.coverImage || "",
+				coverImage: record.coverImageUrl,
 			},
 			onClose
 		);

@@ -14,7 +14,7 @@ interface Record {
 	artistName: string[];
 	price: number;
 	vinylCondition: string;
-	coverImage: string | null;
+	coverImageUrl: string;
 	otherImages?: string[];
 	label: string;
 	sleeveCondition: string;
@@ -60,7 +60,7 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 								{record.coverImage && (
 									<Image
 										className="record-image"
-										src={record.coverImage}
+										src={record.coverImageUrl}
 										alt={`${record.title} cover`}
 										width={250}
 										height={250}
