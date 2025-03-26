@@ -9,6 +9,25 @@ const getOptimizedImageUrl = (url: string): string => {
 	return `${url}?w=400&h=400&fm=webp&q=70&fit=thumb`;
 };
 
+async function fetchAssetUrl(assetId: string): Promise<string | null> {
+	try {
+		const res = await fetch(
+			`https://cdn.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/${process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT}/assets/${assetId}`,
+			{
+				headers: {
+					Authorization: `Bearer ${process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}`,
+				},
+			}
+		);
+		const data = await res.json();
+		const url = data.fields?.file?.["en-GB"]?.url;
+		return getOptimizedImageUrl(url);
+	} catch (err) {
+		console.error("Failed to fetch asset:", err);
+		return null;
+	}
+}
+
 type ContentfulAssetRef = {
 	sys: { id: string };
 	fields: {
@@ -50,11 +69,8 @@ export async function POST(req: Request) {
 		const payload = (await req.json()) as ContentfulWebhookPayload;
 		const f = payload.fields;
 
-		const coverImageAsset = f.coverImage["en-GB"];
-		const coverImageId = coverImageAsset.sys.id;
-		const coverImageUrl = getOptimizedImageUrl(
-			coverImageAsset.fields.file["en-GB"].url
-		);
+		const coverImageId = f.coverImage["en-GB"].sys.id;
+		const coverImageUrl = await fetchAssetUrl(coverImageId);
 
 		const otherImageIds =
 			f.otherImages?.["en-GB"].map((img) => img.sys.id) ?? [];
