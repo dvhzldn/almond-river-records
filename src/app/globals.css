@@ -146,7 +146,7 @@ p {
 }
 
 .basket-wrapper.animate {
-	animation: rotate 0.5s;
+	animation: rotate 0.2s;
 }
 
 @keyframes rotate {
@@ -154,7 +154,7 @@ p {
 		transform: rotate(0deg);
 	}
 	50% {
-		transform: rotate(-25deg);
+		transform: rotate(-15deg);
 	}
 	100% {
 		transform: rotate(0deg);

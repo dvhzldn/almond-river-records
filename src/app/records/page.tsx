@@ -226,12 +226,6 @@ export default function RecordsPage() {
 										</h4>
 										<p>Condition: {record.vinylCondition}</p>
 										<div className="record-actions">
-											<button
-												className="buy-button"
-												onClick={(e) => handleBuy(record, e)}
-											>
-												Buy
-											</button>
 											{isInBasket ? (
 												<button
 													className="remove-button-grid"
@@ -266,6 +260,12 @@ export default function RecordsPage() {
 													/>
 												</button>
 											)}
+											<button
+												className="buy-button"
+												onClick={(e) => handleBuy(record, e)}
+											>
+												Buy
+											</button>
 										</div>
 									</div>
 								</div>
