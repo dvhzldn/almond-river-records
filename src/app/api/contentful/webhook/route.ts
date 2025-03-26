@@ -97,6 +97,9 @@ export async function POST(req: Request) {
 		return NextResponse.json({ success: true }, { status: 200 });
 	} catch (err) {
 		console.error("Contentful webhook sync error:", err);
+		if (err instanceof Error) {
+			return NextResponse.json({ error: err.message }, { status: 500 });
+		}
 		return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
 	}
 }
