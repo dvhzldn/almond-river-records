@@ -158,24 +158,20 @@ export default function BasketPage() {
 									</div>
 								</div>
 								<hr />
-								<em>
+								<p>
 									NB: Items can be returned no later than{" "}
 									<strong>30 days</strong> after the date of purchase.
-									Please see our{" "}
-									<button
-										className="returns-policy"
-										onClick={openReturnsPolicy}
-									>
-										Returns Policy
-									</button>{" "}
-									{/* Conditionally render the ReturnsPolicyModal */}
-									{isReturnsPolicyOpen && (
-										<ReturnsPolicyModal
-											onClose={closeReturnsPolicy}
-										/>
-									)}
-									for further information.
-								</em>
+								</p>
+								<button
+									className="returns-policy"
+									onClick={openReturnsPolicy}
+								>
+									Returns Policy
+								</button>{" "}
+								{/* Conditionally render the ReturnsPolicyModal */}
+								{isReturnsPolicyOpen && (
+									<ReturnsPolicyModal onClose={closeReturnsPolicy} />
+								)}
 								<hr />
 							</div>
 							<div className="basket-list">

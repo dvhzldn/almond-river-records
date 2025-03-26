@@ -257,12 +257,21 @@ img.logo-home:hover {
 }
 
 .nav-links li a,
-li {
+.footer li {
 	font-size: 1rem;
 	font-weight: 500;
 	color: var(--colour-7);
 	text-decoration: none;
 	transition: color 0.3s ease;
+}
+
+.returns ul {
+	list-style-type: none;
+}
+
+.returns li {
+	font-size: 0.6 rem;
+	font-weight: 200;
 }
 
 .nav-links li.active a {
@@ -711,6 +720,14 @@ li {
 	display: block;
 }
 
+.returns ul li {
+	list-style-type: none;
+	font-size: 1rem;
+	margin: 5px 0;
+	line-height: 150%;
+	font-weight: 200;
+}
+
 .swiper-slide {
 	display: flex;
 	justify-content: center;
@@ -938,11 +955,10 @@ li {
 	text-align: right;
 }
 
-.returns-policy {
+button.returns-policy {
 	background-color: var(--colour-7);
 	border: none;
 	color: var(--colour-4);
-	font-style: italic;
 	text-decoration: underline;
 	font-family: inherit;
 	font-size: 1rem;
