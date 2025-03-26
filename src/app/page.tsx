@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import NewThisWeek from "@/components/NewThisWeek";
-// import AlbumOfTheWeek from "@/components/AlbumOfTheWeek";
+import AlbumOfTheWeek from "@/components/AlbumOfTheWeek";
 import GoogleReviews from "@/components/GoogleReviews";
 import SpotifyPlaylist from "@/components/SpotifyPlaylist";
 
@@ -48,7 +48,9 @@ export default async function Home() {
 					<NewThisWeek records={data.records} />
 				</div>
 				<hr />
-				<div>{/* <AlbumOfTheWeek /> */}</div>
+				<div>
+					<AlbumOfTheWeek />
+				</div>
 				<hr />
 				<div>
 					<SpotifyPlaylist playlistId="2XPOAAUp0mNqNmz7gk2Kfx" />
