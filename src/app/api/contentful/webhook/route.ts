@@ -12,6 +12,21 @@ function constructImageUrl(filePath: string, optimized = false): string {
 	return optimized ? `${base}?w=400&h=400&fm=webp&q=70&fit=thumb` : base;
 }
 
+async function fetchContentfulAsset(assetId: string) {
+	const url = `https://api.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/${process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT}/assets/${assetId}`;
+	const res = await fetch(url, {
+		headers: {
+			Authorization: `Bearer ${process.env.CONTENTFUL_MANAGEMENT_API_ACCESS_TOKEN}`,
+			"Content-Type": "application/json",
+		},
+	});
+	if (!res.ok) {
+		console.error(`❌ Failed to fetch asset ${assetId} from Contentful`);
+		return null;
+	}
+	return await res.json();
+}
+
 export async function POST(req: Request) {
 	try {
 		const payload = await req.json();
@@ -87,17 +102,51 @@ export async function POST(req: Request) {
 			other_images: [] as string[],
 		};
 
-		// 💡 Re-add these variables
 		const coverRef = f.coverImage?.["en-GB"];
 		const otherRefs = f.otherImages?.["en-GB"] ?? [];
 
-		const coverAsset = f.coverImage?.["en-GB"];
-		const coverFile = coverAsset?.file?.url;
-
-		if (coverRef?.sys?.id && coverFile) {
+		if (coverRef?.sys?.id) {
 			const assetId = coverRef.sys.id;
+			const asset = await fetchContentfulAsset(assetId);
+
+			if (!asset) {
+				console.error("❌ Could not retrieve cover asset. Aborting.");
+				return NextResponse.json(
+					{ error: "Asset not found" },
+					{ status: 500 }
+				);
+			}
+
+			const file = asset.fields?.file?.["en-GB"];
+			const filePath = file?.url;
+
+			if (!filePath) {
+				console.error("❌ Asset file path missing.");
+				return NextResponse.json(
+					{ error: "Asset file missing" },
+					{ status: 500 }
+				);
+			}
+
 			record.cover_image = assetId;
-			record.cover_image_url = constructImageUrl(coverFile, true);
+			record.cover_image_url = constructImageUrl(filePath, true);
+
+			// Also upsert into contentful_assets
+			await supabase.from("contentful_assets").upsert(
+				{
+					id: asset.sys.id,
+					title: asset.fields?.title?.["en-GB"] ?? null,
+					url: constructImageUrl(filePath, false),
+					details: file?.details ?? null,
+					file_name: file?.fileName ?? null,
+					content_type: file?.contentType ?? null,
+					created_at: asset.sys?.createdAt ?? new Date().toISOString(),
+					updated_at: asset.sys?.updatedAt ?? new Date().toISOString(),
+					revision: asset.sys?.revision ?? null,
+					published_version: asset.sys?.publishedVersion ?? null,
+				},
+				{ onConflict: "id" }
+			);
 		}
 
 		for (const ref of otherRefs) {
