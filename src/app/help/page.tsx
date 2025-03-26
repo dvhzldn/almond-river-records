@@ -8,7 +8,7 @@ export default function Help() {
 				<h2>Frequently Asked Questions</h2>
 				<br />
 				<>
-					<h3>What is Almond River Records?</h3>
+					<h2 className="text">What is Almond River Records?</h2>
 					<p className="text">
 						Almond River Records is a dedicated second-hand vinyl record
 						shop based in the UK. We offer a curated collection of
@@ -17,7 +17,7 @@ export default function Help() {
 						tactile and nostalgic experience of vinyl wherever they are.
 					</p>
 
-					<h3>Where are you located?</h3>
+					<h2 className="text">Where are you located?</h2>
 					<p className="text">
 						Our brick-and-mortar shop is located in Corstorphine,
 						Edinburgh.{" "}
@@ -26,14 +26,16 @@ export default function Help() {
 						knowledgeable staff about your favourite genres and artists.
 					</p>
 
-					<h3>Can I buy records online?</h3>
+					<h2 className="text">Can I buy records online?</h2>
 					<p className="text">
 						Yes! Our online store is open 24/7, and we offer shipping
 						within the UK only. Browse our catalogue from the comfort of
 						your home.
 					</p>
 
-					<h3>How do I know if a record is in good condition?</h3>
+					<h2 className="text">
+						How do I know if a record is in good condition?
+					</h2>
 					<p className="text">
 						We take pride in our quality checks. You can even select by
 						vinyl condition on our website to suit your preferences. Each
@@ -42,7 +44,7 @@ export default function Help() {
 						listings so you know exactly what to expect.
 					</p>
 
-					<h3>Do you offer record cleaning services?</h3>
+					<h2 className="text">Do you offer record cleaning services?</h2>
 					<p className="text">
 						Yes, we do! In addition to our careful inspection process, we
 						offer professional record cleaning equipment on the premises.
@@ -51,7 +53,7 @@ export default function Help() {
 						<Link href="/record-cleaning">record cleaning page</Link>.
 					</p>
 
-					<h3>Do you accept records on consignment?</h3>
+					<h2 className="text">Do you accept records on consignment?</h2>
 					<p className="text">
 						Absolutely. If you have a collection or individual records
 						that you’d like to sell, please{" "}
@@ -61,7 +63,7 @@ export default function Help() {
 						a fair valuation.
 					</p>
 
-					<h3>What payment methods do you accept?</h3>
+					<h2 className="text">What payment methods do you accept?</h2>
 					<p className="text">
 						For both online and in-store purchases, we accept a variety of
 						payment methods including major credit/debit cards, PayPal,
@@ -69,7 +71,7 @@ export default function Help() {
 						page for the most up-to-date details.
 					</p>
 
-					<h3>How are records shipped?</h3>
+					<h2 className="text">How are records shipped?</h2>
 					<p className="text">
 						We pack our records with extra care to ensure they arrive
 						safely. Orders are dispatched promptly via reliable postal
@@ -77,7 +79,7 @@ export default function Help() {
 						once your order has shipped.
 					</p>
 
-					<h3>What is your returns policy?</h3>
+					<h2 className="text">What is your returns policy?</h2>
 					<p className="text">
 						We offer a 30-day returns period. If you encounter any issues
 						with your order, please contact us within 30 days of delivery
@@ -86,21 +88,21 @@ export default function Help() {
 						information.
 					</p>
 
-					<h3>How often do you update your stock?</h3>
+					<h2 className="text">How often do you update your stock?</h2>
 					<p className="text">
 						Our inventory is updated almost daily as new finds and rare
 						gems come in. Follow us on social media to stay informed about
 						new arrivals.
 					</p>
 
-					<h3>Do you host in-store events?</h3>
+					<h2 className="text">Do you host in-store events?</h2>
 					<p className="text">
 						Yes, we occasionally host in-store events and listening
 						sessions. Keep an eye on our events calendar online and our
 						social media channels for the latest details.
 					</p>
 
-					<h3>How can I get in touch?</h3>
+					<h2 className="text">How can I get in touch?</h2>
 					<p className="text">
 						If you have any other questions, feel free to get in touch
 						using <Link href="/contact">our contact form</Link>, email us

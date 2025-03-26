@@ -564,7 +564,7 @@ img.logo-home:hover {
 /* Google Reviews Section */
 .reviews-section {
 	text-align: center;
-	padding: 0.5rem 0.1rem;
+	padding: 0rem 0.1rem;
 	background: var(--colour-7);
 	max-width: 90%;
 	margin: auto;
@@ -580,14 +580,14 @@ img.logo-home:hover {
 /* Star Rating */
 .review-rating {
 	display: block;
-	font-size: 1rem;
+	font-size: 1.5rem;
 	color: #ffb400;
 }
 
 /* Review Text */
 .review-text {
-	font-size: 1.2rem;
-	font-weight: 200;
+	font-size: 1.1rem;
+	font-weight: 400;
 	color: var(--colour-4);
 	line-height: 1.2;
 	font-style: italic;
@@ -904,6 +904,10 @@ img.logo-home:hover {
 	gap: 1rem;
 	align-items: start;
 	margin-bottom: 0rem;
+}
+
+.about .two-column-layout {
+	align-items: start;
 }
 
 .basket-list {

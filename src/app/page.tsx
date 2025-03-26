@@ -39,7 +39,7 @@ export default async function Home() {
 					/>{" "}
 					<div className="view-all-records">
 						<Link href="/records">
-							<h2 className="view-all-records">View all records</h2>
+							<h2 className="view-all-records">Browse our records</h2>
 						</Link>
 					</div>
 				</div>
