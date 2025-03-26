@@ -10,7 +10,7 @@ export default function GiftVouchers() {
 						<h2>Our gift vouchers</h2>
 						<br />
 						<p className="text">
-							You can purchase Almond River Records gift vouchers over
+							Almond River Records gift vouchers can be purchased over
 							the counter at{" "}
 							<Link href="/shop" className="hyperLink">
 								our shop in Edinburgh
@@ -18,9 +18,9 @@ export default function GiftVouchers() {
 							.
 						</p>
 						<p className="text">
-							The vouchers can be used towards any items bought in the
-							store and are valid for 18 months from the date of
-							purchase.
+							A voucher can be used towards the purchase of any items
+							bought in the store and they are valid for 18 months from
+							the date of purchase.
 						</p>
 					</div>
 					<div className="image-container">
