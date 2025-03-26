@@ -65,11 +65,37 @@ export async function POST(req: Request) {
 			...otherRefs.map((ref: { sys: { id: string } }) => ref.sys.id),
 		];
 
-		// Construct the URL for the cover image (no need to fetch asset)
+		// Insert asset into contentful_assets before referencing it in vinyl_records
 		if (coverRef?.sys?.id) {
-			record.cover_image = coverRef.sys.id;
-			// Constructing URL with additional parameters for optimization
-			record.cover_image_url = constructImageUrl(coverRef.sys.id);
+			const assetId = coverRef.sys.id;
+
+			// Fetch the asset data from Contentful if necessary and insert
+			const asset = {
+				id: assetId,
+				title: f.coverImage?.["en-GB"]?.title ?? null,
+				url: constructImageUrl(assetId),
+				details: f.coverImage?.["en-GB"]?.file?.details ?? null,
+				file_name: f.coverImage?.["en-GB"]?.file?.fileName ?? null,
+				content_type: f.coverImage?.["en-GB"]?.file?.contentType ?? null,
+				created_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
+			};
+
+			// Insert the asset into contentful_assets table if not already present
+			const { error: assetError } = await supabase
+				.from("contentful_assets")
+				.upsert(asset, { onConflict: "id" });
+
+			if (assetError) {
+				console.error("❌ Error inserting asset:", assetError);
+				return NextResponse.json(
+					{ error: "Error inserting asset" },
+					{ status: 500 }
+				);
+			}
+
+			record.cover_image = assetId;
+			record.cover_image_url = constructImageUrl(assetId);
 		}
 
 		// Process other images if necessary
