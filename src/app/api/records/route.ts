@@ -45,6 +45,7 @@ export async function GET(request: Request) {
 		const condition = searchParams.get("condition") || "";
 		const artist = searchParams.get("artist") || "";
 		const genre = searchParams.get("genre") || "";
+		const decadeParam = searchParams.get("decade") || "";
 
 		// Pagination: default limit 24, skip 0
 		const limitParam = searchParams.get("limit")
@@ -100,6 +101,17 @@ export async function GET(request: Request) {
 			query = query.or(
 				`title.ilike.%${searchQuery}%,artist_names_text.ilike.%${searchQuery}%`
 			);
+		}
+
+		if (decadeParam) {
+			const decadeNum = parseInt(decadeParam, 10);
+			if (!isNaN(decadeNum)) {
+				const startYear = decadeNum;
+				const endYear = decadeNum + 9;
+				query = query
+					.gte("release_year", startYear)
+					.lte("release_year", endYear);
+			}
 		}
 
 		if (condition) {

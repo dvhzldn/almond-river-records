@@ -21,6 +21,7 @@ interface UseRecordsParams {
 	condition?: string;
 	artist?: string;
 	genre?: string;
+	decade?: string;
 	page?: number;
 	pageSize?: number;
 }
@@ -31,6 +32,7 @@ export function useRecords({
 	priceMax = "",
 	condition = "",
 	artist = "",
+	decade = "",
 	genre = "",
 	page = 1,
 	pageSize = 12,
@@ -47,6 +49,7 @@ export function useRecords({
 		if (priceMin) params.append("priceMin", priceMin);
 		if (priceMax) params.append("priceMax", priceMax);
 		if (condition) params.append("condition", condition);
+		if (decade) params.append("decade", decade);
 		if (artist) params.append("artist", artist);
 		if (genre) params.append("genre", genre);
 		params.append("limit", pageSize.toString());
@@ -66,7 +69,17 @@ export function useRecords({
 		} finally {
 			setLoading(false);
 		}
-	}, [search, priceMin, priceMax, condition, artist, genre, page, pageSize]);
+	}, [
+		search,
+		priceMin,
+		priceMax,
+		condition,
+		decade,
+		artist,
+		genre,
+		page,
+		pageSize,
+	]);
 
 	useEffect(() => {
 		fetchRecords();

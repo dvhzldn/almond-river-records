@@ -18,6 +18,7 @@ export default function RecordsPage() {
 	const [artist, setArtist] = useState("");
 	const [genre, setGenre] = useState("");
 	const [filtersOpen, setFiltersOpen] = useState(false);
+	const [decade, setDecade] = useState("");
 	const [page, setPage] = useState(1);
 	const [selectedRecord, setSelectedRecord] = useState<VinylRecord | null>(
 		null
@@ -29,6 +30,7 @@ export default function RecordsPage() {
 		search,
 		condition,
 		artist,
+		decade,
 		genre,
 		page,
 		pageSize,
@@ -104,6 +106,23 @@ export default function RecordsPage() {
 								{option}
 							</option>
 						))}
+					</select>
+					<select
+						value={decade}
+						onChange={(e) => {
+							setDecade(e.target.value);
+							setPage(1);
+						}}
+					>
+						<option value="">All Decades</option>
+						<option value="1950">1950s</option>
+						<option value="1960">1960s</option>
+						<option value="1970">1970s</option>
+						<option value="1980">1980s</option>
+						<option value="1990">1990s</option>
+						<option value="2000">2000s</option>
+						<option value="2010">2010s</option>
+						<option value="2020">2020s</option>
 					</select>
 					<select
 						value={condition}
