@@ -43,10 +43,10 @@ export default function Menu() {
 					</li>
 					<li className={isActive("/records") ? "active" : ""}>
 						<Link href="/records" onClick={closeMenu}>
-							Online Shop
+							Records for Sale
 						</Link>
 					</li>
-					<li className={isActive("/record-cleaning") ? "active" : ""}>
+					{/* <li className={isActive("/record-cleaning") ? "active" : ""}>
 						<Link href="/record-cleaning" onClick={closeMenu}>
 							Record Cleaning
 						</Link>
@@ -55,15 +55,15 @@ export default function Menu() {
 						<Link href="/gift-vouchers" onClick={closeMenu}>
 							Gift Vouchers
 						</Link>
+					</li> */}
+					<li className={isActive("/about") ? "active" : ""}>
+						<Link href="/about" onClick={closeMenu}>
+							Visit Our Store
+						</Link>
 					</li>
 					<li className={isActive("/contact") ? "active" : ""}>
 						<Link href="/contact" onClick={closeMenu}>
 							Get In Touch
-						</Link>
-					</li>
-					<li className={isActive("/about") ? "active" : ""}>
-						<Link href="/about" onClick={closeMenu}>
-							Visit Our Store
 						</Link>
 					</li>
 					<li className={isActive("/help") ? "active" : ""}>
