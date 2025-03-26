@@ -34,7 +34,8 @@ export default function AlbumOfTheWeek() {
 					`
 					)
 					.eq("album_of_the_week", true)
-					.limit(1); // Fetch single album
+					.order("updated_at", { ascending: false })
+					.limit(1);
 
 				if (error) {
 					console.error("Error fetching vinyl record data:", error);
