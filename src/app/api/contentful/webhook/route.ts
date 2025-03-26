@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
 import type { Document as ContentfulDocument } from "@contentful/rich-text-types";
+import { createClient } from "@supabase/supabase-js";
 
+const supabase = createClient(
+	process.env.NEXT_PUBLIC_SUPABASE_URL!,
+	process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 // Helper: optimize Contentful image URLs for CDN
 const getOptimizedImageUrl = (url: string): string => {
 	if (!url) return "";
