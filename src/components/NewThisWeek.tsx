@@ -57,7 +57,7 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 								className="record-card-slider"
 								onClick={() => handleRecordClick(record)}
 							>
-								{record.coverImage && (
+								{record.coverImageUrl && (
 									<Image
 										className="record-image"
 										src={record.coverImageUrl}
