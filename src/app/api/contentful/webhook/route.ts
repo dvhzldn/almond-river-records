@@ -68,6 +68,7 @@ export async function POST(req: Request) {
 		// Construct the URL for the cover image (no need to fetch asset)
 		if (coverRef?.sys?.id) {
 			record.cover_image = coverRef.sys.id;
+			// Constructing URL with additional parameters for optimization
 			record.cover_image_url = constructImageUrl(coverRef.sys.id);
 		}
 
