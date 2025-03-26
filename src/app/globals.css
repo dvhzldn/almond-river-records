@@ -183,10 +183,9 @@ a,
 Link:hover,
 a:hover,
 .hyperLink:hover {
-	color: var(--colour-2);
+	color: var(--colour-6);
 	opacity: 0.9;
-	text-decoration: underline;
-	font-weight: bold;
+	text-decoration: underline solid;
 }
 
 /* Navigation Bar */
