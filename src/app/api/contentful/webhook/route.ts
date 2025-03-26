@@ -216,7 +216,6 @@ export async function POST(request: Request) {
 				quantity: fields.quantity?.["en-GB"],
 				in_stock: fields.inStock?.["en-GB"],
 				sold: fields.sold?.["en-GB"],
-				album_of_the_week: fields.albumOfTheWeek?.["en-GB"],
 			};
 
 			const { error } = await supabaseService
