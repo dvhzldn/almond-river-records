@@ -18,25 +18,6 @@ interface Order {
 	order_confirmation_email_sent: boolean;
 }
 
-interface OrderItem {
-	order_id: string;
-	vinyl_record_id: string;
-	artist_names: string[];
-	title: string;
-	price: number;
-	cover_image_url?: string | null;
-}
-
-interface VinylRecord {
-	id: string;
-	cover_image: string;
-}
-
-interface Asset {
-	id: string;
-	url: string;
-}
-
 export default async function PaymentSuccess({ params, searchParams }) {
 	// We're not using params.
 	void params;
@@ -192,89 +173,29 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			}
 		}
 
-		// --- Step 4: Fetch Order Items and Build Display Data ---
-		const orderItemsRes = await supabaseService
-			.from("order_items")
-			.select("*")
-			.eq("order_id", order.id);
-		const orderItemsData = orderItemsRes.data as OrderItem[] | null;
-		const orderItems: OrderItem[] = orderItemsData ?? [];
-
-		let orderItemsWithCover: OrderItem[] = [];
-		if (orderItems.length > 0) {
-			const recordIds = orderItems.map((item) => item.vinyl_record_id);
-			const vinylRecordsRes = await supabaseService
-				.from("vinyl_records")
-				.select("id, cover_image")
-				.in("id", recordIds);
-			const vinylRecordsData = vinylRecordsRes.data as VinylRecord[] | null;
-			const vinylRecords: VinylRecord[] = vinylRecordsData ?? [];
-			const vinylRecordMap: Record<string, string> = {};
-			vinylRecords.forEach((record) => {
-				vinylRecordMap[record.id] = record.cover_image;
-			});
-			const assetIds = Array.from(new Set(Object.values(vinylRecordMap)));
-			const assetsRes = await supabaseService
-				.from("contentful_assets")
-				.select("id, url")
-				.in("id", assetIds);
-			const assetsData = assetsRes.data as Asset[] | null;
-			const assets: Asset[] = assetsData ?? [];
-			const assetMap: Record<string, string> = {};
-			assets.forEach((asset) => {
-				assetMap[asset.id] = asset.url;
-			});
-			orderItemsWithCover = orderItems.map((item) => ({
-				...item,
-				cover_image_url:
-					assetMap[vinylRecordMap[item.vinyl_record_id]] || null,
-			}));
-		}
-
 		// --- Step 5: Render Order Success UI ---
 		return (
 			<div className="page-container">
-				<h1 className="page-title">Payment Successful</h1>
+				<h1 className="page-title">Order complete</h1>
 				<div className="content-box">
-					<div className="two-column-layout text">
-						<h2>Thank you for your purchase, {order.customer_name}!</h2>
-						<h3>Order reference: {order.sumup_id}</h3>
-						<p>
-							Your order has been successful and will be processed
-							promptly.
-						</p>
-						<p>
-							If you require further assistance, please get in touch
-							through{" "}
-							<Link href="/contact" className="hyperLink">
-								our contact form
-							</Link>{" "}
-							and we will get back to you.
-						</p>
-					</div>
-					<div className="two-column-layout text">
-						<h3>Ordered Items:</h3>
-						{orderItemsWithCover.length > 0 ? (
-							<ul>
-								{orderItemsWithCover.map((item) => (
-									<li key={item.vinyl_record_id}>
-										{item.cover_image_url && (
-											<Image
-												src={item.cover_image_url}
-												alt={`Cover image for ${item.title}`}
-												width={100}
-												height={100}
-											/>
-										)}
-										<p>
-											{item.artist_names.join(", ")} – {item.title}
-										</p>
-									</li>
-								))}
-							</ul>
-						) : (
-							<p>No order items found.</p>
-						)}
+					<h3>Thank you for your purchase!</h3>
+					<br />
+					<p>
+						Your order will be processed promptly and dispatched within
+						two working days.
+					</p>
+					<br />
+					<div>
+						<div>
+							<p>
+								If you require further assistance, please get in touch
+								through{" "}
+								<Link href="/contact" className="hyperLink">
+									our contact form
+								</Link>{" "}
+								and we will get back to you.
+							</p>
+						</div>
 					</div>
 					<div>
 						<hr />
@@ -286,6 +207,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 							height={200}
 							priority
 						/>
+						<p>Order reference: {order.sumup_id}</p>
 					</div>
 				</div>
 			</div>
