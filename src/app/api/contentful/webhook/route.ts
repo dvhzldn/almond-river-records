@@ -1,35 +1,64 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Supabase client with service key to bypass RLS
 const supabase = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Construct the optimized Contentful image URL
 function constructImageUrl(assetId: string): string {
-	// Base URL for the Contentful image CDN
 	const baseUrl = `https://images.ctfassets.net/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}`;
-
-	// Construct the URL by appending the asset ID and optional query parameters for optimization
 	return `${baseUrl}/${assetId}?w=400&h=400&fm=webp&q=70&fit=thumb`;
 }
 
 export async function POST(req: Request) {
 	try {
 		const payload = await req.json();
+		const sys = payload.sys;
 
-		// Exit early if not a vinyl record
-		if (payload.sys?.contentType?.sys?.id !== "vinylRecord") {
+		// ---- Handle Assets ----
+		if (sys?.type === "Asset") {
+			const id = sys.id;
+			const f = payload.fields;
+
+			const asset = {
+				id,
+				title: f.title?.["en-GB"] ?? null,
+				url: constructImageUrl(id),
+				details: f.file?.["en-GB"]?.details ?? null,
+				file_name: f.file?.["en-GB"]?.fileName ?? null,
+				content_type: f.file?.["en-GB"]?.contentType ?? null,
+				created_at: sys.createdAt ?? new Date().toISOString(),
+				updated_at: sys.updatedAt ?? new Date().toISOString(),
+				revision: sys.revision ?? null,
+				published_version: sys.publishedVersion ?? null,
+			};
+
+			const { error } = await supabase
+				.from("contentful_assets")
+				.upsert(asset, { onConflict: "id" });
+
+			if (error) {
+				console.error("❌ Error inserting asset:", error);
+				return NextResponse.json(
+					{ error: "Error inserting asset" },
+					{ status: 500 }
+				);
+			}
+
+			console.log(`✅ Asset ${id} inserted/updated.`);
+			return NextResponse.json({ success: true }, { status: 200 });
+		}
+
+		// ---- Handle Vinyl Records ----
+		if (sys?.contentType?.sys?.id !== "vinylRecord") {
 			console.log("➡️ Skipping non-vinylRecord content.");
 			return NextResponse.json({ ignored: true }, { status: 200 });
 		}
 
 		const f = payload.fields;
-		const id = payload.sys.id;
+		const id = sys.id;
 
-		// ---- Vinyl Record Fields ----
 		const record = {
 			id,
 			title: f.title?.["en-GB"] ?? "",
@@ -50,62 +79,27 @@ export async function POST(req: Request) {
 			in_stock: f.inStock?.["en-GB"] ?? true,
 			sold: f.sold?.["en-GB"] ?? false,
 			album_of_the_week: f.albumOfTheWeek?.["en-GB"] ?? false,
-			album_of_week: f.albumOfTheWeek?.["en-GB"] ?? false, // for legacy reasons
+			album_of_week: f.albumOfTheWeek?.["en-GB"] ?? false,
 			cover_image: null as string | null,
 			cover_image_url: null as string | null,
 			other_images: [] as string[],
 		};
 
-		// ---- Images ----
 		const coverRef = f.coverImage?.["en-GB"];
 		const otherRefs = f.otherImages?.["en-GB"] ?? [];
 
-		const allImageIds = [
-			...(coverRef?.sys?.id ? [coverRef.sys.id] : []),
-			...otherRefs.map((ref: { sys: { id: string } }) => ref.sys.id),
-		];
-
-		// Insert asset into contentful_assets before referencing it in vinyl_records
 		if (coverRef?.sys?.id) {
 			const assetId = coverRef.sys.id;
-
-			// Fetch the asset data from Contentful if necessary and insert
-			const asset = {
-				id: assetId,
-				title: f.coverImage?.["en-GB"]?.title ?? null,
-				url: constructImageUrl(assetId),
-				details: f.coverImage?.["en-GB"]?.file?.details ?? null,
-				file_name: f.coverImage?.["en-GB"]?.file?.fileName ?? null,
-				content_type: f.coverImage?.["en-GB"]?.file?.contentType ?? null,
-				created_at: new Date().toISOString(),
-				updated_at: new Date().toISOString(),
-			};
-
-			// Insert the asset into contentful_assets table if not already present
-			const { error: assetError } = await supabase
-				.from("contentful_assets")
-				.upsert(asset, { onConflict: "id" });
-
-			if (assetError) {
-				console.error("❌ Error inserting asset:", assetError);
-				return NextResponse.json(
-					{ error: "Error inserting asset" },
-					{ status: 500 }
-				);
-			}
-
 			record.cover_image = assetId;
 			record.cover_image_url = constructImageUrl(assetId);
 		}
 
-		// Process other images if necessary
-		for (const assetId of allImageIds) {
-			if (assetId !== coverRef?.sys?.id) {
-				record.other_images.push(assetId);
+		for (const ref of otherRefs) {
+			if (ref?.sys?.id && ref.sys.id !== record.cover_image) {
+				record.other_images.push(ref.sys.id);
 			}
 		}
 
-		// Insert the vinyl record
 		const { error } = await supabase
 			.from("vinyl_records")
 			.upsert(record, { onConflict: "id" });
