@@ -1,136 +1,149 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import type { Document as ContentfulDocument } from "@contentful/rich-text-types";
 
-// Use the service role key to bypass RLS
+// Supabase client using service role key (to bypass RLS)
 const supabase = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
 	process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Helper to build a smaller, optimized Contentful CDN URL
-const getOptimizedImageUrl = (url: string): string => {
+// Helper to build optimized image URL from Contentful
+function getOptimizedImageUrl(url: string): string {
 	if (!url) return "";
 	if (url.startsWith("//")) url = "https:" + url;
 	return `${url}?w=400&h=400&fm=webp&q=70&fit=thumb`;
-};
-
-async function fetchAssetDetails(id: string) {
-	const res = await fetch(
-		`https://cdn.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/${process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT}/assets/${id}`,
-		{
-			headers: {
-				Authorization: `Bearer ${process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}`,
-			},
-		}
-	);
-	if (!res.ok) throw new Error(`Asset fetch failed for ${id}`);
-	const data = await res.json();
-	const file = data.fields?.file?.["en-GB"];
-	return {
-		id: data.sys.id,
-		title: data.fields?.title?.["en-GB"] ?? null,
-		url: file?.url ? `https:${file.url}` : null,
-		file_name: file?.fileName ?? null,
-		content_type: file?.contentType ?? null,
-		created_at: data.sys?.createdAt ?? null,
-		updated_at: data.sys?.updatedAt ?? null,
-		published_version: data.sys?.publishedVersion ?? null,
-	};
 }
 
-// Webhook payload type
-type ContentfulWebhookPayload = {
-	sys: { id: string };
-	fields: {
-		title: { "en-GB": string };
-		subTitle?: { "en-GB": string };
-		artistName: { "en-GB": string[] };
-		coverImage: { "en-GB": { sys: { id: string } } };
-		otherImages?: { "en-GB": { sys: { id: string } }[] };
-		releaseYear: { "en-GB": number };
-		price: { "en-GB": number };
-		genre: { "en-GB": string[] };
-		label: { "en-GB": string };
-		catalogueNumber?: { "en-GB": string };
-		vinylCondition: { "en-GB": string };
-		sleeveCondition: { "en-GB": string };
-		description?: { "en-GB": ContentfulDocument };
-		barcode?: { "en-GB": string };
-		quantity?: { "en-GB": number };
-		inStock: { "en-GB": boolean };
-		sold: { "en-GB": boolean };
-		albumOfTheWeek: { "en-GB": boolean };
-	};
-};
+// Fetch full asset info from Contentful CDN
+async function fetchAssetData(assetId: string) {
+	try {
+		const res = await fetch(
+			`https://cdn.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/environments/${process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT}/assets/${assetId}`,
+			{
+				headers: {
+					Authorization: `Bearer ${process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}`,
+				},
+			}
+		);
+		if (!res.ok) throw new Error("Failed to fetch asset");
+		return await res.json();
+	} catch (err) {
+		console.error(`Failed to fetch asset ${assetId}:`, err);
+		return null;
+	}
+}
 
 export async function POST(req: Request) {
 	try {
-		const payload = (await req.json()) as ContentfulWebhookPayload;
+		const payload = await req.json();
 		const f = payload.fields;
 
+		// Exit early if it's not a vinylRecord
+		if (payload.sys?.contentType?.sys?.id !== "vinylRecord") {
+			return NextResponse.json({ ignored: true }, { status: 200 });
+		}
+
+		// Parse Contentful fields
+		const id = payload.sys.id;
+		const title = f.title?.["en-GB"] ?? "";
+		const subTitle = f.subTitle?.["en-GB"] ?? null;
+		const artistNames = f.artistName?.["en-GB"] ?? [];
+		const artistNamesText = artistNames.join(", ");
+		const price = f.price?.["en-GB"] ?? 0;
+		const vinylCondition = f.vinylCondition?.["en-GB"] ?? "Unknown";
+		const sleeveCondition = f.sleeveCondition?.["en-GB"] ?? "Unknown";
+		const label = f.label?.["en-GB"] ?? "";
+		const year = f.releaseYear?.["en-GB"] ?? 0;
+		const genre = f.genre?.["en-GB"] ?? [];
+		const description = f.description?.["en-GB"] ?? null;
+		const catalogueNumber = f.catalogueNumber?.["en-GB"] ?? null;
+		const barcode = f.barcode?.["en-GB"] ?? null;
+		const quantity = f.quantity?.["en-GB"] ?? 1;
+		const inStock = f.inStock?.["en-GB"] ?? true;
+		const sold = f.sold?.["en-GB"] ?? false;
+		const albumOfTheWeek = f.albumOfTheWeek?.["en-GB"] ?? false;
+
 		// Cover image
-		const coverImageId = f.coverImage["en-GB"].sys.id;
-		const coverAsset = await fetchAssetDetails(coverImageId);
+		const coverImageRef = f.coverImage?.["en-GB"];
+		const coverImageId = coverImageRef?.sys?.id ?? null;
+		const coverImageUrl = coverImageId
+			? getOptimizedImageUrl(
+					coverImageRef.fields?.file?.["en-GB"]?.url || ""
+				)
+			: "";
 
-		// Insert or update cover image into contentful_assets
-		await supabase.from("contentful_assets").upsert({
-			id: coverAsset.id,
-			title: coverAsset.title,
-			url: coverAsset.url,
-			file_name: coverAsset.file_name,
-			content_type: coverAsset.content_type,
-			created_at: coverAsset.created_at,
-			updated_at: coverAsset.updated_at,
-			published_version: coverAsset.published_version,
-		});
+		// Other images
+		const otherImageRefs = f.otherImages?.["en-GB"] ?? [];
+		const otherImageIds = (otherImageRefs as { sys: { id: string } }[]).map(
+			(img) => img.sys.id
+		);
 
-		// Handle other image IDs
-		const otherImageIds =
-			f.otherImages?.["en-GB"].map((img) => img.sys.id) ?? [];
+		// Insert contentful_assets (cover image and others)
+		const allAssetIds = [coverImageId, ...otherImageIds].filter(Boolean);
 
-		// Insert vinyl record
-		const record = {
-			id: payload.sys.id,
-			title: f.title["en-GB"],
-			sub_title: f.subTitle?.["en-GB"] ?? null,
-			artist_names: f.artistName["en-GB"],
-			artist_names_text: f.artistName["en-GB"].join(", "),
-			price: f.price["en-GB"],
-			vinyl_condition: f.vinylCondition["en-GB"],
-			sleeve_condition: f.sleeveCondition["en-GB"],
-			label: f.label["en-GB"],
-			release_year: f.releaseYear["en-GB"],
-			genre: f.genre["en-GB"],
-			description: f.description?.["en-GB"] ?? null,
-			catalogue_number: f.catalogueNumber?.["en-GB"] ?? null,
-			barcode: f.barcode?.["en-GB"] ?? null,
-			quantity: f.quantity?.["en-GB"] ?? 1,
-			in_stock: f.inStock["en-GB"],
-			sold: f.sold["en-GB"],
-			album_of_the_week: f.albumOfTheWeek["en-GB"],
-			album_of_week: f.albumOfTheWeek["en-GB"],
-			link: `/records/${payload.sys.id}`,
+		for (const assetId of allAssetIds) {
+			const asset = await fetchAssetData(assetId);
+			if (asset) {
+				await supabase.from("contentful_assets").upsert(
+					{
+						id: asset.sys.id,
+						title: asset.fields?.title?.["en-GB"] ?? null,
+						url: asset.fields?.file?.["en-GB"]?.url ?? null,
+						details: asset.fields?.file?.["en-GB"]?.details ?? null,
+						file_name: asset.fields?.file?.["en-GB"]?.fileName ?? null,
+						content_type:
+							asset.fields?.file?.["en-GB"]?.contentType ?? null,
+						created_at: asset.sys?.createdAt ?? null,
+						updated_at: asset.sys?.updatedAt ?? null,
+						published_version: asset.sys?.publishedVersion ?? null,
+					},
+					{ onConflict: "id" }
+				);
+			}
+		}
+
+		// Insert or update vinyl_records
+		const vinylRecord = {
+			id,
+			title,
+			sub_title: subTitle,
+			artist_names: artistNames,
+			artist_names_text: artistNamesText,
+			price,
+			vinyl_condition: vinylCondition,
+			sleeve_condition: sleeveCondition,
+			label,
+			year,
+			genre,
+			description,
+			catalogue_number: catalogueNumber,
+			barcode,
+			quantity,
+			in_stock: inStock,
+			sold,
+			album_of_the_week: albumOfTheWeek,
+			album_of_week: albumOfTheWeek, // legacy duplicate?
+			link: `/records/${id}`,
 			cover_image: coverImageId,
-			cover_image_url: getOptimizedImageUrl(coverAsset.url ?? ""),
+			cover_image_url: coverImageUrl,
 			other_images: otherImageIds,
 		};
 
 		const { error } = await supabase
 			.from("vinyl_records")
-			.upsert(record, { onConflict: "id" });
+			.upsert(vinylRecord, { onConflict: "id" });
 
 		if (error) {
 			console.error("Supabase insert error:", error);
 			return NextResponse.json({ error: error.message }, { status: 500 });
 		}
 
-		return NextResponse.json({ success: true });
+		return NextResponse.json({ success: true }, { status: 200 });
 	} catch (err) {
-		console.error("Webhook error:", err);
-		return NextResponse.json(
-			{ error: err instanceof Error ? err.message : "Unexpected error" },
-			{ status: 500 }
-		);
+		console.error("Contentful webhook error:", err);
+		if (err instanceof Error) {
+			return NextResponse.json({ error: err.message }, { status: 500 });
+		}
+		return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
 	}
 }
