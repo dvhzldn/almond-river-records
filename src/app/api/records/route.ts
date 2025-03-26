@@ -1,95 +1,60 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
-// Helper function to get a normalized cover image URL.
-const getCoverImageUrl = (cover: unknown): string | null => {
-	if (!cover) return null;
-	if (Array.isArray(cover)) {
-		if (cover.length === 0) return null;
-		const url = (cover[0] as { url: string }).url;
-		return url.startsWith("//") ? "https:" + url : url;
-	}
-	if (typeof cover === "object" && "url" in cover) {
-		const url = (cover as { url: string }).url;
-		return url.startsWith("//") ? "https:" + url : url;
-	}
-	return null;
-};
-
-// Helper function to normalize an "other image" asset.
-const getOtherImageUrl = (asset: unknown): string | null => {
-	if (!asset) return null;
-	if (Array.isArray(asset)) {
-		if (asset.length === 0) return null;
-		const first = asset[0];
-		if (first && typeof first === "object" && "url" in first) {
-			const url = (first as { url: string }).url;
-			return url.startsWith("//") ? "https:" + url : url;
-		}
-		return null;
-	}
-	if (typeof asset === "object" && "url" in asset) {
-		const url = (asset as { url: string }).url;
-		return url.startsWith("//") ? "https:" + url : url;
-	}
-	return null;
+type VinylRecord = {
+	id: string;
+	title: string;
+	artist_names: string[];
+	artist_names_text: string;
+	price: number;
+	vinyl_condition: string;
+	sleeve_condition: string;
+	label: string;
+	release_year: number;
+	genre: string[];
+	cover_image_url: string;
+	other_images: string[]; // Contentful asset IDs
 };
 
 export async function GET(request: Request) {
 	try {
 		const { searchParams } = new URL(request.url);
+		const getParam = (key: string) => searchParams.get(key) || "";
 
-		// Retrieve query parameters
-		const newThisWeek = searchParams.get("newThisWeek");
-		const searchQuery = searchParams.get("search") || "";
-		const condition = searchParams.get("condition") || "";
-		const artist = searchParams.get("artist") || "";
-		const genre = searchParams.get("genre") || "";
-		const decadeParam = searchParams.get("decade") || "";
+		const newThisWeek = getParam("newThisWeek");
+		const searchQuery = getParam("search");
+		const condition = getParam("condition");
+		const artist = getParam("artist");
+		const genre = getParam("genre");
+		const decadeParam = getParam("decade");
 
-		// Pagination: default limit 24, skip 0
-		const limitParam = searchParams.get("limit")
-			? Number(searchParams.get("limit"))
-			: 24;
-		const skipParam = searchParams.get("skip")
-			? Number(searchParams.get("skip"))
-			: 0;
+		const limit = Number(getParam("limit")) || 24;
+		const skip = Number(getParam("skip")) || 0;
 
-		// Build the Supabase query.
 		let query = supabase
 			.from("vinyl_records")
 			.select(
 				`
-          id,
-          title,
-          artist_names,
-		            artist_names_text,
-          price,
-          vinyl_condition,
-          sleeve_condition,
-          label,
-          release_year,
-          genre,
-          cover_image,
-          cover_image_asset:contentful_assets!vinyl_records_cover_image_fkey (
-            id,
-            url
-          ),
-          other_images,
-          other_images_assets:vinyl_record_other_images!vinyl_record_id (
-            asset:contentful_assets!vinyl_record_other_images_asset_id_fkey (
-              id,
-              url
-            )
-          )
-        `,
+        id,
+        title,
+        artist_names,
+        artist_names_text,
+        price,
+        vinyl_condition,
+        sleeve_condition,
+        label,
+        release_year,
+        genre,
+        cover_image_url,
+        other_images
+      `,
 				{ count: "exact" }
 			)
 			.eq("in_stock", true)
 			.eq("sold", false)
 			.gt("quantity", 0)
 			.order("created_at", { ascending: false })
-			.range(skipParam, skipParam + limitParam - 1);
+			.range(skip, skip + limit - 1);
 
 		if (newThisWeek) {
 			const sevenDaysAgo = new Date();
@@ -106,11 +71,9 @@ export async function GET(request: Request) {
 		if (decadeParam) {
 			const decadeNum = parseInt(decadeParam, 10);
 			if (!isNaN(decadeNum)) {
-				const startYear = decadeNum;
-				const endYear = decadeNum + 9;
 				query = query
-					.gte("release_year", startYear)
-					.lte("release_year", endYear);
+					.gte("release_year", decadeNum)
+					.lte("release_year", decadeNum + 9);
 			}
 		}
 
@@ -127,15 +90,16 @@ export async function GET(request: Request) {
 		}
 
 		const { data, error, count } = await query;
-		if (error) {
+
+		if (error || !data) {
 			console.error("Supabase query error:", error);
 			return NextResponse.json(
-				{ error: "Failed to fetch records", details: error.message },
+				{ error: "Failed to fetch records", details: error?.message },
 				{ status: 500 }
 			);
 		}
 
-		const records = (data || []).map((r) => ({
+		const records = data.map((r: VinylRecord) => ({
 			id: r.id,
 			title: r.title,
 			artistName: r.artist_names,
@@ -145,18 +109,18 @@ export async function GET(request: Request) {
 			label: r.label,
 			releaseYear: r.release_year,
 			genre: r.genre || [],
-			coverImage: getCoverImageUrl(r.cover_image_asset),
-			otherImages: r.other_images_assets
-				? (Array.isArray(r.other_images_assets)
-						? r.other_images_assets
-						: [r.other_images_assets]
-					)
-						.map((row: { asset: unknown }) => getOtherImageUrl(row.asset))
-						.filter((url): url is string => url !== null)
-				: [],
+			coverImage: r.cover_image_url,
+			otherImages: r.other_images ?? [],
 		}));
 
-		return NextResponse.json({ records, total: count });
+		return NextResponse.json(
+			{ records, total: count ?? 0 },
+			{
+				headers: {
+					"Cache-Control": "s-maxage=3600, stale-while-revalidate",
+				},
+			}
+		);
 	} catch (err) {
 		console.error("Error in /api/records route:", err);
 		return NextResponse.json(

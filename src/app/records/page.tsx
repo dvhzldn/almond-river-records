@@ -222,7 +222,9 @@ export default function RecordsPage() {
 									<div className="record-details">
 										<h3 className="record-title">{record.title}</h3>
 										<h4 className="artist-name">
-											{record.artistName.join(", ")}
+											{Array.isArray(record.artistName)
+												? record.artistName.join(", ")
+												: record.artistName}
 										</h4>
 										<p>Condition: {record.vinylCondition}</p>
 										<div className="record-actions">
@@ -249,8 +251,7 @@ export default function RecordsPage() {
 															title: record.title,
 															artistName: record.artistName,
 															price: record.price,
-															coverImage:
-																record.coverImage || "",
+															coverImage: record.coverImage,
 														});
 													}}
 												>
