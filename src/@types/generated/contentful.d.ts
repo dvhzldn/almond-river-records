@@ -26,7 +26,13 @@ export interface IVinylRecordFields {
   price: number;
 
   /** Genre */
-  genre?: string[] | undefined;
+  genre: string[];
+
+  /** Label */
+  label: string;
+
+  /** Catalogue Number */
+  catalogueNumber?: string | undefined;
 
   /** Vinyl Condition */
   vinylCondition:
@@ -52,14 +58,11 @@ export interface IVinylRecordFields {
     | "Poor"
     | "Other";
 
-  /** Label */
-  label: string;
-
-  /** Catalogue Number */
-  catalogueNumber?: string | undefined;
-
   /** Description */
   description?: Document | undefined;
+
+  /** Album Of The Week */
+  albumOfTheWeek: boolean;
 
   /** Link */
   link?: Document | undefined;
@@ -68,16 +71,13 @@ export interface IVinylRecordFields {
   barcode?: string | undefined;
 
   /** Quantity */
-  quantity: number;
+  quantity?: number | undefined;
 
   /** In Stock */
   inStock: boolean;
 
   /** Sold */
   sold: boolean;
-
-  /** Album Of The Week */
-  albumOfTheWeek: boolean;
 }
 
 /** A vinyl record release */
