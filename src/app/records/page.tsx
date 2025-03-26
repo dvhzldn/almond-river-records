@@ -1,7 +1,7 @@
 "use client";
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Modal from "@/components/Modal";
 import { useRecords, VinylRecord } from "@/hooks/useRecords";
 import { useSupabaseOptions } from "@/hooks/useSupabaseOptions";
@@ -25,7 +25,6 @@ export default function RecordsPage() {
 	const pageSize = 24;
 
 	const { artistOptions, genreOptions } = useSupabaseOptions();
-
 	const { records, totalRecords, loading } = useRecords({
 		search,
 		condition,
@@ -35,11 +34,9 @@ export default function RecordsPage() {
 		pageSize,
 	});
 
-	// Hooks for basket actions
 	const { handleAddToBasket } = useAddToBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const { basket } = useBasket();
-
 	const router = useRouter();
 
 	const nextPage = () => setPage((prev) => prev + 1);
@@ -50,7 +47,6 @@ export default function RecordsPage() {
 
 	const handleBuy = (record: VinylRecord, e: React.MouseEvent) => {
 		e.stopPropagation(); // Prevent triggering card onClick that opens Modal
-
 		handleAddToBasket({
 			id: record.id,
 			title: record.title,
@@ -60,6 +56,13 @@ export default function RecordsPage() {
 		});
 		router.push("/basket");
 	};
+
+	// Determine if any filters have been applied.
+	const filtersApplied =
+		searchInput.trim() !== "" ||
+		condition.trim() !== "" ||
+		artist.trim() !== "" ||
+		genre.trim() !== "";
 
 	return (
 		<div className="page-container">
@@ -137,21 +140,24 @@ export default function RecordsPage() {
 						Search
 					</button>
 				</div>
-				<div>
-					<button
-						className="clear-filters-button"
-						onClick={() => {
-							setSearch("");
-							setSearchInput("");
-							setCondition("");
-							setArtist("");
-							setPage(1);
-							setGenre("");
-						}}
-					>
-						Clear Filters
-					</button>
-				</div>
+				{/* Only show "Clear Filters" if at least one filter is applied */}
+				{filtersApplied && (
+					<div>
+						<button
+							className="clear-filters-button"
+							onClick={() => {
+								setSearch("");
+								setSearchInput("");
+								setCondition("");
+								setArtist("");
+								setGenre("");
+								setPage(1);
+							}}
+						>
+							Reset Filters
+						</button>
+					</div>
+				)}
 			</div>
 			<div className="content-box-grid">
 				{loading ? (
@@ -164,7 +170,6 @@ export default function RecordsPage() {
 							const isInBasket = basket.some(
 								(item) => item.id === record.id
 							);
-
 							return (
 								<div
 									key={record.id}
@@ -214,7 +219,7 @@ export default function RecordsPage() {
 														handleRemoveFromBasket(record.id);
 													}}
 												>
-													{`Remove    `}
+													{`Remove `}
 													<FontAwesomeIcon
 														icon={faShoppingBasket}
 													/>
@@ -234,7 +239,7 @@ export default function RecordsPage() {
 														});
 													}}
 												>
-													Add{"  "}
+													Add{" "}
 													<FontAwesomeIcon
 														icon={faShoppingBasket}
 													/>
@@ -248,20 +253,22 @@ export default function RecordsPage() {
 					</div>
 				)}
 			</div>
-			<div className="pagination">
-				<button onClick={prevPage} disabled={page === 1}>
-					Previous
-				</button>
-				<span>
-					Page {page} of {totalPages}
-				</span>
-				<button
-					onClick={nextPage}
-					disabled={page * pageSize >= totalRecords}
-				>
-					Next
-				</button>
-			</div>
+			{totalPages > 1 && (
+				<div className="pagination">
+					<button onClick={prevPage} disabled={page === 1}>
+						Previous
+					</button>
+					<span>
+						Page {page} of {totalPages}
+					</span>
+					<button
+						onClick={nextPage}
+						disabled={page * pageSize >= totalRecords}
+					>
+						Next
+					</button>
+				</div>
+			)}
 
 			{selectedRecord && (
 				<Modal

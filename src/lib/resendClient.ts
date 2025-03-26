@@ -50,18 +50,20 @@ export async function sendOrderConfirmationEmail(
 	const htmlContent = `
     <p>Hi ${order.customer_name},</p>
     <p>Thank you for your purchase!</p>
-    <p>Your order reference is <strong>${order.sumup_id}</strong>.</p>
-    <p>Order Date: ${new Date(order.order_date).toLocaleDateString()}</p>
-    <p>Order Details:</p>
-    <ul>${itemsHtml}</ul>
+    <br>
+    <p>We will process your order promptly and dispatch within two working days.</p>
+    <br>
+	<p>Order details:</p>
+	<ul>${itemsHtml}</ul>
     <p>Total Amount: £${order.sumup_amount.toFixed(2)}</p>
     <p>Shipping Address:</p>
     <p>${shippingAddress}</p>
-    <p>We will process your order promptly and dispatch within two working days.</p>
-    <hr/>
-	<p>Best wishes,</p>
 	<br>
+    <p>Your order reference is <strong>${order.sumup_checkout_reference}</strong>.</p>
+	<br>
+	<p>Best wishes,</p>
 	<p>Almond River Records</p>
+    <hr/>
     <div style="text-align:center;">
       <p><img src="https://almondriverrecords.online/images/almond-river-logo.jpg" alt="Almond River Records Logo" style="max-width:200px;" /></p>
     </div>

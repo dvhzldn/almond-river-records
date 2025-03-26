@@ -16,10 +16,7 @@ export default function BasketPage() {
 	// Calculate order price
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
-	// const totalPrice = subTotalPrice + postagePrice;
-
-	// testing
-	const totalPrice = 1;
+	const totalPrice = subTotalPrice + postagePrice;
 
 	const recordIds = basket.map((item) => item.id);
 	const description = basket
