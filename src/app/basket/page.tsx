@@ -6,6 +6,7 @@ import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import OrderForm, { OrderData } from "@/components/OrderForm";
 import ReturnsPolicyModal from "@/components/ReturnsPolicyModal";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 export default function BasketPage() {
 	const { basket, clearBasket } = useBasket();
@@ -25,6 +26,8 @@ export default function BasketPage() {
 
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
+
+	const { track } = useAnalytics();
 
 	const handleOrderSubmit = async (orderData: OrderData) => {
 		setLoading(true);
@@ -74,6 +77,12 @@ export default function BasketPage() {
 				"Redirecting to hosted checkout URL:",
 				data.hosted_checkout_url
 			);
+
+			track("checkout-started", {
+				total: totalPrice,
+				records: recordIds.join(","),
+			});
+
 			// Redirect to the SumUp hosted checkout URL.
 			window.location.href = data.hosted_checkout_url;
 		} catch (err: unknown) {
