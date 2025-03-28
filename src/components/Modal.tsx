@@ -5,7 +5,8 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { useAddToBasket } from "@/hooks/useAddToBasket";
+import { useAddToBasketWithTracking } from "@/hooks/useAddToBasketWithTracking";
+import { useBuyNow } from "@/hooks/useBuyNow";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
 import { useRouter } from "next/navigation";
@@ -38,20 +39,21 @@ export default function Modal({ record, onClose }: ModalProps) {
 	}
 
 	const { basket } = useBasket();
-	const { handleAddToBasket } = useAddToBasket();
+	const { handleAddToBasket } = useAddToBasketWithTracking();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const router = useRouter();
 
 	const isInBasket = basket.some((item) => item.id === record.id);
+	const { handleBuyNow } = useBuyNow();
 
 	const onBuy = () => {
 		if (!isInBasket) {
-			handleAddToBasket({
+			handleBuyNow({
 				id: record.id,
 				title: record.title,
 				artistName: record.artistName,
 				price: record.price,
-				coverImage: record.coverImageUrl || "",
+				coverImage: record.coverImageUrl,
 			});
 		}
 		onClose();

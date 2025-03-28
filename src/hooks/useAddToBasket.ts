@@ -1,6 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import { useBasket } from "@/app/api/context/BasketContext";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 export interface AddToBasketPayload {
 	id: string;
@@ -12,6 +13,7 @@ export interface AddToBasketPayload {
 
 export const useAddToBasket = () => {
 	const { addToBasket } = useBasket();
+	const { track } = useAnalytics();
 
 	const handleAddToBasket = useCallback(
 		(item: AddToBasketPayload, onSuccess?: () => void) => {
@@ -24,12 +26,13 @@ export const useAddToBasket = () => {
 			};
 
 			addToBasket(basketItem);
+			track("add-to-basket", { recordId: item.id, price: item.price });
 
 			if (onSuccess) {
 				onSuccess();
 			}
 		},
-		[addToBasket]
+		[addToBasket, track]
 	);
 
 	return { handleAddToBasket };

@@ -1,16 +1,16 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import { useRecords, VinylRecord } from "@/hooks/useRecords";
 import { useSupabaseOptions } from "@/hooks/useSupabaseOptions";
-import { useAddToBasket } from "@/hooks/useAddToBasket";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 import { useAnalytics } from "@/lib/useAnalytics";
+import { useAddToBasketWithTracking } from "@/hooks/useAddToBasketWithTracking";
+import { useBuyNow } from "@/hooks/useBuyNow";
 
 export default function RecordsPage() {
 	const { track } = useAnalytics();
@@ -38,28 +38,16 @@ export default function RecordsPage() {
 		pageSize,
 	});
 
-	const { handleAddToBasket } = useAddToBasket();
+	const { handleAddToBasket } = useAddToBasketWithTracking();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
+	const { handleBuyNow } = useBuyNow();
 	const { basket } = useBasket();
-	const router = useRouter();
 
 	const nextPage = () => setPage((prev) => prev + 1);
 	const prevPage = () => setPage((prev) => Math.max(prev - 1, 1));
 
 	// Calculate total pages:
 	const totalPages = Math.ceil(totalRecords / pageSize);
-
-	const handleBuy = (record: VinylRecord, e: React.MouseEvent) => {
-		e.stopPropagation(); // Prevent triggering card onClick that opens Modal
-		handleAddToBasket({
-			id: record.id,
-			title: record.title,
-			artistName: record.artistName,
-			price: record.price,
-			coverImage: record.coverImageUrl || "",
-		});
-		router.push("/basket");
-	};
 
 	// Determine if any filters have been applied.
 	const filtersApplied =
@@ -285,7 +273,16 @@ export default function RecordsPage() {
 											)}
 											<button
 												className="buy-button"
-												onClick={(e) => handleBuy(record, e)}
+												onClick={(e) => {
+													e.stopPropagation();
+													handleBuyNow({
+														id: record.id,
+														title: record.title,
+														artistName: record.artistName,
+														price: record.price,
+														coverImage: record.coverImageUrl,
+													});
+												}}
 											>
 												Buy
 											</button>
