@@ -141,6 +141,23 @@ export async function runFulfillment(checkoutReference: string): Promise<void> {
 		requestBody: { values: [rowData] },
 	});
 
+	// Fallback email send if not already sent
+	if (!order.order_confirmation_email_sent) {
+		await supabaseService
+			.from("orders")
+			.update({ order_confirmation_email_sent: true })
+			.eq("sumup_checkout_reference", checkoutReference);
+
+		const { sendOrderConfirmationEmail } = await import("@/lib/resendClient");
+		await sendOrderConfirmationEmail(order, orderItems);
+
+		await logOrderEvent({
+			event: "email-sent",
+			checkout_reference: checkoutReference,
+			message: "Order confirmation email sent via runFulfillment fallback.",
+		});
+	}
+
 	await logOrderEvent({
 		event: "order-fulfilled",
 		checkout_reference: checkoutReference,
