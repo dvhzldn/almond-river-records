@@ -50,7 +50,18 @@ export async function POST(request: Request) {
 			order.order_confirmation_email_sent
 		);
 
-		// Update the flag immediately if email has not been sent.
+		// Ensure order is paid before fulfilling
+		if (order.sumup_status !== "PAID") {
+			console.warn(
+				`fulfillOrder: Skipping fulfillment – order status is '${order.sumup_status}', not 'PAID'.`
+			);
+			return NextResponse.json(
+				{ error: "Order not paid yet. Fulfillment skipped." },
+				{ status: 200 }
+			);
+		}
+
+		// Proceed only if email hasn't already been sent (i.e., not yet fulfilled)
 		if (!order.order_confirmation_email_sent) {
 			console.log(
 				"fulfillOrder: Email not sent yet. Updating flag before sending email..."
@@ -70,15 +81,35 @@ export async function POST(request: Request) {
 					{ status: 500 }
 				);
 			}
+
 			console.log(
 				"fulfillOrder: Email flag updated. Proceeding to send confirmation email..."
 			);
 			await sendOrderConfirmationEmail(order, orderItems);
 			console.log("fulfillOrder: Confirmation email sent successfully.");
 
-			// After inventory update, append a new row to the Google Sheet.
+			// Update inventory
+			for (const item of orderItems) {
+				console.log(
+					`fulfillOrder: Updating inventory for record ${item.vinyl_record_id}`
+				);
+				const { error } = await supabaseService
+					.from("vinyl_records")
+					.update({ quantity: 0 })
+					.eq("id", item.vinyl_record_id);
+				if (error) {
+					console.error(
+						`fulfillOrder: Error updating inventory for record ${item.vinyl_record_id}:`,
+						error
+					);
+				} else {
+					console.log(
+						`fulfillOrder: Inventory updated to 0 for record ${item.vinyl_record_id}`
+					);
+				}
+			}
 
-			// FIX GOOGLE SHEET ROW DATA
+			// Append order to Google Sheets
 			const isoString = order.order_date;
 			const [orderDatePart, timePart] = isoString.split("T");
 			const orderTime = timePart.split(".")[0];
@@ -108,7 +139,6 @@ export async function POST(request: Request) {
 				checkoutReference,
 			];
 
-			// Setup Google Sheets credentials.
 			const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
 			const credentials = JSON.parse(
 				Buffer.from(encoded, "base64").toString("utf8")
@@ -120,7 +150,6 @@ export async function POST(request: Request) {
 			const sheets = google.sheets({ version: "v4", auth });
 			const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
 
-			// Append a new row to the spreadsheet.
 			const appendResponse = await sheets.spreadsheets.values.append({
 				spreadsheetId,
 				range: "Sheet1!A1",
@@ -129,32 +158,14 @@ export async function POST(request: Request) {
 					values: [rowData],
 				},
 			});
-			console.log("Row appended successfully:", appendResponse.data);
+			console.log(
+				"fulfillOrder: Row appended to Google Sheet:",
+				appendResponse.data
+			);
 		} else {
 			console.log(
-				"fulfillOrder: Confirmation email already sent; skipping email send."
+				"fulfillOrder: Confirmation email already sent; skipping fulfillment."
 			);
-		}
-
-		// Update inventory for each order item.
-		for (const item of orderItems) {
-			console.log(
-				`fulfillOrder: Updating inventory for record ${item.vinyl_record_id}`
-			);
-			const { error } = await supabaseService
-				.from("vinyl_records")
-				.update({ quantity: 0 })
-				.eq("id", item.vinyl_record_id);
-			if (error) {
-				console.error(
-					`fulfillOrder: Error updating inventory for record ${item.vinyl_record_id}:`,
-					error
-				);
-			} else {
-				console.log(
-					`fulfillOrder: Inventory updated to 0 for record ${item.vinyl_record_id}`
-				);
-			}
 		}
 
 		console.log("fulfillOrder: Order fulfillment complete");
