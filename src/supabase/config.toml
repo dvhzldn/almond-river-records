@@ -1,0 +1,2 @@
+[functions.check_pending_orders]
+schedule = "*/5 * * * *"  # every 5 minutes
