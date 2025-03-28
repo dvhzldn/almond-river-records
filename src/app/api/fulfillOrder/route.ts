@@ -3,6 +3,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
 import { contentfulManagementClient } from "@/lib/contentfulManagementClient";
 import { logOrderEvent } from "@/lib/logOrderEvent";
+
 interface OrderItem {
 	vinyl_record_id: string;
 	artist_names: string[];
@@ -106,79 +107,102 @@ export async function POST(request: Request) {
 
 		console.log("fulfillOrder: Starting fulfillment for", checkoutReference);
 		const orderData = await waitForPaidOrder(checkoutReference);
-
 		const order = orderData;
 		const orderItems = orderData.order_items;
 
-		// Update inventory + Contentful
-		for (const item of orderItems) {
-			await supabaseService
-				.from("vinyl_records")
-				.update({ quantity: 0, sold: true })
-				.eq("id", item.vinyl_record_id);
+		// 🔁 Check if fulfillment already logged
+		const { data: recentLogs, error: logsError } = await supabaseService
+			.from("order_logs")
+			.select("*")
+			.eq("checkout_reference", checkoutReference)
+			.eq("event", "order-fulfilled")
+			.order("created_at", { ascending: false })
+			.limit(1);
 
-			await updateContentfulRecord(item.vinyl_record_id);
+		if (logsError) {
+			console.warn(
+				"fulfillOrder: Unable to fetch previous logs:",
+				logsError
+			);
 		}
 
-		console.log("fulfillOrder: Inventory updated.");
+		if (Array.isArray(recentLogs) && recentLogs.length > 0) {
+			console.log(
+				"fulfillOrder: Fulfillment already logged — skipping log."
+			);
+		} else {
+			// ⬇️ Perform fulfillment
+			for (const item of orderItems) {
+				await supabaseService
+					.from("vinyl_records")
+					.update({ quantity: 0, sold: true })
+					.eq("id", item.vinyl_record_id);
 
-		// Append to Google Sheets
-		const [orderDatePart, timePart] = order.order_date.split("T");
-		const orderTime = timePart.split(".")[0];
-		const fullDescription = orderItems
-			.map((item) => `${item.artist_names} - ${item.title}`)
-			.join("\n");
-		const contentfulIds = orderItems
-			.map(
-				(item) =>
-					`https://app.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/entries/${item.vinyl_record_id}`
-			)
-			.join("\n");
+				await updateContentfulRecord(item.vinyl_record_id);
+			}
 
-		const rowData = [
-			orderDatePart,
-			orderTime,
-			order.sumup_status,
-			order.customer_name,
-			order.customer_email,
-			order.address1,
-			order.address2,
-			order.address3,
-			order.city,
-			order.postcode,
-			fullDescription,
-			contentfulIds,
-			checkoutReference,
-		];
+			console.log("fulfillOrder: Inventory updated.");
 
-		const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
-		const credentials = JSON.parse(
-			Buffer.from(encoded, "base64").toString("utf8")
-		);
-		const auth = new google.auth.GoogleAuth({
-			credentials,
-			scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-		});
-		const sheets = google.sheets({ version: "v4", auth });
-		const spreadsheetId = process.env.ORDER_SPREADSHEET_ID!;
+			// ⬇️ Append to Google Sheets
+			const [orderDatePart, timePart] = order.order_date.split("T");
+			const orderTime = timePart.split(".")[0];
+			const fullDescription = orderItems
+				.map((item) => `${item.artist_names} - ${item.title}`)
+				.join("\n");
+			const contentfulIds = orderItems
+				.map(
+					(item) =>
+						`https://app.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/entries/${item.vinyl_record_id}`
+				)
+				.join("\n");
 
-		await sheets.spreadsheets.values.append({
-			spreadsheetId,
-			range: "Sheet1!A1",
-			valueInputOption: "RAW",
-			requestBody: {
-				values: [rowData],
-			},
-		});
-		console.log("fulfillOrder: Row added to Google Sheet.");
+			const rowData = [
+				orderDatePart,
+				orderTime,
+				order.sumup_status,
+				order.customer_name,
+				order.customer_email,
+				order.address1,
+				order.address2,
+				order.address3,
+				order.city,
+				order.postcode,
+				fullDescription,
+				contentfulIds,
+				checkoutReference,
+			];
 
-		await logOrderEvent({
-			event: "order-fulfilled",
-			checkout_reference: checkoutReference,
-			message:
-				"Order fulfilled: inventory + Contentful + Google Sheets updated.",
-			metadata: { items: orderItems.map((i) => i.vinyl_record_id) },
-		});
+			const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
+			const credentials = JSON.parse(
+				Buffer.from(encoded, "base64").toString("utf8")
+			);
+			const auth = new google.auth.GoogleAuth({
+				credentials,
+				scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+			});
+			const sheets = google.sheets({ version: "v4", auth });
+			const spreadsheetId = process.env.ORDER_SPREADSHEET_ID!;
+
+			await sheets.spreadsheets.values.append({
+				spreadsheetId,
+				range: "Sheet1!A1",
+				valueInputOption: "RAW",
+				requestBody: {
+					values: [rowData],
+				},
+			});
+			console.log("fulfillOrder: Row added to Google Sheet.");
+
+			await logOrderEvent({
+				event: "order-fulfilled",
+				checkout_reference: checkoutReference,
+				message:
+					"Order fulfilled: inventory + Contentful + Google Sheets updated.",
+				metadata: {
+					items: orderItems.map((i) => i.vinyl_record_id),
+				},
+			});
+		}
 
 		return NextResponse.json(
 			{ message: "Fulfillment complete." },
