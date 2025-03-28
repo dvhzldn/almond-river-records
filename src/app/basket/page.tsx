@@ -79,8 +79,11 @@ export default function BasketPage() {
 			);
 
 			track("checkout-started", {
-				total: totalPrice,
-				records: recordIds.join(","),
+				artistTitle: basket
+					.map((item) => `${item.artist} - ${item.title}`)
+					.join(", "),
+				artists: basket.map((item) => item.artist).join(", "),
+				titles: basket.map((item) => item.title).join(", "),
 			});
 
 			// Redirect to the SumUp hosted checkout URL.

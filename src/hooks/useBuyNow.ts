@@ -15,7 +15,11 @@ export const useBuyNow = () => {
 		price: number;
 		coverImage?: string;
 	}) => {
-		track("buy-record", { recordId: record.id, price: record.price });
+		track("buy-record", {
+			title: record.title,
+			artist: record.artistName.join(", "),
+			artistTitle: `${record.artistName.join(", ")} - ${record.title}`,
+		});
 
 		handleAddToBasket({
 			id: record.id,

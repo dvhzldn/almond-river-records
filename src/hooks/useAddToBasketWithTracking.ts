@@ -19,8 +19,9 @@ export const useAddToBasketWithTracking = () => {
 			onSuccess?: () => void
 		) => {
 			track("add-to-basket", {
-				recordId: record.id,
-				price: record.price,
+				title: record.title,
+				artist: record.artistName.join(", "),
+				artistTitle: `${record.artistName.join(", ")} - ${record.title}`,
 			});
 
 			baseAddToBasket(
