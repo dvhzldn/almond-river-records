@@ -6,6 +6,7 @@ import ClearBasketOnSuccess from "@/components/ClearBasketOnSuccess";
 import TrackPurchaseComplete from "@/components/TrackPurchaseComplete";
 import TrackPurchaseFailed from "@/components/TrackPurchaseFailed";
 import TrackPurchasePending from "@/components/TrackPurchasePending";
+import { logOrderEvent } from "@/lib/logOrderEvent";
 
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -57,6 +58,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
+	// 1. Fetch the order from Supabase
 	const { data: order, error } = await supabaseService
 		.from("orders")
 		.select("*")
@@ -74,9 +76,13 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
+	// 2. Fetch latest status from SumUp API
 	const accessToken = process.env.SUMUP_DEVELOPMENT_API_KEY;
-	const sumupUrl = `https://api.sumup.com/v0.1/checkouts/${order.sumup_id}`;
+	if (!accessToken) {
+		throw new Error("Missing SumUp API key");
+	}
 
+	const sumupUrl = `https://api.sumup.com/v0.1/checkouts/${order.sumup_id}`;
 	const sumupResponse = await fetch(sumupUrl, {
 		method: "GET",
 		headers: { Authorization: `Bearer ${accessToken}` },
@@ -84,6 +90,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	const checkoutData = await sumupResponse.json();
 	const checkoutStatus = checkoutData.status;
 
+	console.log("payment-success: SumUp status =", checkoutStatus);
+
+	// 3. Display appropriate message based on SumUp status
 	if (checkoutStatus === "PENDING") {
 		return <TrackPurchasePending />;
 	}
@@ -93,43 +102,35 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	}
 
 	if (checkoutStatus === "PAID") {
-		if (!order.order_confirmation_email_sent) {
-			const maxRetries = 5;
-			const delay = 300;
-			let retries = 0;
-			let paid = false;
+		// 4. If Supabase hasn't updated to PAID, fix it here
+		if (order.sumup_status !== "PAID") {
+			console.log("payment-success: Updating Supabase to PAID manually");
+			await supabaseService
+				.from("orders")
+				.update({ sumup_status: "PAID" })
+				.eq("sumup_checkout_reference", checkoutId);
 
-			while (retries < maxRetries) {
-				const { data: refreshed, error: fetchError } = await supabaseService
-					.from("orders")
-					.select("sumup_status")
-					.eq("sumup_checkout_reference", order.sumup_checkout_reference)
-					.single();
-
-				if (fetchError) {
-					console.warn("PaymentSuccess: Retry fetch error:", fetchError);
-				}
-
-				if (refreshed?.sumup_status === "PAID") {
-					paid = true;
-					break;
-				}
-
-				await new Promise((r) => setTimeout(r, delay));
-				retries++;
-			}
-
-			if (paid) {
-				try {
-					await runFulfillment(order.sumup_checkout_reference);
-				} catch (err) {
-					console.error("PaymentSuccess: Fulfillment failed", err);
-				}
-			} else {
-				console.warn("PaymentSuccess: Supabase never reached PAID status.");
-			}
+			await logOrderEvent({
+				event: "checkout-status-update",
+				checkout_reference: checkoutId,
+				message: "Status manually updated to PAID by payment-success",
+				metadata: {
+					from: order.sumup_status,
+					to: "PAID",
+					context: "payment-success fallback",
+				},
+			});
 		}
 
+		// 5. Fulfillment (includes email if not sent)
+		try {
+			await runFulfillment(checkoutId);
+			console.log("payment-success: Fulfillment completed");
+		} catch (err) {
+			console.error("PaymentSuccess: Fulfillment failed", err);
+		}
+
+		// 6. UI confirmation
 		return (
 			<>
 				<ClearBasketOnSuccess checkoutStatus={checkoutStatus} />
@@ -157,6 +158,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		);
 	}
 
+	// 7. Unexpected state fallback
 	return (
 		<div className="page-container">
 			<h1 className="page-title">Payment Status Unknown</h1>
