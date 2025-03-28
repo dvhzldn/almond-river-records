@@ -1,3 +1,4 @@
+import { runFulfillment } from "@/lib/runFulfillment";
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,7 +6,6 @@ import ClearBasketOnSuccess from "@/components/ClearBasketOnSuccess";
 import TrackPurchaseComplete from "@/components/TrackPurchaseComplete";
 import TrackPurchaseFailed from "@/components/TrackPurchaseFailed";
 import TrackPurchasePending from "@/components/TrackPurchasePending";
-import { runFulfillment } from "@/lib/runFulfillment";
 
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,6 +25,7 @@ interface Order {
 
 export default async function PaymentSuccess({ params, searchParams }) {
 	void params;
+
 	const checkoutId = Array.isArray(searchParams.checkout_id)
 		? searchParams.checkout_id[0]
 		: searchParams.checkout_id;
@@ -86,15 +87,46 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	if (checkoutStatus === "PENDING") {
 		return <TrackPurchasePending />;
 	}
+
 	if (checkoutStatus === "FAILED") {
 		return <TrackPurchaseFailed />;
 	}
+
 	if (checkoutStatus === "PAID") {
 		if (!order.order_confirmation_email_sent) {
-			try {
-				await runFulfillment(order.sumup_checkout_reference);
-			} catch (err) {
-				console.error("PaymentSuccess: Fulfillment failed", err);
+			const maxRetries = 5;
+			const delay = 300;
+			let retries = 0;
+			let paid = false;
+
+			while (retries < maxRetries) {
+				const { data: refreshed, error: fetchError } = await supabaseService
+					.from("orders")
+					.select("sumup_status")
+					.eq("sumup_checkout_reference", order.sumup_checkout_reference)
+					.single();
+
+				if (fetchError) {
+					console.warn("PaymentSuccess: Retry fetch error:", fetchError);
+				}
+
+				if (refreshed?.sumup_status === "PAID") {
+					paid = true;
+					break;
+				}
+
+				await new Promise((r) => setTimeout(r, delay));
+				retries++;
+			}
+
+			if (paid) {
+				try {
+					await runFulfillment(order.sumup_checkout_reference);
+				} catch (err) {
+					console.error("PaymentSuccess: Fulfillment failed", err);
+				}
+			} else {
+				console.warn("PaymentSuccess: Supabase never reached PAID status.");
 			}
 		}
 
