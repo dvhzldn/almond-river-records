@@ -7,30 +7,19 @@ type Props = {
 	title: string;
 	artistName: string;
 	price: number;
-	genre?: string[] | string | null;
+	genre?: string;
 };
 
-export default function TrackRecordView({
-	recordId,
-	title,
-	artistName,
-	price,
-	genre,
-}: Props) {
+export default function TrackRecordView({ title, artistName }: Props) {
 	const { track } = useAnalytics();
-	const formattedGenre = Array.isArray(genre)
-		? genre.join(", ")
-		: (genre ?? "unknown");
 
 	useEffect(() => {
 		track("record-view", {
-			recordId,
+			artist: artistName,
 			title,
-			artistName,
-			price,
-			genre: formattedGenre,
+			artistTitle: `${artistName} - ${title}`,
 		});
-	}, [track, recordId, title, artistName, price, formattedGenre]);
+	}, [track, artistName, title]);
 
 	return null;
 }
