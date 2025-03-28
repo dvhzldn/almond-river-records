@@ -11,6 +11,8 @@ import {
 import { useBasket } from "@/app/api/context/BasketContext";
 
 export default function Menu() {
+	const [hasMounted, setHasMounted] = useState(false);
+
 	const [isOpen, setIsOpen] = useState(false);
 	const { basket } = useBasket();
 	const basketCount = basket.length;
@@ -21,8 +23,11 @@ export default function Menu() {
 	const closeMenu = () => setIsOpen(false);
 
 	// Helper to determine if the link is active
-	const isActive = (path: string) => pathname === path;
-
+	const isActive = (path: string) => {
+		if (!pathname) return false;
+		if (path === "/") return pathname === "/";
+		return pathname.startsWith(path);
+	};
 	// Trigger basket animation when basketCount changes
 	useEffect(() => {
 		if (basketCount > 0) {
@@ -33,6 +38,12 @@ export default function Menu() {
 			return () => clearTimeout(timer);
 		}
 	}, [basketCount]);
+
+	useEffect(() => {
+		setHasMounted(true);
+	}, []);
+
+	if (!hasMounted) return null;
 
 	return (
 		<nav className="menu">
