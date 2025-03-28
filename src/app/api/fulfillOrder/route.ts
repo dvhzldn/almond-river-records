@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
+import { contentfulManagementClient } from "@/lib/contentfulManagementClient";
 
 interface OrderItem {
 	vinyl_record_id: string;
@@ -48,6 +49,50 @@ async function waitForPaidOrder(
 	throw new Error("fulfillOrder: Timed out waiting for PAID status.");
 }
 
+async function updateContentfulRecord(
+	vinylRecordId: string,
+	retries = 3
+): Promise<void> {
+	try {
+		const space = await contentfulManagementClient.getSpace(
+			process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID!
+		);
+		const environment = await space.getEnvironment(
+			process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || "master"
+		);
+		const entry = await environment.getEntry(vinylRecordId);
+
+		const currentQuantity = entry.fields.quantity?.["en-GB"];
+		const currentSold = entry.fields.sold?.["en-GB"];
+
+		if (currentQuantity === 0 && currentSold === true) {
+			console.log(
+				`Contentful: Record ${vinylRecordId} already marked as sold. Skipping update.`
+			);
+			return;
+		}
+
+		entry.fields.quantity = { "en-GB": 0 };
+		entry.fields.sold = { "en-GB": true };
+
+		const updated = await entry.update();
+		await updated.publish();
+
+		console.log(`Contentful: Record ${vinylRecordId} updated and published.`);
+	} catch (err) {
+		console.error(`Contentful: Error updating record ${vinylRecordId}`, err);
+
+		if (retries > 0) {
+			console.warn(
+				`Retrying Contentful update for ${vinylRecordId} (${retries} retries left)...`
+			);
+			await new Promise((resolve) => setTimeout(resolve, 500));
+			return updateContentfulRecord(vinylRecordId, retries - 1);
+		}
+		console.error(`Contentful: Max retries reached for ${vinylRecordId}.`);
+	}
+}
+
 export async function POST(request: Request) {
 	try {
 		const { checkoutReference }: { checkoutReference?: string } =
@@ -65,16 +110,19 @@ export async function POST(request: Request) {
 		const order = orderData;
 		const orderItems = orderData.order_items;
 
-		// Update inventory
+		// Update inventory + Contentful
 		for (const item of orderItems) {
 			await supabaseService
 				.from("vinyl_records")
 				.update({ quantity: 0 })
 				.eq("id", item.vinyl_record_id);
+
+			await updateContentfulRecord(item.vinyl_record_id);
 		}
+
 		console.log("fulfillOrder: Inventory updated.");
 
-		// Append row to Google Sheet
+		// Append to Google Sheets
 		const [orderDatePart, timePart] = order.order_date.split("T");
 		const orderTime = timePart.split(".")[0];
 		const fullDescription = orderItems
@@ -83,7 +131,7 @@ export async function POST(request: Request) {
 		const contentfulIds = orderItems
 			.map(
 				(item) =>
-					`https://app.contentful.com/spaces/hvl6gmwk3ce2/entries/${item.vinyl_record_id}`
+					`https://app.contentful.com/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}/entries/${item.vinyl_record_id}`
 			)
 			.join("\n");
 
