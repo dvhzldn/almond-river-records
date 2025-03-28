@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
 import { contentfulManagementClient } from "@/lib/contentfulManagementClient";
-
+import { logOrderEvent } from "@/lib/logOrderEvent";
 interface OrderItem {
 	vinyl_record_id: string;
 	artist_names: string[];
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 		for (const item of orderItems) {
 			await supabaseService
 				.from("vinyl_records")
-				.update({ quantity: 0 })
+				.update({ quantity: 0, sold: true })
 				.eq("id", item.vinyl_record_id);
 
 			await updateContentfulRecord(item.vinyl_record_id);
@@ -171,6 +171,14 @@ export async function POST(request: Request) {
 			},
 		});
 		console.log("fulfillOrder: Row added to Google Sheet.");
+
+		await logOrderEvent({
+			event: "order-fulfilled",
+			checkout_reference: checkoutReference,
+			message:
+				"Order fulfilled: inventory + Contentful + Google Sheets updated.",
+			metadata: { items: orderItems.map((i) => i.vinyl_record_id) },
+		});
 
 		return NextResponse.json(
 			{ message: "Fulfillment complete." },

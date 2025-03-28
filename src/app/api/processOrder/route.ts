@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { logOrderEvent } from "@/lib/logOrderEvent";
 
 // Define a proper interface for vinyl records.
 interface VinylRecord {
@@ -211,6 +212,13 @@ export async function POST(request: Request) {
 			};
 		});
 		console.log("processOrder: Inserting order items:", orderItemsData);
+
+		await logOrderEvent({
+			event: "order-created",
+			checkout_reference: checkoutReference,
+			message: "Order record created in Supabase.",
+			metadata: { orderId, recordIds, amount },
+		});
 
 		const { error: orderItemsError } = await supabaseService
 			.from("order_items")
