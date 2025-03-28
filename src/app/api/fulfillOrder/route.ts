@@ -75,6 +75,61 @@ export async function POST(request: Request) {
 			);
 			await sendOrderConfirmationEmail(order, orderItems);
 			console.log("fulfillOrder: Confirmation email sent successfully.");
+
+			// After inventory update, append a new row to the Google Sheet.
+
+			// FIX GOOGLE SHEET ROW DATA
+			const isoString = order.order_date;
+			const [orderDatePart, timePart] = isoString.split("T");
+			const orderTime = timePart.split(".")[0];
+			const fullDescription = orderItems
+				.map((item) => `${item.artist_names} - ${item.title}`)
+				.join("\n");
+			const contentfulIds = orderItems
+				.map(
+					(item) =>
+						`https://app.contentful.com/spaces/hvl6gmwk3ce2/entries/${item.vinyl_record_id}`
+				)
+				.join("\n");
+
+			const rowData = [
+				orderDatePart,
+				orderTime,
+				order.sumup_status,
+				order.customer_name,
+				order.customer_email,
+				order.address1,
+				order.address2,
+				order.address3,
+				order.city,
+				order.postcode,
+				fullDescription,
+				contentfulIds,
+				checkoutReference,
+			];
+
+			// Setup Google Sheets credentials.
+			const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
+			const credentials = JSON.parse(
+				Buffer.from(encoded, "base64").toString("utf8")
+			);
+			const auth = new google.auth.GoogleAuth({
+				credentials,
+				scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+			});
+			const sheets = google.sheets({ version: "v4", auth });
+			const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
+
+			// Append a new row to the spreadsheet.
+			const appendResponse = await sheets.spreadsheets.values.append({
+				spreadsheetId,
+				range: "Sheet1!A1",
+				valueInputOption: "RAW",
+				requestBody: {
+					values: [rowData],
+				},
+			});
+			console.log("Row appended successfully:", appendResponse.data);
 		} else {
 			console.log(
 				"fulfillOrder: Confirmation email already sent; skipping email send."
@@ -101,61 +156,6 @@ export async function POST(request: Request) {
 				);
 			}
 		}
-
-		// After inventory update, append a new row to the Google Sheet.
-
-		// FIX GOOGLE SHEET ROW DATA
-		const isoString = order.order_date;
-		const [orderDatePart, timePart] = isoString.split("T");
-		const orderTime = timePart.split(".")[0];
-		const fullDescription = orderItems
-			.map((item) => `${item.artist_names} - ${item.title}`)
-			.join("\n");
-		const contentfulIds = orderItems
-			.map(
-				(item) =>
-					`https://app.contentful.com/spaces/hvl6gmwk3ce2/entries/${item.vinyl_record_id}`
-			)
-			.join("\n");
-
-		const rowData = [
-			orderDatePart,
-			orderTime,
-			order.sumup_status,
-			order.customer_name,
-			order.customer_email,
-			order.address1,
-			order.address2,
-			order.address3,
-			order.city,
-			order.postcode,
-			fullDescription,
-			contentfulIds,
-			checkoutReference,
-		];
-
-		// Setup Google Sheets credentials.
-		const encoded = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_BASE64!;
-		const credentials = JSON.parse(
-			Buffer.from(encoded, "base64").toString("utf8")
-		);
-		const auth = new google.auth.GoogleAuth({
-			credentials,
-			scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-		});
-		const sheets = google.sheets({ version: "v4", auth });
-		const spreadsheetId = process.env.ORDER_SPREADSHEET_ID;
-
-		// Append a new row to the spreadsheet.
-		const appendResponse = await sheets.spreadsheets.values.append({
-			spreadsheetId,
-			range: "Sheet1!A1",
-			valueInputOption: "RAW",
-			requestBody: {
-				values: [rowData],
-			},
-		});
-		console.log("Row appended successfully:", appendResponse.data);
 
 		console.log("fulfillOrder: Order fulfillment complete");
 		return NextResponse.json(
