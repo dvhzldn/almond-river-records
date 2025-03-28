@@ -11,6 +11,7 @@ import { useBasket } from "@/app/api/context/BasketContext";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
+import TrackRecordView from "./TrackRecordView";
 
 interface ModalProps {
 	record: {
@@ -23,6 +24,7 @@ interface ModalProps {
 		coverImageUrl?: string;
 		otherImages?: string[];
 		releaseYear?: number | null;
+		genre?: string[] | string;
 		id: string;
 	};
 	onClose: () => void;
@@ -40,7 +42,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const router = useRouter();
 
-	// This check should update when the basket context updates.
 	const isInBasket = basket.some((item) => item.id === record.id);
 
 	const onBuy = () => {
@@ -77,6 +78,17 @@ export default function Modal({ record, onClose }: ModalProps) {
 	return (
 		<div className="backdrop" onClick={onClose}>
 			<div className="modalContent" onClick={(e) => e.stopPropagation()}>
+				<TrackRecordView
+					recordId={record.id}
+					title={record.title}
+					artistName={record.artistName.join(", ")}
+					price={record.price}
+					genre={
+						Array.isArray(record.genre)
+							? record.genre.join(", ")
+							: record.genre
+					}
+				/>
 				<button className="closeButton" onClick={onClose}>
 					×
 				</button>

@@ -2,6 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import ClearBasketOnSuccess from "@/components/ClearBasketOnSuccess";
+import TrackPurchaseComplete from "@/components/TrackPurchaseComplete";
+import TrackPurchaseFailed from "@/components/TrackPurchaseFailed";
+import TrackPurchasePending from "@/components/TrackPurchasePending";
 
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -116,7 +119,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	console.log("Fetched checkout status:", checkoutStatus);
 
 	// --- Step 2: Render fallback messages based on checkoutStatus ---
-	if (checkoutStatus === "PENDING") {
+	if (checkoutStatus === "PENDING" && <TrackPurchasePending />) {
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Pending</h1>
@@ -126,7 +129,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 				</div>
 			</div>
 		);
-	} else if (checkoutStatus === "FAILED") {
+	} else if (checkoutStatus === "FAILED" && <TrackPurchaseFailed />) {
 		return (
 			<div className="page-container">
 				<h1 className="page-title">Payment Error</h1>
@@ -178,6 +181,11 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		return (
 			<>
 				<ClearBasketOnSuccess checkoutStatus={checkoutStatus} />
+
+				<TrackPurchaseComplete
+					orderId={order.id}
+					amount={order.sumup_amount}
+				/>
 
 				<div className="page-container">
 					<h1 className="page-title">Order complete</h1>

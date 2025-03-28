@@ -10,8 +10,10 @@ import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 export default function RecordsPage() {
+	const { track } = useAnalytics();
 	const [searchInput, setSearchInput] = useState("");
 	const [search, setSearch] = useState("");
 	const [condition, setCondition] = useState("");
@@ -85,6 +87,10 @@ export default function RecordsPage() {
 						onChange={(e) => {
 							setArtist(e.target.value);
 							setPage(1);
+							track("filter-applied", {
+								filter: "artist",
+								value: e.target.value,
+							});
 						}}
 					>
 						<option value="">All Artists</option>
@@ -99,6 +105,10 @@ export default function RecordsPage() {
 						onChange={(e) => {
 							setGenre(e.target.value);
 							setPage(1);
+							track("filter-applied", {
+								filter: "genre",
+								value: e.target.value,
+							});
 						}}
 					>
 						<option value="">All Genres</option>
@@ -113,6 +123,10 @@ export default function RecordsPage() {
 						onChange={(e) => {
 							setDecade(e.target.value);
 							setPage(1);
+							track("filter-applied", {
+								filter: "decade",
+								value: e.target.value,
+							});
 						}}
 					>
 						<option value="">All Decades</option>
@@ -130,6 +144,10 @@ export default function RecordsPage() {
 						onChange={(e) => {
 							setCondition(e.target.value);
 							setPage(1);
+							track("filter-applied", {
+								filter: "condition",
+								value: e.target.value,
+							});
 						}}
 					>
 						<option value="">All Conditions</option>
@@ -148,6 +166,9 @@ export default function RecordsPage() {
 							if (e.key === "Enter") {
 								setSearch(searchInput);
 								setPage(1);
+								if (searchInput.trim()) {
+									track("record-search", { term: searchInput.trim() });
+								}
 							}
 						}}
 					/>
@@ -155,6 +176,7 @@ export default function RecordsPage() {
 						onClick={() => {
 							setSearch(searchInput);
 							setPage(1);
+							track("record-search", { term: searchInput.trim() });
 						}}
 					>
 						Search
