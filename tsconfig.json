@@ -39,5 +39,5 @@
 		"getContentfulEnvironment.cjs",
 		"bulkUpdate.js"
 	],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules", "supabase"]
 }

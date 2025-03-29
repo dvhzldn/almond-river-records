@@ -13,6 +13,7 @@ interface OrderItem {
 }
 
 interface Order {
+	id: string;
 	customer_name: string;
 	customer_email: string;
 	address1: string;
@@ -22,6 +23,10 @@ interface Order {
 	postcode: string;
 	order_date: string;
 	sumup_status: string;
+	sumup_checkout_reference: string;
+	sumup_id: string;
+	sumup_amount: number;
+	order_confirmation_email_sent: boolean;
 	order_items: OrderItem[];
 }
 
