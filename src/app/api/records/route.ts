@@ -13,13 +13,16 @@ type VinylRecord = {
 	release_year: number;
 	genre: string[];
 	cover_image_url: string;
-	other_images: string[]; // Contentful asset IDs
+	other_images: string[];
 };
 
 export async function GET(request: Request) {
 	try {
 		const { searchParams } = new URL(request.url);
-		const getParam = (key: string) => searchParams.get(key) || "";
+		const getParam = (key: string): string | undefined => {
+			const value = searchParams.get(key);
+			return value?.trim() || undefined;
+		};
 
 		const newThisWeek = getParam("newThisWeek");
 		const searchQuery = getParam("search");
@@ -35,19 +38,19 @@ export async function GET(request: Request) {
 			.from("vinyl_records")
 			.select(
 				`
-        id,
-        title,
-        artist_names,
-        artist_names_text,
-        price,
-        vinyl_condition,
-        sleeve_condition,
-        label,
-        release_year,
-        genre,
-        cover_image_url,
-        other_images
-      `,
+				id,
+				title,
+				artist_names,
+				artist_names_text,
+				price,
+				vinyl_condition,
+				sleeve_condition,
+				label,
+				release_year,
+				genre,
+				cover_image_url,
+				other_images
+			`,
 				{ count: "exact" }
 			)
 			.eq("in_stock", true)
@@ -56,7 +59,7 @@ export async function GET(request: Request) {
 			.order("created_at", { ascending: false })
 			.range(skip, skip + limit - 1);
 
-		if (newThisWeek) {
+		if (newThisWeek === "true") {
 			const sevenDaysAgo = new Date();
 			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 			query = query.gte("created_at", sevenDaysAgo.toISOString());
@@ -92,7 +95,7 @@ export async function GET(request: Request) {
 		const { data, error, count } = await query;
 
 		if (error || !data) {
-			console.error("Supabase query error:", error);
+			console.error("❌ Supabase query error:", error);
 			return NextResponse.json(
 				{ error: "Failed to fetch records", details: error?.message },
 				{ status: 500 }
@@ -122,7 +125,7 @@ export async function GET(request: Request) {
 			}
 		);
 	} catch (err) {
-		console.error("Error in /api/records route:", err);
+		console.error("❌ Error in /api/records route:", err);
 		return NextResponse.json(
 			{ error: "Failed to fetch records" },
 			{ status: 500 }
