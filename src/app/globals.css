@@ -1322,7 +1322,8 @@ hr {
 	}
 
 	.record-actions .basket-button,
-	.record-actions .buy-button {
+	.record-actions .buy-button,
+	.record-actions .remove-button-grid {
 		font-size: 9px;
 		width: 50px;
 	}
@@ -1365,6 +1366,19 @@ hr {
 	.filter-menu .filter-toggle {
 		display: block;
 		margin: 0.5rem auto;
+	}
+
+	/* Filter Menu*/
+	.filter-menu {
+		margin-bottom: 0;
+	}
+
+	.pagination {
+		margin-top: 1rem;
+	}
+
+	.page-title {
+		margin: 0;
 	}
 	.filter-controls {
 		display: none;
