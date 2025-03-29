@@ -1,7 +1,7 @@
-// supabase/functions/check_pending_orders.ts
+// supabase/functions/check_pending_orders/index.ts
 
-import { createClient } from "@supabase/supabase-js";
-import { logOrderEvent } from "@/lib/logOrderEvent";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.5?dts";
+import { logOrderEvent } from "./logOrderEvent.ts";
 
 interface ScheduledOrder {
 	id: string;
@@ -17,14 +17,14 @@ interface SumUpCheckoutResponse {
 }
 
 const supabase = createClient(
-	process.env.SUPABASE_URL!,
-	process.env.SUPABASE_SERVICE_ROLE_KEY!
+	Deno.env.get("SUPABASE_URL")!,
+	Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
 const MAX_RETRIES = 5;
 const BACKOFF_MINUTES = 10;
 
-export default async function handler() {
+export default async function handler(_req: Request): Promise<Response> {
 	const now = new Date();
 	const backoffCutoff = new Date(
 		now.getTime() - BACKOFF_MINUTES * 60 * 1000
@@ -39,14 +39,11 @@ export default async function handler() {
 		.lt("fulfillment_retry_attempts", MAX_RETRIES)
 		.or(
 			`last_fulfillment_attempt_at.is.null,last_fulfillment_attempt_at.lt.${backoffCutoff}`
-		)) as {
-		data: ScheduledOrder[] | null;
-		error: Error | null;
-	};
+		)) as { data: ScheduledOrder[] | null; error: Error | null };
 
 	if (error) {
 		console.error("Scheduled check error:", error);
-		return;
+		return new Response("Error during scheduled check", { status: 500 });
 	}
 
 	for (const order of orders ?? []) {
@@ -57,7 +54,7 @@ export default async function handler() {
 				`https://api.sumup.com/v0.1/checkouts/${order.sumup_id}`,
 				{
 					headers: {
-						Authorization: `Bearer ${process.env.SUMUP_DEVELOPMENT_API_KEY}`,
+						Authorization: `Bearer ${Deno.env.get("SUMUP_DEVELOPMENT_API_KEY")}`,
 					},
 				}
 			);
@@ -94,7 +91,7 @@ export default async function handler() {
 
 			// Trigger fulfillment
 			const fulfillRes = await fetch(
-				`${process.env.NEXT_PUBLIC_BASE_URL}/api/fulfillOrder`,
+				`${Deno.env.get("NEXT_PUBLIC_BASE_URL")}/api/fulfillOrder`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -123,6 +120,7 @@ export default async function handler() {
 		} catch (err) {
 			const errorMessage =
 				err instanceof Error ? err.message : "Unknown error occurred";
+
 			console.error("Retry error:", checkoutId, errorMessage);
 
 			await logOrderEvent({
@@ -140,4 +138,6 @@ export default async function handler() {
 				.eq("id", order.id);
 		}
 	}
+
+	return new Response("Scheduled function executed", { status: 200 });
 }

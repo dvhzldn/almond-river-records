@@ -134,12 +134,36 @@ export async function runFulfillment(checkoutReference: string): Promise<void> {
 	const sheets = google.sheets({ version: "v4", auth });
 	const spreadsheetId = process.env.ORDER_SPREADSHEET_ID!;
 
-	await sheets.spreadsheets.values.append({
+	const sheetRange = "Sheet1!A1:Z1000";
+
+	// Fetch existing rows
+	const existingRowsRes = await sheets.spreadsheets.values.get({
 		spreadsheetId,
-		range: "Sheet1!A1",
-		valueInputOption: "RAW",
-		requestBody: { values: [rowData] },
+		range: sheetRange,
 	});
+
+	const existingRows = existingRowsRes.data.values || [];
+	const checkoutColumnIndex = 13; // column M = 13th index (0-based)
+
+	// Check if this checkoutReference already exists in that column
+	const alreadyLogged = existingRows.some(
+		(row) => row[checkoutColumnIndex] === checkoutReference
+	);
+
+	if (!alreadyLogged) {
+		await sheets.spreadsheets.values.append({
+			spreadsheetId,
+			range: "Sheet1!A1",
+			valueInputOption: "RAW",
+			requestBody: {
+				values: [rowData],
+			},
+		});
+
+		console.log("Google Sheets: Row appended.");
+	} else {
+		console.log("Google Sheets: Row already exists, skipping append.");
+	}
 
 	// Fallback email send if not already sent
 	if (!order.order_confirmation_email_sent) {
