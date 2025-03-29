@@ -1,0 +1,7 @@
+supabase/
+*.log
+*.env
+.env.local
+.env.*.backup
+node_modules/
+.vscode/
