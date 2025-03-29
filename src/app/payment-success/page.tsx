@@ -39,9 +39,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 					<h4>Error: missing checkout reference.</h4>
 					<p>Something went wrong and your order has not been placed.</p>
 					<p>
-						If you require further assistance, please contact{" "}
+						If you require further assistance, please{" "}
 						<Link href="/contact" className="hyperLink">
-							support
+							send us a message
 						</Link>
 						.
 					</p>
@@ -70,7 +70,13 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			<div className="page-container">
 				<h1 className="page-title">Payment Error</h1>
 				<div className="content-box">
-					<p>Could not retrieve your order. Please contact support.</p>
+					<p>
+						Please{" "}
+						<Link href="/contact" className="hyperLink">
+							send us a message
+						</Link>{" "}
+						if this issue persists.
+					</p>
 				</div>
 			</div>
 		);
@@ -151,7 +157,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 							height={200}
 							priority
 						/>
-						<p>Order reference: {order.sumup_id}</p>
+						<p>Order reference: {order.sumup_checkout_reference}</p>
 					</div>
 				</div>
 			</>
@@ -165,9 +171,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 			<div className="content-box">
 				<p>We were unable to confirm your payment.</p>
 				<p>
-					Please contact{" "}
+					Please{" "}
 					<Link href="/contact" className="hyperLink">
-						support
+						send us a message
 					</Link>{" "}
 					if this issue persists.
 				</p>
