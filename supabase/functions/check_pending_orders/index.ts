@@ -23,7 +23,7 @@ const supabase = createClient(
 
 const MAX_RETRIES = 5;
 const BACKOFF_MINUTES = 10;
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default async function handler(_req: Request): Promise<Response> {
 	const now = new Date();
 	const backoffCutoff = new Date(
