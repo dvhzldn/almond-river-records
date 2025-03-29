@@ -236,7 +236,9 @@ export default function RecordsPage() {
 												? record.artistName.join(", ")
 												: record.artistName}
 										</h4>
-										<p>Condition: {record.vinylCondition}</p>
+										<p className="condition">
+											Condition: {record.vinylCondition}
+										</p>
 										<div className="record-actions">
 											{isInBasket ? (
 												<button
