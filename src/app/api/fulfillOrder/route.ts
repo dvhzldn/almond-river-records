@@ -3,6 +3,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
 import { contentfulManagementClient } from "@/lib/contentfulManagementClient";
 import { logOrderEvent } from "@/lib/logOrderEvent";
+import { sendOrderConfirmation } from "@/lib/sendOrderConfirmation";
 
 interface OrderItem {
 	vinyl_record_id: string;
@@ -109,6 +110,8 @@ export async function POST(request: Request) {
 		const orderData = await waitForPaidOrder(checkoutReference);
 		const order = orderData;
 		const orderItems = orderData.order_items;
+
+		await sendOrderConfirmation(supabaseService, order, orderItems);
 
 		// 🔁 Check if fulfillment already logged
 		const { data: recentLogs, error: logsError } = await supabaseService

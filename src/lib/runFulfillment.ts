@@ -4,6 +4,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { google } from "googleapis";
 import { contentfulManagementClient } from "@/lib/contentfulManagementClient";
 import { logOrderEvent } from "@/lib/logOrderEvent";
+import { sendOrderConfirmation } from "@/lib/sendOrderConfirmation";
 
 interface OrderItem {
 	vinyl_record_id: string;
@@ -85,6 +86,9 @@ export async function runFulfillment(checkoutReference: string): Promise<void> {
 		throw new Error("runFulfillment: Order is not marked as PAID");
 	}
 
+	// Send confirmation email
+	await sendOrderConfirmation(supabaseService, order, orderItems);
+
 	// Update inventory in Supabase + Contentful
 	for (const item of orderItems) {
 		await supabaseService
@@ -163,23 +167,6 @@ export async function runFulfillment(checkoutReference: string): Promise<void> {
 		console.log("Google Sheets: Row appended.");
 	} else {
 		console.log("Google Sheets: Row already exists, skipping append.");
-	}
-
-	// Fallback email send if not already sent
-	if (!order.order_confirmation_email_sent) {
-		await supabaseService
-			.from("orders")
-			.update({ order_confirmation_email_sent: true })
-			.eq("sumup_checkout_reference", checkoutReference);
-
-		const { sendOrderConfirmationEmail } = await import("@/lib/resendClient");
-		await sendOrderConfirmationEmail(order, orderItems);
-
-		await logOrderEvent({
-			event: "email-sent",
-			checkout_reference: checkoutReference,
-			message: "Order confirmation email sent via runFulfillment fallback.",
-		});
 	}
 
 	await logOrderEvent({

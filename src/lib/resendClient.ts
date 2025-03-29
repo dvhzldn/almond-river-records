@@ -50,16 +50,15 @@ export async function sendOrderConfirmationEmail(
 	const htmlContent = `
     <p>Hi ${order.customer_name},</p>
     <p>Thank you for your purchase!</p>
-    <br>
     <p>We will process your order promptly and dispatch within two working days.</p>
     <br>
 	<p>Order details:</p>
 	<ul>${itemsHtml}</ul>
-    <p>Total Amount: £${order.sumup_amount.toFixed(2)}</p>
+    <ul>Total amount paid: £${order.sumup_amount.toFixed(2)}</ul>
     <p>Shipping Address:</p>
-    <p>${shippingAddress}</p>
+    <ul>${shippingAddress}</ul>
 	<br>
-    <p>Your order reference is <strong>${order.sumup_checkout_reference}</strong>.</p>
+    <p>Order reference: <strong>${order.sumup_checkout_reference}</strong>.</p>
 	<br>
 	<p>Best wishes,</p>
 	<p>Almond River Records</p>
