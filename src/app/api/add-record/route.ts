@@ -34,6 +34,12 @@ export async function POST(req: NextRequest) {
 
 		const title = formData.get("title")?.toString() ?? "";
 		const artistName = getValues("artistName[]");
+		const displayArtist = artistName.join(", ");
+		const displayTitle = `${displayArtist} - ${title} (cover)`;
+		const normalizedFileName = `${displayTitle}.jpg`.replace(
+			/[/\\?%*:|"<>]/g,
+			""
+		);
 		const releaseYear = Number(formData.get("releaseYear"));
 		const genre = getValues("genre[]");
 		const label = formData.get("label")?.toString() ?? "";
@@ -63,12 +69,12 @@ export async function POST(req: NextRequest) {
 
 		const asset = await env.createAssetFromFiles({
 			fields: {
-				title: { "en-GB": title },
+				title: { "en-GB": displayTitle },
 				description: { "en-GB": "" },
 				file: {
 					"en-GB": {
 						contentType: coverImage.type || "image/jpeg",
-						fileName: coverImage.name,
+						fileName: normalizedFileName,
 						file: arrayBuffer,
 					},
 				},

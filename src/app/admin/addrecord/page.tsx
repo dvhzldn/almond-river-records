@@ -104,11 +104,11 @@ export default function AddRecordPage() {
 
 	return (
 		<div className="admin-form-container">
-			<h1 className="admin-form-title">Add New Vinyl Record</h1>
+			<h1 className="admin-form-title">Add New Record</h1>
 			<form onSubmit={handleSubmit} className="admin-form">
 				<input
 					name="title"
-					placeholder="Title"
+					placeholder="Title of release (e.g. Abbey Road)"
 					value={form.title}
 					onChange={handleChange}
 					required
@@ -120,7 +120,7 @@ export default function AddRecordPage() {
 						key={i}
 						value={artist}
 						onChange={(e) => handleArrayChange(e, "artistName", i)}
-						placeholder={`Artist ${i + 1}`}
+						placeholder={`Name of artist ${i + 1}`}
 						className="w-full border p-2"
 					/>
 				))}
@@ -168,17 +168,6 @@ export default function AddRecordPage() {
 				/>
 
 				<input
-					name="price"
-					type="number"
-					step="0.01"
-					placeholder="Price"
-					value={form.price}
-					onChange={handleChange}
-					required
-					className="w-full border p-2"
-				/>
-
-				<input
 					name="catalogueNumber"
 					placeholder="Catalogue Number"
 					value={form.catalogueNumber}
@@ -186,6 +175,17 @@ export default function AddRecordPage() {
 					className="w-full border p-2"
 				/>
 
+				<input
+					name="price"
+					type="number"
+					step="1"
+					placeholder="Price"
+					value={form.price}
+					onChange={handleChange}
+					required
+					className="w-full border p-2"
+				/>
+				<p>Vinyl Condition</p>
 				<select
 					name="vinylCondition"
 					value={form.vinylCondition}
@@ -196,6 +196,7 @@ export default function AddRecordPage() {
 						<option key={cond}>{cond}</option>
 					))}
 				</select>
+				<p>Record Sleeve Condition</p>
 
 				<select
 					name="sleeveCondition"
@@ -212,11 +213,11 @@ export default function AddRecordPage() {
 					name="description"
 					value={form.description}
 					onChange={handleChange}
-					placeholder="Description"
+					placeholder="Description of the release (used for Album Of The Week)"
 					className="w-full border p-2"
 					rows={4}
 				/>
-
+				<p>Attach a cover image</p>
 				<input
 					type="file"
 					accept="image/*"
