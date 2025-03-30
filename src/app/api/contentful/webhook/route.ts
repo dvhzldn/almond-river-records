@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 			title: f.title?.["en-GB"] ?? "",
 			sub_title: f.subTitle?.["en-GB"] ?? null,
 			artist_names: f.artistName?.["en-GB"] ?? [],
-			artist_names_text: (f.artistName?.["en-GB"] ?? []).join(", "),
+			artist_names_text: (f.artistName?.["en-GB"] ?? []).join(" & "),
 			price: f.price?.["en-GB"] ?? 0,
 			vinyl_condition: f.vinylCondition?.["en-GB"] ?? "Unknown",
 			sleeve_condition: f.sleeveCondition?.["en-GB"] ?? "Unknown",
