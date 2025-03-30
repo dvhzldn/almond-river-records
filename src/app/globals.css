@@ -299,6 +299,16 @@ img.logo-home:hover {
 	border: 0 !important;
 }
 
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 3px solid var(--colour-2);
+	outline-offset: 2px;
+	border-radius: var(--border-radius);
+}
+
 /* Footer */
 .footer {
 	background: var(--colour-4);
@@ -326,7 +336,7 @@ img.logo-home:hover {
 }
 
 .footer-icon {
-	font-size: 0.2rem; /* Adjust as needed */
+	font-size: 0.2rem;
 	vertical-align: middle;
 	margin-right: 0.5rem;
 }
@@ -334,6 +344,10 @@ img.logo-home:hover {
 .footer-icon a svg {
 	width: 1rem;
 	height: 1rem;
+}
+
+.footer-contact span {
+	font-style: normal;
 }
 
 /* Social Links */
@@ -923,12 +937,14 @@ fieldset div {
 }
 
 .remove-button-grid:hover {
-	color: white;
+	color: var(--colour-7);
 }
 
 .pagination button:disabled {
 	opacity: 0.8;
 	cursor: not-allowed;
+	background: var(--colour-4);
+	border: 1px solid var(--colour-1);
 }
 
 /* Basket Page */

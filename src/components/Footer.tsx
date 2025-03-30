@@ -15,7 +15,7 @@ export default function Footer() {
 					itemScope
 					itemType="https://schema.org/Organization"
 				>
-					<ul>
+					<ul className="footer-contact">
 						<li>
 							<a
 								href="mailto:almondriverrecords@gmail.com"
