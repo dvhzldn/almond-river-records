@@ -25,6 +25,7 @@ interface UseRecordsParams {
 	decade?: string;
 	page?: number;
 	pageSize?: number;
+	sort?: string;
 }
 
 export function useRecords({
@@ -37,6 +38,7 @@ export function useRecords({
 	genre = "",
 	page = 1,
 	pageSize = 12,
+	sort = "recent",
 }: UseRecordsParams) {
 	const [records, setRecords] = useState<VinylRecord[]>([]);
 	const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -55,6 +57,7 @@ export function useRecords({
 		if (genre) params.append("genre", genre);
 		params.append("limit", pageSize.toString());
 		params.append("skip", ((page - 1) * pageSize).toString());
+		if (sort) params.append("sort", sort);
 
 		try {
 			const res = await fetch(`/api/records?${params.toString()}`);
@@ -80,6 +83,7 @@ export function useRecords({
 		genre,
 		page,
 		pageSize,
+		sort,
 	]);
 
 	useEffect(() => {

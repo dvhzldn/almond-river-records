@@ -27,6 +27,8 @@ export default function RecordsPage() {
 	);
 	const pageSize = 24;
 
+	const [sort, setSort] = useState("recent");
+
 	const { artistOptions, genreOptions } = useSupabaseOptions();
 	const { records, totalRecords, loading } = useRecords({
 		search,
@@ -36,6 +38,7 @@ export default function RecordsPage() {
 		genre,
 		page,
 		pageSize,
+		sort,
 	});
 
 	const { handleAddToBasket } = useAddToBasketWithTracking();
@@ -70,6 +73,20 @@ export default function RecordsPage() {
 					{filtersOpen ? "Close Filters" : "Show Filters"}
 				</button>
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
+					<select
+						value={sort}
+						aria-label="Sort records"
+						onChange={(e) => {
+							setSort(e.target.value);
+							setPage(1);
+							track("sort-changed", {
+								sortOption: e.target.value,
+							});
+						}}
+					>
+						<option value="recent">Recently Added</option>
+						<option value="artist">Artist Name (A-Z)</option>
+					</select>
 					<select
 						value={artist}
 						aria-label="Filter by artist"

@@ -34,6 +34,8 @@ export async function GET(request: Request) {
 		const limit = Number(getParam("limit")) || 24;
 		const skip = Number(getParam("skip")) || 0;
 
+		const sort = getParam("sort") || "recent";
+
 		let query = supabase
 			.from("vinyl_records")
 			.select(
@@ -55,9 +57,15 @@ export async function GET(request: Request) {
 			)
 			.eq("in_stock", true)
 			.eq("sold", false)
-			.gt("quantity", 0)
-			.order("created_at", { ascending: false })
-			.range(skip, skip + limit - 1);
+			.gt("quantity", 0);
+
+		if (sort === "artist") {
+			query = query.order("artist_names", { ascending: true });
+		} else if (sort === "recent") {
+			query = query.order("created_at", { ascending: false });
+		}
+
+		query = query.range(skip, skip + limit - 1);
 
 		if (newThisWeek === "true") {
 			const sevenDaysAgo = new Date();
