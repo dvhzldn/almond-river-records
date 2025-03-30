@@ -227,7 +227,8 @@ export default function AddRecordPage() {
 				/>
 				<p>Attach a cover image</p>
 				<input
-					type={fileInputRef}
+					ref={fileInputRef}
+					type="file"
 					accept="image/*"
 					capture="environment"
 					onChange={handleFileChange}
@@ -244,6 +245,7 @@ export default function AddRecordPage() {
 								maxWidth: "100%",
 								borderRadius: "8px",
 								marginBottom: "0.5rem",
+								height: "auto",
 							}}
 						/>
 						<button
