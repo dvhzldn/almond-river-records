@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import { useRef } from "react";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -37,6 +38,7 @@ export default function AddRecordPage() {
 	const [submitting, setSubmitting] = useState(false);
 
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
+	const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 	const handleChange = (
 		e: React.ChangeEvent<
@@ -225,7 +227,7 @@ export default function AddRecordPage() {
 				/>
 				<p>Attach a cover image</p>
 				<input
-					type="file"
+					type={fileInputRef}
 					accept="image/*"
 					capture="environment"
 					onChange={handleFileChange}
@@ -234,15 +236,29 @@ export default function AddRecordPage() {
 				/>
 
 				{imagePreview && (
-					<Image
-						src={imagePreview}
-						alt="Cover preview"
-						style={{
-							maxWidth: "100%",
-							marginTop: "1rem",
-							borderRadius: "8px",
-						}}
-					/>
+					<div style={{ marginTop: "1rem" }}>
+						<Image
+							src={imagePreview}
+							alt="Cover preview"
+							style={{
+								maxWidth: "100%",
+								borderRadius: "8px",
+								marginBottom: "0.5rem",
+							}}
+						/>
+						<button
+							type="button"
+							onClick={() => {
+								setForm((prev) => ({ ...prev, coverImage: undefined }));
+								setImagePreview(null);
+								if (fileInputRef.current)
+									fileInputRef.current.value = "";
+							}}
+							className="clear-button"
+						>
+							Remove Image
+						</button>
+					</div>
 				)}
 
 				<button type="submit" disabled={submitting}>
