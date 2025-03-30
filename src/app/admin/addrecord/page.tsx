@@ -47,11 +47,13 @@ export default function AddRecordPage() {
 		maxHeight: number
 	): Promise<Blob> => {
 		return new Promise((resolve, reject) => {
-			const img = new Image();
+			const img = new Image(); // No 'new' needed here
 			const reader = new FileReader();
+
 			reader.onload = () => {
 				img.src = reader.result as string;
 			};
+
 			reader.onerror = reject;
 			reader.readAsDataURL(file);
 
