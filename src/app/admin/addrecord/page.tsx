@@ -45,9 +45,9 @@ export default function AddRecordPage() {
 		file: File,
 		maxWidth: number,
 		maxHeight: number
-	): Promise<Blob> => {
+	): Promise<File> => {
 		return new Promise((resolve, reject) => {
-			const img = new Image(); // No 'new' needed here
+			const img = document.createElement("img"); // Create an HTML <img> element
 			const reader = new FileReader();
 
 			reader.onload = () => {
@@ -103,7 +103,24 @@ export default function AddRecordPage() {
 				);
 
 				// Convert the canvas to a Blob
-				croppedCanvas.toBlob(resolve, "image/jpeg", 0.8);
+				croppedCanvas.toBlob(
+					(blob) => {
+						if (blob) {
+							// Convert Blob to File (you'll need to provide a name and lastModified)
+							const fileName = file.name || "image.jpg"; // Default file name if not provided
+							const fileObj = new File([blob], fileName, {
+								type: "image/jpeg",
+								lastModified: Date.now(),
+							});
+
+							resolve(fileObj); // Resolve with the File object
+						} else {
+							reject(new Error("Failed to convert canvas to Blob"));
+						}
+					},
+					"image/jpeg",
+					0.8
+				);
 			};
 		});
 	};
