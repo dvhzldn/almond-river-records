@@ -1,4 +1,3 @@
-"use client";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -13,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 import TrackRecordView from "./TrackRecordView";
+import { useEffect, useRef } from "react";
 
 interface ModalProps {
 	record: {
@@ -34,17 +34,15 @@ interface ModalProps {
 export default function Modal({ record, onClose }: ModalProps) {
 	const images: string[] = [];
 	if (record.coverImageUrl) images.push(record.coverImageUrl);
-	if (record.otherImages && record.otherImages.length > 0) {
-		images.push(...record.otherImages);
-	}
+	if (record.otherImages?.length) images.push(...record.otherImages);
 
 	const { basket } = useBasket();
 	const { handleAddToBasket } = useAddToBasketWithTracking();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
+	const { handleBuyNow } = useBuyNow();
 	const router = useRouter();
 
 	const isInBasket = basket.some((item) => item.id === record.id);
-	const { handleBuyNow } = useBuyNow();
 
 	const onBuy = () => {
 		if (!isInBasket) {
@@ -77,9 +75,43 @@ export default function Modal({ record, onClose }: ModalProps) {
 		handleRemoveFromBasket(record.id, onClose);
 	};
 
+	// 🔒 Focus trap setup
+	const modalRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		const previouslyFocused = document.activeElement as HTMLElement;
+		modalRef.current?.focus();
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				onClose();
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => {
+			document.removeEventListener("keydown", handleKeyDown);
+			previouslyFocused?.focus();
+		};
+	}, [onClose]);
+
 	return (
-		<div className="backdrop" onClick={onClose}>
-			<div className="modalContent" onClick={(e) => e.stopPropagation()}>
+		<div
+			className="backdrop"
+			role="presentation"
+			aria-hidden="true"
+			onClick={onClose}
+			tabIndex={-1}
+		>
+			<div
+				className="modalContent"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="modal-title"
+				aria-describedby="modal-description"
+				tabIndex={-1}
+				ref={modalRef}
+				onClick={(e) => e.stopPropagation()}
+			>
 				<TrackRecordView
 					recordId={record.id}
 					title={record.title}
@@ -91,10 +123,16 @@ export default function Modal({ record, onClose }: ModalProps) {
 							: record.genre
 					}
 				/>
-				<button className="closeButton" onClick={onClose}>
+
+				<button
+					className="closeButton"
+					onClick={onClose}
+					aria-label="Close modal"
+				>
 					×
 				</button>
-				<h2>{record.title}</h2>
+
+				<h2 id="modal-title">{record.title}</h2>
 				<h3>{record.artistName.join(", ")}</h3>
 				<h3>
 					Price: <strong>£{record.price}</strong>
@@ -122,28 +160,28 @@ export default function Modal({ record, onClose }: ModalProps) {
 						))}
 					</Swiper>
 				)}
-				<div className="modal-image-container">
+
+				<div className="modal-image-container" id="modal-description">
 					<button
 						className="buy-button modal-above-image modal-top-left"
 						onClick={onBuy}
 					>
 						Buy
 					</button>
+
 					{isInBasket ? (
 						<button
 							className="remove-button modal-above-image modal-top-right"
 							onClick={onRemoveFromBasket}
 						>
-							{`Remove    `}
-							<FontAwesomeIcon icon={faShoppingBasket} />
+							Remove <FontAwesomeIcon icon={faShoppingBasket} />
 						</button>
 					) : (
 						<button
 							className="basket-button modal-above-image modal-top-right"
 							onClick={onAddToBasket}
 						>
-							Add{"  "}
-							<FontAwesomeIcon icon={faShoppingBasket} />
+							Add <FontAwesomeIcon icon={faShoppingBasket} />
 						</button>
 					)}
 
@@ -161,6 +199,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 					</p>
 				</div>
 			</div>
+			<div
+				tabIndex={0}
+				aria-hidden="true"
+				onFocus={() => modalRef.current?.focus()}
+			/>
 		</div>
 	);
 }

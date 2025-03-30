@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export interface OrderData {
 	name: string;
@@ -28,6 +28,14 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSubmit, loading, error }) => {
 		postcode: "",
 	});
 
+	const errorRef = useRef<HTMLParagraphElement>(null);
+
+	useEffect(() => {
+		if (error) {
+			errorRef.current?.focus();
+		}
+	}, [error]);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setOrderData({
 			...orderData,
@@ -41,85 +49,126 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSubmit, loading, error }) => {
 	};
 
 	return (
-		<div>
-			<form onSubmit={handleSubmit} className="order-form">
-				<h4>Contact:</h4>
+		<form
+			onSubmit={handleSubmit}
+			className="order-form"
+			aria-describedby={error ? "order-error" : undefined}
+		>
+			<fieldset>
+				<legend>Contact information:</legend>
+
 				<div>
-					<label>Name:</label>
+					<label htmlFor="name">Name:</label>
 					<input
-						type="text"
+						id="name"
 						name="name"
+						type="text"
+						autoComplete="name"
 						value={orderData.name}
 						onChange={handleChange}
 						required
 					/>
 				</div>
+
 				<div>
-					<label>Email Address:</label>
+					<label htmlFor="email">Email Address:</label>
 					<input
-						type="email"
+						id="email"
 						name="email"
+						type="email"
+						autoComplete="email"
 						value={orderData.email}
 						onChange={handleChange}
 						required
 					/>
 				</div>
-				<h4>Shipping:</h4>
+			</fieldset>
+
+			<fieldset>
+				<legend>Shipping information:</legend>
+
 				<div>
-					<label>Address 1:</label>
+					<label htmlFor="address1">Address 1:</label>
 					<input
-						type="text"
+						id="address1"
 						name="address1"
+						type="text"
+						autoComplete="address-line1"
 						value={orderData.address1}
 						onChange={handleChange}
 						required
 					/>
 				</div>
+
 				<div>
-					<label>Address 2:</label>
+					<label htmlFor="address2">Address 2:</label>
 					<input
-						type="text"
+						id="address2"
 						name="address2"
+						type="text"
+						autoComplete="address-line2"
 						value={orderData.address2}
 						onChange={handleChange}
 					/>
 				</div>
+
 				<div>
-					<label>Address 3:</label>
+					<label htmlFor="address3">Address 3:</label>
 					<input
-						type="text"
+						id="address3"
 						name="address3"
+						type="text"
 						value={orderData.address3}
 						onChange={handleChange}
 					/>
 				</div>
+
 				<div>
-					<label>City/Town:</label>
+					<label htmlFor="city">City/Town:</label>
 					<input
-						type="text"
+						id="city"
 						name="city"
+						type="text"
+						autoComplete="address-level2"
 						value={orderData.city}
 						onChange={handleChange}
 						required
 					/>
 				</div>
+
 				<div>
-					<label>Postcode:</label>
+					<label htmlFor="postcode">Postcode:</label>
 					<input
-						type="text"
+						id="postcode"
 						name="postcode"
+						type="text"
+						autoComplete="postal-code"
 						value={orderData.postcode}
 						onChange={handleChange}
 						required
 					/>
 				</div>
-				{error && <p style={{ color: "red" }}>{error}</p>}
-				<br />
-				<button className="order-button" type="submit" disabled={loading}>
-					{loading ? "Submitting..." : "Go to payment"}
-				</button>
-			</form>
-		</div>
+			</fieldset>
+
+			{error && (
+				<p
+					ref={errorRef}
+					id="order-error"
+					role="alert"
+					aria-live="assertive"
+					tabIndex={-1}
+					style={{ color: "red" }}
+				>
+					{error}
+				</p>
+			)}
+
+			<br />
+
+			<button type="submit" className="order-button" disabled={loading}>
+				{loading ? "Submitting..." : "Go to payment"}
+			</button>
+		</form>
 	);
 };
 

@@ -18,13 +18,13 @@ export default function GoogleReviews() {
 			setReviews(parsedReviews);
 			setCurrentReview(
 				parsedReviews[Math.floor(Math.random() * parsedReviews.length)]
-			); // Set initial review
+			);
 		} else {
 			fetch("/api/reviews")
 				.then((res) => res.json())
 				.then((data) => {
 					setReviews(data);
-					setCurrentReview(data[Math.floor(Math.random() * data.length)]); // Set initial review
+					setCurrentReview(data[Math.floor(Math.random() * data.length)]);
 					sessionStorage.setItem("reviews", JSON.stringify(data));
 				})
 				.catch((error) => {
@@ -41,31 +41,44 @@ export default function GoogleReviews() {
 					do {
 						newReview =
 							reviews[Math.floor(Math.random() * reviews.length)];
-					} while (newReview === prevReview); // Ensure a different review is picked
+					} while (newReview === prevReview);
 					return newReview;
 				});
-			}, 60000); // Change review every 60 seconds
+			}, 60000);
 
 			return () => clearInterval(interval);
 		}
 	}, [reviews]);
 
-	if (!currentReview) return <p>Loading reviews...</p>;
+	if (!currentReview)
+		return <p aria-live="polite">Loading customer reviews...</p>;
 
-	const renderStars = (rating: number) => "⭐".repeat(rating);
+	const renderStars = (rating: number) => {
+		return (
+			<span
+				className="review-rating"
+				aria-label={`Rating: ${rating} out of 5 stars`}
+			>
+				{"⭐".repeat(rating)}
+			</span>
+		);
+	};
 
 	return (
-		<div>
-			{" "}
-			<h2>Customer feedback</h2>
-			<section className="reviews-section">
-				<div className="review-container">
+		<div
+			className="review-container"
+			aria-live="polite"
+			role="region"
+			aria-label="Customer review"
+		>
+			{currentReview.text ? (
+				<>
 					<p className="review-text">{currentReview.text}</p>
-					<span className="review-rating">
-						{renderStars(currentReview.rating)}
-					</span>
-				</div>
-			</section>
+					{renderStars(currentReview.rating)}
+				</>
+			) : (
+				<p>This review has no written content.</p>
+			)}
 		</div>
 	);
 }

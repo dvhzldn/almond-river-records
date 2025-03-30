@@ -24,42 +24,65 @@ export default async function Home() {
 	}
 
 	const data = await res.json();
+
 	return (
-		<div className="page-container">
+		<main className="page-container" role="main">
 			<h1 className="page-title">Almond River Records</h1>
+
 			<div className="content-box">
-				<div>
-					<Image
-						className="logo-home"
-						src="/images/almond-river-logo.jpg"
-						alt="Almond River Records logo"
-						width={300}
-						height={300}
-						priority
-					/>{" "}
-					<div className="view-all-records">
-						<Link href="/records">
-							<h2 className="view-all-records">Browse our records</h2>
-						</Link>
+				<section aria-labelledby="logo-browse-section">
+					<h2 id="logo-browse-section" className="sr-only">
+						Logo and browse link
+					</h2>
+
+					<div>
+						<Image
+							className="logo-home"
+							src="/images/almond-river-logo.jpg"
+							alt="Almond River Records logo"
+							width={300}
+							height={300}
+							priority
+						/>
 					</div>
-				</div>
+
+					<div className="view-all-records">
+						<h2>
+							<Link className="browse-hero" href="/records">
+								Browse Our Records
+							</Link>
+						</h2>
+					</div>
+				</section>
+
 				<hr />
-				<div>
+
+				<section aria-labelledby="new-this-week-heading">
+					<h2 id="new-this-week-heading">New Arrivals This Week</h2>
 					<NewThisWeek records={data.records} />
-				</div>
+				</section>
+
 				<hr />
-				<div>
+
+				<section aria-labelledby="album-of-the-week-heading">
+					<h2 id="album-of-the-week-heading">Album Of The Week</h2>
 					<AlbumOfTheWeek />
-				</div>
+				</section>
+
 				<hr />
-				<div>
+
+				<section aria-labelledby="spotify-heading">
+					<h2 id="spotify-heading">What We Are Listening To</h2>
 					<SpotifyPlaylist playlistId="2XPOAAUp0mNqNmz7gk2Kfx" />
-				</div>
+				</section>
+
 				<hr />
-				<div>
+
+				<section aria-labelledby="reviews-heading">
+					<h2 id="reviews-heading">Customer Reviews</h2>
 					<GoogleReviews />
-				</div>
+				</section>
 			</div>
-		</div>
+		</main>
 	);
 }

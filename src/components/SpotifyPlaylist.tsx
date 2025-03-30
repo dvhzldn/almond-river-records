@@ -7,7 +7,6 @@ type SpotifyPlaylistProps = {
 const SpotifyPlaylist: React.FC<SpotifyPlaylistProps> = ({ playlistId }) => {
 	return (
 		<div className="spotify-container">
-			<h2>What we are listening to</h2>
 			<iframe
 				src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}
 				width="100%"
@@ -16,7 +15,19 @@ const SpotifyPlaylist: React.FC<SpotifyPlaylistProps> = ({ playlistId }) => {
 				allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
 				loading="lazy"
 				className="spotify-iframe"
+				title="Spotify playlist player"
 			></iframe>
+			<p className="sr-only">
+				Embedded Spotify playlist. If the player does not load, you can{" "}
+				<a
+					href={`https://open.spotify.com/playlist/${playlistId}`}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					open it directly on Spotify
+				</a>
+				.
+			</p>
 		</div>
 	);
 };

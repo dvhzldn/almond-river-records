@@ -10,7 +10,7 @@ interface Album {
 	id: string;
 	title: string;
 	artist_names: string[];
-	cover_image_url?: string | null; // The cover image will be a URL string
+	cover_image_url?: string | null;
 	description?: Document | string;
 }
 
@@ -21,7 +21,6 @@ export default function AlbumOfTheWeek() {
 	useEffect(() => {
 		async function fetchAlbum() {
 			try {
-				// First, fetch the album data from vinyl_records
 				const { data, error } = await supabase
 					.from("vinyl_records")
 					.select(
@@ -39,13 +38,11 @@ export default function AlbumOfTheWeek() {
 
 				if (error) {
 					console.error("Error fetching vinyl record data:", error);
-					throw error; // Rethrow error for further handling
+					throw error;
 				}
 
 				if (data && data.length > 0) {
 					const albumData = data[0];
-
-					// Now, fetch the cover image based on the cover_image field
 					const { data: coverImageData, error: coverError } =
 						await supabase
 							.from("contentful_assets")
@@ -75,43 +72,39 @@ export default function AlbumOfTheWeek() {
 		fetchAlbum();
 	}, []);
 
-	if (loading) return <p>Loading Album of the Week...</p>;
+	if (loading) return <p aria-live="polite">Loading Album of the Week...</p>;
 	if (!album) return <p>No album available at this time.</p>;
 
 	return (
-		<section className="album-of-the-week">
-			<h2>Album of the Week</h2>
-			<div className="featured-record">
-				<div className="featured-record-details">
-					<h3>
-						{album.title} by {album.artist_names.join(", ")}
-					</h3>
-					<div>
-						{album.description ? (
-							typeof album.description === "object" ? (
-								documentToReactComponents(album.description as Document)
-							) : (
-								<p>{album.description}</p>
-							)
+		<div className="featured-record">
+			<div className="featured-record-details">
+				<h3>
+					{album.title} by {album.artist_names.join(", ")}
+				</h3>
+				<div>
+					{album.description ? (
+						typeof album.description === "object" ? (
+							documentToReactComponents(album.description as Document)
 						) : (
-							<p></p>
-						)}
-					</div>
-				</div>
-				<div className="record-image-container">
-					{album.cover_image_url ? (
-						<Image
-							src={album.cover_image_url}
-							alt={album.title}
-							className="featured-record-cover"
-							width={400}
-							height={400}
-						/>
-					) : (
-						<p>No cover image available.</p>
-					)}
+							<p>{album.description}</p>
+						)
+					) : null}
 				</div>
 			</div>
-		</section>
+
+			<div className="record-image-container">
+				{album.cover_image_url ? (
+					<Image
+						src={album.cover_image_url}
+						alt={`Album cover for ${album.title} by ${album.artist_names.join(", ")}`}
+						className="featured-record-cover"
+						width={400}
+						height={400}
+					/>
+				) : (
+					<p>No cover image available.</p>
+				)}
+			</div>
+		</div>
 	);
 }

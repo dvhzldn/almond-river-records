@@ -34,7 +34,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	if (!checkoutId) {
 		return (
 			<div className="page-container">
-				<h1 className="page-title">Order Incomplete</h1>
+				<h1 className="page-title" tabIndex={-1}>
+					Order Incomplete
+				</h1>
 				<div className="content-box">
 					<h4>Error: missing checkout reference.</h4>
 					<p>Something went wrong and your order has not been placed.</p>
@@ -68,7 +70,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	if (error || !order) {
 		return (
 			<div className="page-container">
-				<h1 className="page-title">Payment Error</h1>
+				<h1 className="page-title" tabIndex={-1}>
+					Payment Error
+				</h1>
 				<div className="content-box">
 					<p>
 						Please{" "}
@@ -139,7 +143,10 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		// 6. UI confirmation
 		return (
 			<>
-				<ClearBasketOnSuccess checkoutStatus={checkoutStatus} />
+				<ClearBasketOnSuccess
+					checkoutStatus={checkoutStatus}
+					tabIndex={-1}
+				/>
 				<TrackPurchaseComplete
 					orderId={order.id}
 					amount={order.sumup_amount}
@@ -152,7 +159,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						<hr />
 						<Image
 							src="/images/almond-river-logo.jpg"
-							alt="Logo"
+							alt="Almond River Records logo"
 							width={200}
 							height={200}
 							priority
@@ -167,7 +174,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	// 7. Unexpected state fallback
 	return (
 		<div className="page-container">
-			<h1 className="page-title">Payment Status Unknown</h1>
+			<h1 className="page-title" tabIndex={-1}>
+				Payment Status Unknown
+			</h1>
 			<div className="content-box">
 				<p>We were unable to confirm your payment.</p>
 				<p>

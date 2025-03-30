@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,29 +12,44 @@ import { useBasket } from "@/app/api/context/BasketContext";
 
 export default function Menu() {
 	const [hasMounted, setHasMounted] = useState(false);
-
 	const [isOpen, setIsOpen] = useState(false);
 	const { basket } = useBasket();
 	const basketCount = basket.length;
 	const pathname = usePathname();
 	const [animateBasket, setAnimateBasket] = useState(false);
 
-	const toggleMenu = () => setIsOpen(!isOpen);
+	const toggleMenu = () => setIsOpen((prev) => !prev);
 	const closeMenu = () => setIsOpen(false);
 
-	// Helper to determine if the link is active
-	const isActive = (path: string) => {
-		if (!pathname) return false;
-		if (path === "/") return pathname === "/";
-		return pathname.startsWith(path);
-	};
-	// Trigger basket animation when basketCount changes
+	const firstNavLinkRef = useRef<HTMLAnchorElement | null>(null);
+	const burgerButtonRef = useRef<HTMLButtonElement | null>(null);
+
+	// Focus management when menu opens
+	useEffect(() => {
+		if (isOpen && firstNavLinkRef.current) {
+			firstNavLinkRef.current.focus();
+		}
+		if (!isOpen && burgerButtonRef.current) {
+			burgerButtonRef.current.focus();
+		}
+	}, [isOpen]);
+
+	// Close menu on Escape key
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				closeMenu();
+			}
+		};
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, []);
+
+	// Trigger basket animation when count changes
 	useEffect(() => {
 		if (basketCount > 0) {
 			setAnimateBasket(true);
-			const timer = setTimeout(() => {
-				setAnimateBasket(false);
-			}, 500); // duration should match your CSS animation duration
+			const timer = setTimeout(() => setAnimateBasket(false), 500);
 			return () => clearTimeout(timer);
 		}
 	}, [basketCount]);
@@ -43,24 +58,32 @@ export default function Menu() {
 		setHasMounted(true);
 	}, []);
 
+	const isActive = (path: string): boolean => {
+		if (!pathname) return false;
+		return path === "/" ? pathname === "/" : pathname.startsWith(path);
+	};
+
 	if (!hasMounted) return null;
 
 	return (
-		<nav className="menu">
+		<nav className="menu" aria-label="Main site navigation">
 			<div className="menu-container">
-				{/* Burger Menu Button (Left) */}
-				<div className="burger" onClick={toggleMenu}>
-					{isOpen ? (
-						<FontAwesomeIcon icon={faTimes} />
-					) : (
-						<FontAwesomeIcon icon={faBars} />
-					)}
-				</div>
+				{/* Burger Menu Button */}
+				<button
+					type="button"
+					className="burger"
+					onClick={toggleMenu}
+					aria-expanded={isOpen}
+					aria-label={isOpen ? "Close menu" : "Open menu"}
+					ref={burgerButtonRef}
+				>
+					<FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
+				</button>
 
-				{/* Navigation Links (Centered) */}
+				{/* Navigation Links */}
 				<ul className={isOpen ? "nav-links open" : "nav-links"}>
 					<li className={isActive("/") ? "active" : ""}>
-						<Link href="/" onClick={closeMenu}>
+						<Link href="/" onClick={closeMenu} ref={firstNavLinkRef}>
 							Home
 						</Link>
 					</li>
@@ -69,16 +92,6 @@ export default function Menu() {
 							Records for Sale
 						</Link>
 					</li>
-					{/* <li className={isActive("/record-cleaning") ? "active" : ""}>
-            <Link href="/record-cleaning" onClick={closeMenu}>
-              Record Cleaning
-            </Link>
-          </li>
-          <li className={isActive("/gift-vouchers") ? "active" : ""}>
-            <Link href="/gift-vouchers" onClick={closeMenu}>
-              Gift Vouchers
-            </Link>
-          </li> */}
 					<li className={isActive("/about") ? "active" : ""}>
 						<Link href="/about" onClick={closeMenu}>
 							Visit The Shop
@@ -96,9 +109,13 @@ export default function Menu() {
 					</li>
 				</ul>
 
-				{/* Basket Icon (Right - Always Visible) */}
+				{/* Basket Icon */}
 				<div className={`basket-wrapper ${animateBasket ? "animate" : ""}`}>
-					<Link href="/basket" className="basket-link">
+					<Link
+						href="/basket"
+						className="basket-link"
+						aria-label={`Basket with ${basketCount} item${basketCount !== 1 ? "s" : ""}`}
+					>
 						<FontAwesomeIcon icon={faShoppingBasket} />
 						{basketCount > 0 && (
 							<span className="basket-count">{basketCount}</span>

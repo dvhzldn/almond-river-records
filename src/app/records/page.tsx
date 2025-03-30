@@ -72,6 +72,7 @@ export default function RecordsPage() {
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
 					<select
 						value={artist}
+						aria-label="Filter by artist"
 						onChange={(e) => {
 							setArtist(e.target.value);
 							setPage(1);
@@ -90,6 +91,7 @@ export default function RecordsPage() {
 					</select>
 					<select
 						value={genre}
+						aria-label="Filter by genre"
 						onChange={(e) => {
 							setGenre(e.target.value);
 							setPage(1);
@@ -108,6 +110,7 @@ export default function RecordsPage() {
 					</select>
 					<select
 						value={decade}
+						aria-label="Filter by decade"
 						onChange={(e) => {
 							setDecade(e.target.value);
 							setPage(1);
@@ -129,6 +132,7 @@ export default function RecordsPage() {
 					</select>
 					<select
 						value={condition}
+						aria-label="Filter by condition of record"
 						onChange={(e) => {
 							setCondition(e.target.value);
 							setPage(1);
@@ -148,6 +152,7 @@ export default function RecordsPage() {
 					<input
 						type="text"
 						placeholder="Search all records..."
+						aria-label="Do not apply any filters to results"
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
 						onKeyDown={(e) => {
@@ -196,7 +201,7 @@ export default function RecordsPage() {
 				) : records.length === 0 ? (
 					<p>No records found.</p>
 				) : (
-					<div className="records-grid">
+					<div className="records-grid" aria-live="polite">
 						{records.map((record) => {
 							const isInBasket = basket.some(
 								(item) => item.id === record.id
@@ -212,7 +217,7 @@ export default function RecordsPage() {
 											<Image
 												className="record-image"
 												src={record.coverImageUrl}
-												alt={record.title}
+												alt={`${record.title} by ${record.artistName.join(", ")}`}
 												width={250}
 												height={250}
 											/>
@@ -243,6 +248,7 @@ export default function RecordsPage() {
 											{isInBasket ? (
 												<button
 													className="remove-button-grid"
+													aria-label={`Remove ${record.title} by ${record.artistName} from your basket`}
 													onClick={(e) => {
 														e.stopPropagation();
 														handleRemoveFromBasket(record.id);
@@ -256,6 +262,7 @@ export default function RecordsPage() {
 											) : (
 												<button
 													className="basket-button"
+													aria-label={`Add ${record.title} by ${record.artistName} to your basket`}
 													onClick={(e) => {
 														e.stopPropagation();
 														handleAddToBasket({
@@ -275,6 +282,7 @@ export default function RecordsPage() {
 											)}
 											<button
 												className="buy-button"
+												aria-label={`Buy ${record.title} by ${record.artistName}`}
 												onClick={(e) => {
 													e.stopPropagation();
 													handleBuyNow({
@@ -297,7 +305,11 @@ export default function RecordsPage() {
 				)}
 			</div>
 			{totalPages > 1 && (
-				<div className="pagination">
+				<div
+					className="pagination"
+					role="navigation"
+					aria-label="Pagination"
+				>
 					<button onClick={prevPage} disabled={page === 1}>
 						Previous
 					</button>

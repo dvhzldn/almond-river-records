@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Modal from "@/components/Modal";
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -33,9 +33,19 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 		setSelectedRecord(record);
 	};
 
+	const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>, record: Record) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			handleRecordClick(record);
+		}
+	};
+
 	return (
-		<div>
-			<h2>New In The Shop This Week</h2>
+		<section aria-labelledby="new-this-week-carousel">
+			<h3 id="new-this-week-carousel" className="sr-only">
+				New This Week Record Carousel
+			</h3>
+
 			{records.length === 0 ? (
 				<p>No new records added this week.</p>
 			) : (
@@ -50,18 +60,23 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 						768: { slidesPerView: 3, spaceBetween: 20 },
 						1024: { slidesPerView: 4, spaceBetween: 30 },
 					}}
+					aria-label="New records carousel"
 				>
 					{records.map((record) => (
 						<SwiperSlide key={record.id}>
 							<div
 								className="record-card-slider"
 								onClick={() => handleRecordClick(record)}
+								onKeyDown={(e) => handleKeyDown(e, record)}
+								role="button"
+								tabIndex={0}
+								aria-label={`View details for ${record.title} by ${record.artistName.join(", ")}`}
 							>
 								{record.coverImageUrl && (
 									<Image
 										className="record-image"
 										src={record.coverImageUrl}
-										alt={`${record.title} cover`}
+										alt={`${record.title} by ${record.artistName.join(", ")} cover art`}
 										width={250}
 										height={250}
 									/>
@@ -76,12 +91,13 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 					))}
 				</Swiper>
 			)}
+
 			{selectedRecord && (
 				<Modal
 					record={selectedRecord}
 					onClose={() => setSelectedRecord(null)}
 				/>
 			)}
-		</div>
+		</section>
 	);
 }
