@@ -143,10 +143,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 		// 6. UI confirmation
 		return (
 			<>
-				<ClearBasketOnSuccess
-					checkoutStatus={checkoutStatus}
-					tabIndex={-1}
-				/>
+				<ClearBasketOnSuccess checkoutStatus={checkoutStatus} />
 				<TrackPurchaseComplete
 					orderId={order.id}
 					amount={order.sumup_amount}
