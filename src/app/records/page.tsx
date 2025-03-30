@@ -74,20 +74,6 @@ export default function RecordsPage() {
 				</button>
 				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
 					<select
-						value={sort}
-						aria-label="Sort records"
-						onChange={(e) => {
-							setSort(e.target.value);
-							setPage(1);
-							track("sort-changed", {
-								sortOption: e.target.value,
-							});
-						}}
-					>
-						<option value="recent">Recently Added</option>
-						<option value="artist">Artist Name (A-Z)</option>
-					</select>
-					<select
 						value={artist}
 						aria-label="Filter by artist"
 						onChange={(e) => {
@@ -192,6 +178,22 @@ export default function RecordsPage() {
 						Search
 					</button>
 				</div>
+				<h4>Sort results by:</h4>
+				<select
+					value={sort}
+					aria-label="Sort records"
+					onChange={(e) => {
+						setSort(e.target.value);
+						setPage(1);
+						track("sort-changed", {
+							sortOption: e.target.value,
+						});
+					}}
+				>
+					<option value="recent">Recently Added</option>
+					<option value="artist">Artist Name (A-Z)</option>
+				</select>
+
 				{/* Only show "Clear Filters" if at least one filter is applied */}
 				{filtersApplied && (
 					<div>
