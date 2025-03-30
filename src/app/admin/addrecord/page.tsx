@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -35,6 +36,8 @@ export default function AddRecordPage() {
 	const [status, setStatus] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 
+	const [imagePreview, setImagePreview] = useState<string | null>(null);
+
 	const handleChange = (
 		e: React.ChangeEvent<
 			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -46,7 +49,10 @@ export default function AddRecordPage() {
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
-		if (file) setForm((prev) => ({ ...prev, coverImage: file }));
+		if (file) {
+			setForm((prev) => ({ ...prev, coverImage: file }));
+			setImagePreview(URL.createObjectURL(file));
+		}
 	};
 
 	const handleArrayChange = (
@@ -221,10 +227,23 @@ export default function AddRecordPage() {
 				<input
 					type="file"
 					accept="image/*"
+					capture="environment"
 					onChange={handleFileChange}
 					className="w-full"
 					required
 				/>
+
+				{imagePreview && (
+					<Image
+						src={imagePreview}
+						alt="Cover preview"
+						style={{
+							maxWidth: "100%",
+							marginTop: "1rem",
+							borderRadius: "8px",
+						}}
+					/>
+				)}
 
 				<button type="submit" disabled={submitting}>
 					{submitting ? "Submitting..." : "Submit"}
