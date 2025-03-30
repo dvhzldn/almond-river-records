@@ -32,6 +32,49 @@ export async function POST(req: Request) {
 		const payload = await req.json();
 		const sys = payload.sys;
 
+		// ---- Handle Deleted Assets ----
+		if (sys?.type === "DeletedAsset") {
+			const assetId = sys.id;
+			const { error } = await supabase
+				.from("contentful_assets")
+				.delete()
+				.eq("id", assetId);
+
+			if (error) {
+				console.error("❌ Error deleting asset:", error);
+				return NextResponse.json(
+					{ error: "Error deleting asset" },
+					{ status: 500 }
+				);
+			}
+
+			console.log(`✅ Asset ${assetId} deleted from Supabase.`);
+			return NextResponse.json({ success: true }, { status: 200 });
+		}
+
+		// ---- Handle Deleted Vinyl Records ----
+		if (
+			sys?.type === "DeletedEntry" &&
+			sys?.contentType?.sys?.id === "vinylRecord"
+		) {
+			const recordId = sys.id;
+			const { error } = await supabase
+				.from("vinyl_records")
+				.delete()
+				.eq("id", recordId);
+
+			if (error) {
+				console.error("❌ Error deleting vinyl record:", error);
+				return NextResponse.json(
+					{ error: "Error deleting vinyl record" },
+					{ status: 500 }
+				);
+			}
+
+			console.log(`✅ Vinyl record ${recordId} deleted from Supabase.`);
+			return NextResponse.json({ success: true }, { status: 200 });
+		}
+
 		// ---- Handle Assets ----
 		if (sys?.type === "Asset") {
 			const id = sys.id;

@@ -40,6 +40,72 @@ export default function AddRecordPage() {
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+	// Function to resize and crop the image to 800x800 px
+	const resizeAndCropImage = (
+		file: File,
+		maxWidth: number,
+		maxHeight: number
+	): Promise<Blob> => {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			const reader = new FileReader();
+			reader.onload = () => {
+				img.src = reader.result as string;
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+
+			img.onload = () => {
+				// Resize logic: scale the image
+				const canvas = document.createElement("canvas");
+				const ctx = canvas.getContext("2d");
+
+				// Resize to fit within maxWidth and maxHeight, keeping aspect ratio
+				let width = img.width;
+				let height = img.height;
+
+				if (width > maxWidth || height > maxHeight) {
+					const scale = Math.min(maxWidth / width, maxHeight / height);
+					width = width * scale;
+					height = height * scale;
+				}
+
+				// Set canvas size to fit the resized image
+				canvas.width = width;
+				canvas.height = height;
+
+				// Draw the image onto the canvas
+				ctx?.drawImage(img, 0, 0, width, height);
+
+				// Crop the image to make it square (center crop)
+				const cropSize = Math.min(width, height);
+				const offsetX = (width - cropSize) / 2;
+				const offsetY = (height - cropSize) / 2;
+
+				const croppedCanvas = document.createElement("canvas");
+				const croppedCtx = croppedCanvas.getContext("2d");
+				croppedCanvas.width = cropSize;
+				croppedCanvas.height = cropSize;
+
+				// Draw the cropped part of the image onto the new canvas
+				croppedCtx?.drawImage(
+					canvas,
+					offsetX,
+					offsetY,
+					cropSize,
+					cropSize,
+					0,
+					0,
+					cropSize,
+					cropSize
+				);
+
+				// Convert the canvas to a Blob
+				croppedCanvas.toBlob(resolve, "image/jpeg", 0.8);
+			};
+		});
+	};
+
 	const handleChange = (
 		e: React.ChangeEvent<
 			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -49,11 +115,15 @@ export default function AddRecordPage() {
 		setForm((prev) => ({ ...prev, [name]: value }));
 	};
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
-			setForm((prev) => ({ ...prev, coverImage: file }));
-			setImagePreview(URL.createObjectURL(file));
+			// Resize and crop the image before setting it
+			const resizedBlob = await resizeAndCropImage(file, 800, 800);
+			const resizedUrl = URL.createObjectURL(resizedBlob);
+
+			setForm((prev) => ({ ...prev, coverImage: resizedBlob }));
+			setImagePreview(resizedUrl); // Set the preview to the resized and cropped image
 		}
 	};
 
@@ -241,6 +311,8 @@ export default function AddRecordPage() {
 						<Image
 							src={imagePreview}
 							alt="Cover preview"
+							width={400}
+							height={400}
 							style={{
 								maxWidth: "100%",
 								borderRadius: "8px",
