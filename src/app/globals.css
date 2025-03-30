@@ -1266,7 +1266,7 @@ hr {
 
 /* Responsive Adjustments */
 
-@media (max-inline-size: 1024px) {
+@media (max-width: 1024px) {
 	.two-column-layout,
 	.reverse {
 		grid-template-columns: 1fr; /* Single column layout */
@@ -1308,7 +1308,7 @@ hr {
 	}
 }
 
-@media (max-inline-size: 768px) {
+@media (max-width: 768px) {
 	.basket-two-column-layout {
 		grid-template-columns: 1fr; /* Single column layout */
 		text-align: center;
