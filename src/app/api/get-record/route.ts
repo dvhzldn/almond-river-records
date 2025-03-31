@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "contentful";
+import { Asset } from "contentful";
+
+type VinylRecordFields = {
+	title: string;
+	artistName: string[];
+	releaseYear: number;
+	genre: string[];
+	label: string;
+	price: number;
+	catalogueNumber: string;
+	vinylCondition: string;
+	sleeveCondition: string;
+	description: Document;
+	coverImage: Asset;
+};
 
 const client = createClient({
 	space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID!,
@@ -12,22 +27,25 @@ export async function GET(req: NextRequest) {
 
 	try {
 		const entry = await client.getEntry(id);
+		const fields = entry.fields as unknown as VinylRecordFields;
+		const coverImage = fields.coverImage as Asset;
+		const coverImageUrl = coverImage?.fields?.file?.url
+			? `https:${coverImage.fields.file.url}`
+			: undefined;
 
 		const record = {
 			id: entry.sys.id,
-			title: entry.fields.title as string,
-			artistName: entry.fields.artistName as string[],
-			releaseYear: entry.fields.releaseYear.toString(),
-			genre: entry.fields.genre as string[],
-			label: entry.fields.label as string,
-			price: entry.fields.price.toString(),
-			catalogueNumber: entry.fields.catalogueNumber as string,
-			vinylCondition: entry.fields.vinylCondition as string,
-			sleeveCondition: entry.fields.sleeveCondition as string,
-			description: entry.fields.description as string,
-			coverImageUrl: entry.fields.coverImage?.fields?.file?.url
-				? `https:${entry.fields.coverImage.fields.file.url}`
-				: undefined,
+			title: fields.title,
+			artistName: fields.artistName,
+			releaseYear: fields.releaseYear,
+			genre: fields.genre,
+			label: fields.label,
+			price: fields.price,
+			catalogueNumber: fields.catalogueNumber,
+			vinylCondition: fields.vinylCondition,
+			sleeveCondition: fields.sleeveCondition,
+			description: fields.description,
+			coverImageUrl,
 		};
 
 		return NextResponse.json(record);
