@@ -40,6 +40,7 @@ export async function GET() {
 				id: entry.sys.id,
 				title: fields.title,
 				artistName: fields.artistName,
+				price: fields.price,
 				coverImageUrl,
 			};
 		});

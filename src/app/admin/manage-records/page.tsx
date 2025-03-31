@@ -9,6 +9,7 @@ type VinylRecord = {
 	title: string;
 	artistName: string[];
 	coverImageUrl?: string;
+	price: number;
 };
 
 export default function ManageRecordsPage() {
@@ -66,12 +67,13 @@ export default function ManageRecordsPage() {
 								<th>Cover</th>
 								<th>Title</th>
 								<th>Artist(s)</th>
+								<th>Price</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							{records.map((record) => (
-								<tr key={record.id}>
+								<tr className="text" key={record.id}>
 									<td>
 										{record.coverImageUrl ? (
 											<Image
@@ -86,6 +88,7 @@ export default function ManageRecordsPage() {
 									</td>
 									<td>{record.title}</td>
 									<td>{record.artistName.join(", ")}</td>
+									<td>{record.price}</td>
 									<td>
 										<Link href={`/admin/editrecord/${record.id}`}>
 											Edit
