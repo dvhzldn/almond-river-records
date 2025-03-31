@@ -202,7 +202,7 @@ export default function AddRecordPage() {
 
 	return (
 		<div className="page-container">
-			<Link href="/admin/manage-records">← Back to Manage Records</Link>
+			<Link href="/admin/home">← Back to Admin</Link>
 			<div className="admin-form-container">
 				<h1 className="admin-form-title">Add New Record</h1>
 				<form onSubmit={handleSubmit} className="admin-form">
