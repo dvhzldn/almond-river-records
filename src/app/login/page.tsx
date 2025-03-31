@@ -39,7 +39,7 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="form">
+		<div className="page-container">
 			<h1 className="page-title">Admin</h1>
 			<form onSubmit={handleLogin} className="form">
 				<input

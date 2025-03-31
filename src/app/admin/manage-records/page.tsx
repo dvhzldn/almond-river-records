@@ -36,23 +36,24 @@ export default function ManageRecordsPage() {
 	}, []);
 
 	const handleArchive = async (id: string) => {
-		const confirmed = confirm("Archive this record?");
+		const confirmed = confirm("Delete this record?");
 		if (!confirmed) return;
 
 		try {
 			const res = await fetch(`/api/delete-record?id=${id}`, {
 				method: "DELETE",
 			});
-			if (!res.ok) throw new Error("Archive failed");
+			if (!res.ok) throw new Error("Deletion failed");
 			setRecords((prev) => prev.filter((r) => r.id !== id));
 		} catch (err) {
-			console.error("[Archive Error]", err);
-			alert("❌ Failed to archive record.");
+			console.error("[Deletion Error]", err);
+			alert("❌ Failed to delete record.");
 		}
 	};
 
 	return (
 		<div className="page-container">
+			<Link href="/admin">← Back to Admin</Link>
 			<h1>Manage Records</h1>
 			{loading && <p>Loading...</p>}
 			{error && <p className="text-red-600">{error}</p>}
@@ -64,16 +65,25 @@ export default function ManageRecordsPage() {
 					<table>
 						<thead>
 							<tr>
+								<th></th>
 								<th>Cover</th>
 								<th>Title</th>
 								<th>Artist(s)</th>
 								<th>Price</th>
-								<th>Actions</th>
+								<th></th>
 							</tr>
 						</thead>
 						<tbody>
 							{records.map((record) => (
 								<tr className="text" key={record.id}>
+									<td>
+										<Link
+											className="form-button"
+											href={`/admin/editrecord/${record.id}`}
+										>
+											Edit
+										</Link>
+									</td>
 									<td>
 										{record.coverImageUrl ? (
 											<Image
@@ -90,10 +100,10 @@ export default function ManageRecordsPage() {
 									<td>{record.artistName.join(", ")}</td>
 									<td>{record.price}</td>
 									<td>
-										<Link href={`/admin/editrecord/${record.id}`}>
-											Edit
-										</Link>{" "}
-										<button onClick={() => handleArchive(record.id)}>
+										<button
+											className="basket-button"
+											onClick={() => handleArchive(record.id)}
+										>
 											Delete
 										</button>
 									</td>
