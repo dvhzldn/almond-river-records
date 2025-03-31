@@ -112,6 +112,13 @@ export async function POST(req: NextRequest) {
 		const updatedEntry = await entry.update();
 		await updatedEntry.publish();
 
+		const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
+		const secret = process.env.REVALIDATION_SECRET!;
+
+		await Promise.all([
+			fetch(`${baseUrl}/api/revalidate?path=/&secret=${secret}`),
+			fetch(`${baseUrl}/api/revalidate?path=/records&secret=${secret}`),
+		]);
 		return NextResponse.json({ success: true });
 	} catch (err) {
 		console.error("Error updating record:", err);

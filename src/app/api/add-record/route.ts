@@ -139,6 +139,13 @@ export async function POST(req: NextRequest) {
 		const entry = await env.createEntry("vinylRecord", { fields });
 		await entry.publish();
 
+		const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
+		const secret = process.env.REVALIDATION_SECRET!;
+
+		await Promise.all([
+			fetch(`${baseUrl}/api/revalidate?path=/&secret=${secret}`),
+			fetch(`${baseUrl}/api/revalidate?path=/records&secret=${secret}`),
+		]);
 		return NextResponse.json({ message: "Success" });
 	} catch (err: unknown) {
 		console.error("[Contentful Error]", err);
