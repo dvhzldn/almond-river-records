@@ -53,7 +53,7 @@ export default function ManageRecordsPage() {
 
 	return (
 		<div className="page-container">
-			<Link href="/admin">← Back to Admin</Link>
+			<Link href="/admin/home">← Back to Admin</Link>
 			<h1>Manage Records</h1>
 			{loading && <p>Loading...</p>}
 			{error && <p className="text-red-600">{error}</p>}

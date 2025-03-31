@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -129,6 +130,8 @@ export default function EditRecordPage() {
 
 	return (
 		<div className="admin-form-container">
+			<Link href="/admin/manage-records">← Back to Manage Records</Link>
+
 			<h1 className="admin-form-title">Edit Record</h1>
 			<form onSubmit={handleSubmit} className="admin-form">
 				<input

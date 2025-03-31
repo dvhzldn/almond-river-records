@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRef } from "react";
+import Link from "next/link";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -47,7 +48,7 @@ export default function AddRecordPage() {
 		maxHeight: number
 	): Promise<File> => {
 		return new Promise((resolve, reject) => {
-			const img = document.createElement("img"); // Create an HTML <img> element
+			const img = document.createElement("img");
 			const reader = new FileReader();
 
 			reader.onload = () => {
@@ -202,6 +203,7 @@ export default function AddRecordPage() {
 	return (
 		<div className="admin-form-container">
 			<h1 className="admin-form-title">Add New Record</h1>
+			<Link href="/admin/manage-records">← Back to Manage Records</Link>
 			<form onSubmit={handleSubmit} className="admin-form">
 				<input
 					name="title"
