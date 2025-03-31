@@ -201,166 +201,171 @@ export default function AddRecordPage() {
 	};
 
 	return (
-		<div className="admin-form-container">
-			<h1 className="admin-form-title">Add New Record</h1>
+		<div className="page-container">
 			<Link href="/admin/manage-records">← Back to Manage Records</Link>
-			<form onSubmit={handleSubmit} className="admin-form">
-				<input
-					name="title"
-					placeholder="Title of release (e.g. Abbey Road)"
-					value={form.title}
-					onChange={handleChange}
-					required
-					className="w-full border p-2"
-				/>
-
-				{form.artistName.map((artist, i) => (
+			<div className="admin-form-container">
+				<h1 className="admin-form-title">Add New Record</h1>
+				<form onSubmit={handleSubmit} className="admin-form">
 					<input
-						key={i}
-						value={artist}
-						onChange={(e) => handleArrayChange(e, "artistName", i)}
-						placeholder={`Name of artist ${i + 1}`}
+						name="title"
+						placeholder="Title of release (e.g. Abbey Road)"
+						value={form.title}
+						onChange={handleChange}
+						required
 						className="w-full border p-2"
 					/>
-				))}
-				<button
-					type="button"
-					onClick={() => addArrayField("artistName")}
-					className="text-blue-600"
-				>
-					+ Add Artist
-				</button>
 
-				<input
-					name="releaseYear"
-					type="number"
-					placeholder="Release Year"
-					value={form.releaseYear}
-					onChange={handleChange}
-					required
-					className="w-full border p-2"
-				/>
-
-				{form.genre.map((g, i) => (
-					<input
-						key={i}
-						value={g}
-						onChange={(e) => handleArrayChange(e, "genre", i)}
-						placeholder={`Genre ${i + 1}`}
-						className="w-full border p-2"
-					/>
-				))}
-				<button
-					type="button"
-					onClick={() => addArrayField("genre")}
-					className="text-blue-600"
-				>
-					+ Add Genre
-				</button>
-
-				<input
-					name="label"
-					placeholder="Record Label"
-					value={form.label}
-					onChange={handleChange}
-					className="w-full border p-2"
-				/>
-
-				<input
-					name="catalogueNumber"
-					placeholder="Catalogue Number"
-					value={form.catalogueNumber}
-					onChange={handleChange}
-					className="w-full border p-2"
-				/>
-
-				<input
-					name="price"
-					type="number"
-					step="1"
-					placeholder="Price"
-					value={form.price}
-					onChange={handleChange}
-					required
-					className="w-full border p-2"
-				/>
-				<p>Vinyl Condition</p>
-				<select
-					name="vinylCondition"
-					value={form.vinylCondition}
-					onChange={handleChange}
-					className="w-full border p-2"
-				>
-					{vinylConditions.map((cond) => (
-						<option key={cond}>{cond}</option>
-					))}
-				</select>
-				<p>Record Sleeve Condition</p>
-
-				<select
-					name="sleeveCondition"
-					value={form.sleeveCondition}
-					onChange={handleChange}
-					className="w-full border p-2"
-				>
-					{vinylConditions.map((cond) => (
-						<option key={cond}>{cond}</option>
-					))}
-				</select>
-
-				<textarea
-					name="description"
-					value={form.description}
-					onChange={handleChange}
-					placeholder="Description of the release (used for Album Of The Week)"
-					className="w-full border p-2"
-					rows={4}
-				/>
-				<p>Attach a cover image</p>
-				<input
-					ref={fileInputRef}
-					type="file"
-					accept="image/*"
-					capture="environment"
-					onChange={handleFileChange}
-					className="w-full"
-					required
-				/>
-
-				{imagePreview && (
-					<div style={{ marginTop: "1rem" }}>
-						<Image
-							src={imagePreview}
-							alt="Cover preview"
-							width={400}
-							height={400}
-							style={{
-								maxWidth: "100%",
-								borderRadius: "8px",
-								marginBottom: "0.5rem",
-								height: "auto",
-							}}
+					{form.artistName.map((artist, i) => (
+						<input
+							key={i}
+							value={artist}
+							onChange={(e) => handleArrayChange(e, "artistName", i)}
+							placeholder={`Name of artist ${i + 1}`}
+							className="w-full border p-2"
 						/>
-						<button
-							type="button"
-							onClick={() => {
-								setForm((prev) => ({ ...prev, coverImage: undefined }));
-								setImagePreview(null);
-								if (fileInputRef.current)
-									fileInputRef.current.value = "";
-							}}
-							className="clear-button"
-						>
-							Remove Image
-						</button>
-					</div>
-				)}
+					))}
+					<button
+						type="button"
+						onClick={() => addArrayField("artistName")}
+						className="text-blue-600"
+					>
+						+ Add Artist
+					</button>
 
-				<button type="submit" disabled={submitting}>
-					{submitting ? "Submitting..." : "Submit"}
-				</button>
-				{status && <p className="admin-status">{status}</p>}
-			</form>
+					<input
+						name="releaseYear"
+						type="number"
+						placeholder="Release Year"
+						value={form.releaseYear}
+						onChange={handleChange}
+						required
+						className="w-full border p-2"
+					/>
+
+					{form.genre.map((g, i) => (
+						<input
+							key={i}
+							value={g}
+							onChange={(e) => handleArrayChange(e, "genre", i)}
+							placeholder={`Genre ${i + 1}`}
+							className="w-full border p-2"
+						/>
+					))}
+					<button
+						type="button"
+						onClick={() => addArrayField("genre")}
+						className="text-blue-600"
+					>
+						+ Add Genre
+					</button>
+
+					<input
+						name="label"
+						placeholder="Record Label"
+						value={form.label}
+						onChange={handleChange}
+						className="w-full border p-2"
+					/>
+
+					<input
+						name="catalogueNumber"
+						placeholder="Catalogue Number"
+						value={form.catalogueNumber}
+						onChange={handleChange}
+						className="w-full border p-2"
+					/>
+
+					<input
+						name="price"
+						type="number"
+						step="1"
+						placeholder="Price"
+						value={form.price}
+						onChange={handleChange}
+						required
+						className="w-full border p-2"
+					/>
+					<p>Vinyl Condition</p>
+					<select
+						name="vinylCondition"
+						value={form.vinylCondition}
+						onChange={handleChange}
+						className="w-full border p-2"
+					>
+						{vinylConditions.map((cond) => (
+							<option key={cond}>{cond}</option>
+						))}
+					</select>
+					<p>Record Sleeve Condition</p>
+
+					<select
+						name="sleeveCondition"
+						value={form.sleeveCondition}
+						onChange={handleChange}
+						className="w-full border p-2"
+					>
+						{vinylConditions.map((cond) => (
+							<option key={cond}>{cond}</option>
+						))}
+					</select>
+
+					<textarea
+						name="description"
+						value={form.description}
+						onChange={handleChange}
+						placeholder="Description of the release (used for Album Of The Week)"
+						className="w-full border p-2"
+						rows={4}
+					/>
+					<p>Attach a cover image</p>
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept="image/*"
+						capture="environment"
+						onChange={handleFileChange}
+						className="w-full"
+						required
+					/>
+
+					{imagePreview && (
+						<div style={{ marginTop: "1rem" }}>
+							<Image
+								src={imagePreview}
+								alt="Cover preview"
+								width={400}
+								height={400}
+								style={{
+									maxWidth: "100%",
+									borderRadius: "8px",
+									marginBottom: "0.5rem",
+									height: "auto",
+								}}
+							/>
+							<button
+								type="button"
+								onClick={() => {
+									setForm((prev) => ({
+										...prev,
+										coverImage: undefined,
+									}));
+									setImagePreview(null);
+									if (fileInputRef.current)
+										fileInputRef.current.value = "";
+								}}
+								className="clear-button"
+							>
+								Remove Image
+							</button>
+						</div>
+					)}
+
+					<button type="submit" disabled={submitting}>
+						{submitting ? "Submitting..." : "Submit"}
+					</button>
+					{status && <p className="admin-status">{status}</p>}
+				</form>
+			</div>
 		</div>
 	);
 }
