@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "contentful-management";
 import { Document } from "@contentful/rich-text-types";
+import { BLOCKS } from "@contentful/rich-text-types";
 
 export async function POST(req: NextRequest) {
 	const formData = await req.formData();
@@ -34,16 +35,16 @@ export async function POST(req: NextRequest) {
 		const description: Document =
 			descriptionText.trim() === ""
 				? {
-						nodeType: "document",
+						nodeType: BLOCKS.DOCUMENT,
 						data: {},
 						content: [],
 					}
 				: {
-						nodeType: "document",
+						nodeType: BLOCKS.DOCUMENT,
 						data: {},
 						content: [
 							{
-								nodeType: "paragraph",
+								nodeType: BLOCKS.PARAGRAPH,
 								content: [
 									{
 										nodeType: "text",
