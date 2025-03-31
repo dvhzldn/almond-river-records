@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
 		// If a new image was uploaded, process and link the asset
 		const imageFile = formData.get("coverImage") as File | null;
 		if (imageFile) {
-			const buffer = Buffer.from(await imageFile.arrayBuffer());
+			const arrayBuffer = await imageFile.arrayBuffer();
+
 			const asset = await environment.createAssetFromFiles({
 				fields: {
 					title: { "en-GB": imageFile.name },
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
 						"en-GB": {
 							contentType: imageFile.type,
 							fileName: imageFile.name,
-							file: buffer,
+							file: arrayBuffer,
 						},
 					},
 				},
