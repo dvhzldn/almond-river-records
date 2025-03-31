@@ -21,6 +21,7 @@ type RecordFormData = {
 	description: string;
 	coverImageUrl?: string;
 	coverImageFile?: File;
+	albumOfTheWeek?: boolean;
 };
 
 export default function EditRecordPage() {
@@ -40,7 +41,10 @@ export default function EditRecordPage() {
 			try {
 				const res = await fetch(`/api/get-record?id=${recordId}`);
 				const data = await res.json();
-				setForm(data);
+				setForm({
+					...data,
+					albumOfTheWeek: data.albumOfTheWeek ?? false,
+				});
 			} catch (err) {
 				console.error("Failed to load record", err);
 				setStatus("Failed to load record.");
@@ -105,6 +109,8 @@ export default function EditRecordPage() {
 		if (form.coverImageFile) {
 			formData.append("coverImage", form.coverImageFile);
 		}
+
+		formData.append("albumOfTheWeek", form.albumOfTheWeek ? "true" : "false");
 
 		try {
 			const res = await fetch("/api/edit-record", {
@@ -247,6 +253,18 @@ export default function EditRecordPage() {
 					onChange={handleFileChange}
 					className="w-full"
 				/>
+
+				<label>
+					<input
+						type="checkbox"
+						name="albumOfTheWeek"
+						checked={form.albumOfTheWeek ?? false}
+						onChange={(e) =>
+							setForm({ ...form, albumOfTheWeek: e.target.checked })
+						}
+					/>
+					Album of the Week
+				</label>
 
 				<button type="submit" disabled={submitting}>
 					{submitting ? "Updating..." : "Update Record"}

@@ -78,6 +78,9 @@ export async function POST(req: NextRequest) {
 		const artistNamesJoined = artistName.join(", ");
 		const imageMeta = `${artistNamesJoined} - ${title} (cover)`;
 
+		const albumOfTheWeek =
+			formData.get("albumOfTheWeek")?.toString() === "true";
+
 		// Update entry fields
 		entry.fields.title = { "en-GB": title };
 		entry.fields.artistName = { "en-GB": artistName };
@@ -89,6 +92,7 @@ export async function POST(req: NextRequest) {
 		entry.fields.vinylCondition = { "en-GB": vinylCondition };
 		entry.fields.sleeveCondition = { "en-GB": sleeveCondition };
 		entry.fields.description = { "en-GB": description };
+		entry.fields.albumOfTheWeek = { "en-GB": albumOfTheWeek };
 
 		// If a new image was uploaded, process and link the asset
 		const imageFile = formData.get("coverImage") as File | null;
