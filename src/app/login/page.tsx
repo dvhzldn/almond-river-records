@@ -1,13 +1,13 @@
-// File: app/login/page.tsx
-
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -30,9 +30,10 @@ export default function LoginPage() {
 			setError(error.message);
 		} else {
 			console.log("[Login Success]", data);
-			const session = await supabase.auth.getSession();
-			console.log("[Session]", session);
-			router.replace("/admin/home");
+
+			const redirectedFrom =
+				searchParams.get("redirectedFrom") || "/admin/home";
+			router.replace(redirectedFrom);
 		}
 
 		setLoading(false);

@@ -1,5 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, Asset, Environment } from "contentful-management";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+const getSupabaseUserFromToken = async (token: string | undefined) => {
+	if (!token) return null;
+
+	const supabase = createSupabaseClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+		process.env.SUPABASE_SERVICE_ROLE_KEY!,
+		{
+			global: {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			},
+		}
+	);
+
+	const {
+		data: { user },
+		error,
+	} = await supabase.auth.getUser();
+
+	return error ? null : user;
+};
 
 const waitForAssetProcessing = async (
 	env: Environment,
@@ -24,6 +48,12 @@ const waitForAssetProcessing = async (
 
 export async function POST(req: NextRequest) {
 	try {
+		const token = req.headers.get("authorization")?.replace("Bearer ", "");
+
+		const user = await getSupabaseUserFromToken(token);
+		if (!user) {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
 		const formData = await req.formData();
 
 		const getValues = (key: string) =>

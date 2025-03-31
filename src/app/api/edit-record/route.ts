@@ -2,8 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "contentful-management";
 import { Document } from "@contentful/rich-text-types";
 import { BLOCKS } from "@contentful/rich-text-types";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function POST(req: NextRequest) {
+	const token = req.headers.get("authorization")?.replace("Bearer ", "");
+	if (!token) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	const {
+		data: { user },
+		error,
+	} = await supabaseAdmin.auth.getUser(token);
+
+	if (error || !user) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
 	const formData = await req.formData();
 
 	const recordId = formData.get("id")?.toString();

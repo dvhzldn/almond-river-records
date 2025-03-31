@@ -11,18 +11,38 @@ export default function AdminLayout({
 }) {
 	const router = useRouter();
 	const [authChecked, setAuthChecked] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		supabase.auth.getUser().then(({ data: { user } }) => {
-			if (!user) {
+		let isMounted = true;
+
+		const checkUser = async () => {
+			const { data, error } = await supabase.auth.getUser();
+
+			if (!isMounted) return;
+
+			if (error || !data?.user) {
 				router.replace("/login");
 			} else {
 				setAuthChecked(true);
 			}
-		});
+			setLoading(false);
+		};
+
+		checkUser();
+
+		return () => {
+			isMounted = false;
+		};
 	}, [router]);
 
-	if (!authChecked) return null;
+	if (loading || !authChecked) {
+		return (
+			<div className="flex h-screen items-center justify-center">
+				<p>Checking authentication...</p>
+			</div>
+		);
+	}
 
 	return <>{children}</>;
 }

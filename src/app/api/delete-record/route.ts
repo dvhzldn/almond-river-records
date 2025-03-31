@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "contentful-management";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function DELETE(req: NextRequest) {
+	const token = req.headers.get("authorization")?.replace("Bearer ", "");
+
+	if (!token) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	const {
+		data: { user },
+		error,
+	} = await supabaseAdmin.auth.getUser(token);
+
+	if (error || !user) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
 	const recordId = req.nextUrl.searchParams.get("id");
 
 	if (!recordId) {
@@ -19,7 +35,6 @@ export async function DELETE(req: NextRequest) {
 		const environment = await space.getEnvironment("master");
 		const entry = await environment.getEntry(recordId);
 
-		// Unpublish before archiving
 		if (entry.isPublished()) {
 			await entry.unpublish();
 		}

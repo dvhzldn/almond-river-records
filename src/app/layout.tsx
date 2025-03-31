@@ -5,6 +5,7 @@ import "./globals.css";
 import Menu from "@/components/Menu";
 import Footer from "@/components/Footer";
 import { BasketProvider } from "./api/context/BasketContext";
+import { Suspense } from "react";
 
 const lato = Lato({
 	subsets: ["latin"],
@@ -41,7 +42,9 @@ export default function RootLayout({
 					<header>
 						<Menu />
 					</header>
-					<main>{children}</main>
+					<Suspense fallback={<div>Loading...</div>}>
+						<main>{children}</main>
+					</Suspense>
 					<footer>
 						<Footer />
 					</footer>
