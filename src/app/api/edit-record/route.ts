@@ -58,10 +58,11 @@ export async function POST(req: NextRequest) {
 						],
 					};
 
-		entry.fields.description = { "en-GB": description };
-
 		const artistName = formData.getAll("artistName[]").map(String);
 		const genre = formData.getAll("genre[]").map(String);
+
+		const artistNamesJoined = artistName.join(", ");
+		const imageMeta = `${artistNamesJoined} - ${title} (cover)`;
 
 		// Update entry fields
 		entry.fields.title = { "en-GB": title };
@@ -82,7 +83,8 @@ export async function POST(req: NextRequest) {
 
 			const asset = await environment.createAssetFromFiles({
 				fields: {
-					title: { "en-GB": imageFile.name },
+					title: { "en-GB": imageMeta },
+					description: { "en-GB": imageMeta },
 					file: {
 						"en-GB": {
 							contentType: imageFile.type,
