@@ -1,29 +1,19 @@
 "use client";
-
+import "@/app/globals.css";
 import Link from "next/link";
 
 export default function AdminHomePage() {
 	return (
-		<div className="p-6">
-			<h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+		<div>
+			<h1>Admin Dashboard</h1>
 
-			<ul className="space-y-4">
+			<ul>
 				<li>
-					<Link
-						href="/admin/addrecord"
-						className="text-blue-600 hover:underline text-lg"
-					>
-						➕ Add New Record
-					</Link>
+					<Link href="/admin/addrecord">➕ Add New Record</Link>
 				</li>
-
+				<br />
 				<li>
-					<Link
-						href="/admin/manage-records"
-						className="text-blue-600 hover:underline text-lg"
-					>
-						📦 Manage Records
-					</Link>
+					<Link href="/admin/manage-records">📦 Manage Records</Link>
 				</li>
 
 				{/* Future features
