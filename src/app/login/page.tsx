@@ -32,7 +32,7 @@ export default function LoginPage() {
 			console.log("[Login Success]", data);
 			const session = await supabase.auth.getSession();
 			console.log("[Session]", session);
-			router.replace("/admin/addrecord");
+			router.replace("/admin/home");
 		}
 
 		setLoading(false);

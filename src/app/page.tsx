@@ -14,7 +14,8 @@ export default async function Home() {
 	const endpoint = new URL("/api/records?newThisWeek=true", base).toString();
 
 	const res = await fetch(endpoint, {
-		next: { revalidate: 60 },
+		next: { revalidate: 5 },
+		// cache: "no-store",
 	});
 
 	if (!res.ok) {
