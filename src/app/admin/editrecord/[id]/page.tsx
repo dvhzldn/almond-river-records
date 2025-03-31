@@ -140,26 +140,16 @@ export default function EditRecordPage() {
 
 			<h1 className="admin-form-title">Edit Record</h1>
 			<form onSubmit={handleSubmit} className="admin-form">
-				<input
-					name="title"
-					value={form.title}
-					onChange={handleChange}
-					className="w-full border p-2"
-				/>
+				<input name="title" value={form.title} onChange={handleChange} />
 
 				{form.artistName.map((artist, i) => (
 					<input
 						key={i}
 						value={artist}
 						onChange={(e) => handleArrayChange(e, "artistName", i)}
-						className="w-full border p-2"
 					/>
 				))}
-				<button
-					type="button"
-					onClick={() => addArrayField("artistName")}
-					className="text-blue-600"
-				>
+				<button type="button" onClick={() => addArrayField("artistName")}>
 					+ Add Artist
 				</button>
 
@@ -168,7 +158,6 @@ export default function EditRecordPage() {
 					type="number"
 					value={form.releaseYear}
 					onChange={handleChange}
-					className="w-full border p-2"
 				/>
 
 				{form.genre.map((genre, i) => (
@@ -176,42 +165,29 @@ export default function EditRecordPage() {
 						key={i}
 						value={genre}
 						onChange={(e) => handleArrayChange(e, "genre", i)}
-						className="w-full border p-2"
 					/>
 				))}
-				<button
-					type="button"
-					onClick={() => addArrayField("genre")}
-					className="text-blue-600"
-				>
+				<button type="button" onClick={() => addArrayField("genre")}>
 					+ Add Genre
 				</button>
 
-				<input
-					name="label"
-					value={form.label}
-					onChange={handleChange}
-					className="w-full border p-2"
-				/>
+				<input name="label" value={form.label} onChange={handleChange} />
 				<input
 					name="catalogueNumber"
 					value={form.catalogueNumber}
 					onChange={handleChange}
-					className="w-full border p-2"
 				/>
 				<input
 					name="price"
 					type="number"
 					value={form.price}
 					onChange={handleChange}
-					className="w-full border p-2"
 				/>
 
 				<select
 					name="vinylCondition"
 					value={form.vinylCondition}
 					onChange={handleChange}
-					className="w-full border p-2"
 				>
 					{vinylConditions.map((v) => (
 						<option key={v}>{v}</option>
@@ -222,18 +198,27 @@ export default function EditRecordPage() {
 					name="sleeveCondition"
 					value={form.sleeveCondition}
 					onChange={handleChange}
-					className="w-full border p-2"
 				>
 					{vinylConditions.map((v) => (
 						<option key={v}>{v}</option>
 					))}
 				</select>
+				<label>
+					<input
+						type="checkbox"
+						name="albumOfTheWeek"
+						checked={form.albumOfTheWeek ?? false}
+						onChange={(e) =>
+							setForm({ ...form, albumOfTheWeek: e.target.checked })
+						}
+					/>
+					Album of the Week
+				</label>
 
 				<textarea
 					name="description"
 					value={form.description}
 					onChange={handleChange}
-					className="w-full border p-2"
 					rows={4}
 				/>
 
@@ -251,20 +236,7 @@ export default function EditRecordPage() {
 					accept="image/*"
 					ref={fileInputRef}
 					onChange={handleFileChange}
-					className="w-full"
 				/>
-
-				<label>
-					<input
-						type="checkbox"
-						name="albumOfTheWeek"
-						checked={form.albumOfTheWeek ?? false}
-						onChange={(e) =>
-							setForm({ ...form, albumOfTheWeek: e.target.checked })
-						}
-					/>
-					Album of the Week
-				</label>
 
 				<button type="submit" disabled={submitting}>
 					{submitting ? "Updating..." : "Update Record"}

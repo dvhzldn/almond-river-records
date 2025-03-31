@@ -212,7 +212,6 @@ export default function AddRecordPage() {
 						value={form.title}
 						onChange={handleChange}
 						required
-						className="w-full border p-2"
 					/>
 
 					{form.artistName.map((artist, i) => (
@@ -221,13 +220,12 @@ export default function AddRecordPage() {
 							value={artist}
 							onChange={(e) => handleArrayChange(e, "artistName", i)}
 							placeholder={`Name of artist ${i + 1}`}
-							className="w-full border p-2"
+							required
 						/>
 					))}
 					<button
 						type="button"
 						onClick={() => addArrayField("artistName")}
-						className="text-blue-600"
 					>
 						+ Add Artist
 					</button>
@@ -239,7 +237,6 @@ export default function AddRecordPage() {
 						value={form.releaseYear}
 						onChange={handleChange}
 						required
-						className="w-full border p-2"
 					/>
 
 					{form.genre.map((g, i) => (
@@ -248,23 +245,18 @@ export default function AddRecordPage() {
 							value={g}
 							onChange={(e) => handleArrayChange(e, "genre", i)}
 							placeholder={`Genre ${i + 1}`}
-							className="w-full border p-2"
 						/>
 					))}
-					<button
-						type="button"
-						onClick={() => addArrayField("genre")}
-						className="text-blue-600"
-					>
+					<button type="button" onClick={() => addArrayField("genre")}>
 						+ Add Genre
 					</button>
 
 					<input
 						name="label"
 						placeholder="Record Label"
+						required
 						value={form.label}
 						onChange={handleChange}
-						className="w-full border p-2"
 					/>
 
 					<input
@@ -272,7 +264,7 @@ export default function AddRecordPage() {
 						placeholder="Catalogue Number"
 						value={form.catalogueNumber}
 						onChange={handleChange}
-						className="w-full border p-2"
+						required
 					/>
 
 					<input
@@ -283,14 +275,12 @@ export default function AddRecordPage() {
 						value={form.price}
 						onChange={handleChange}
 						required
-						className="w-full border p-2"
 					/>
 					<p>Vinyl Condition</p>
 					<select
 						name="vinylCondition"
 						value={form.vinylCondition}
 						onChange={handleChange}
-						className="w-full border p-2"
 					>
 						{vinylConditions.map((cond) => (
 							<option key={cond}>{cond}</option>
@@ -302,7 +292,6 @@ export default function AddRecordPage() {
 						name="sleeveCondition"
 						value={form.sleeveCondition}
 						onChange={handleChange}
-						className="w-full border p-2"
 					>
 						{vinylConditions.map((cond) => (
 							<option key={cond}>{cond}</option>
@@ -314,7 +303,6 @@ export default function AddRecordPage() {
 						value={form.description}
 						onChange={handleChange}
 						placeholder="Description of the release (used for Album Of The Week)"
-						className="w-full border p-2"
 						rows={4}
 					/>
 					<p>Attach a cover image</p>
@@ -324,7 +312,6 @@ export default function AddRecordPage() {
 						accept="image/*"
 						capture="environment"
 						onChange={handleFileChange}
-						className="w-full"
 						required
 					/>
 
