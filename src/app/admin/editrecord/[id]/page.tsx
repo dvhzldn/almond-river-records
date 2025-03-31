@@ -139,88 +139,124 @@ export default function EditRecordPage() {
 			<Link href="/admin/manage-records">← Back to Manage Records</Link>
 
 			<h1 className="admin-form-title">Edit Record</h1>
-			<form onSubmit={handleSubmit} className="admin-form">
-				<input name="title" value={form.title} onChange={handleChange} />
+			<form onSubmit={handleSubmit}>
+				<label>
+					Title
+					<input name="title" value={form.title} onChange={handleChange} />
+				</label>
 
 				{form.artistName.map((artist, i) => (
-					<input
-						key={i}
-						value={artist}
-						onChange={(e) => handleArrayChange(e, "artistName", i)}
-					/>
+					<label key={i}>
+						Artist {i + 1}
+						<input
+							value={artist}
+							onChange={(e) => handleArrayChange(e, "artistName", i)}
+						/>
+					</label>
 				))}
 				<button type="button" onClick={() => addArrayField("artistName")}>
 					+ Add Artist
 				</button>
 
-				<input
-					name="releaseYear"
-					type="number"
-					value={form.releaseYear}
-					onChange={handleChange}
-				/>
+				<label>
+					Release Year
+					<input
+						name="releaseYear"
+						type="number"
+						value={form.releaseYear}
+						onChange={handleChange}
+					/>
+				</label>
 
 				{form.genre.map((genre, i) => (
-					<input
-						key={i}
-						value={genre}
-						onChange={(e) => handleArrayChange(e, "genre", i)}
-					/>
+					<label key={i}>
+						Genre {i + 1}
+						<input
+							value={genre}
+							onChange={(e) => handleArrayChange(e, "genre", i)}
+						/>
+					</label>
 				))}
 				<button type="button" onClick={() => addArrayField("genre")}>
 					+ Add Genre
 				</button>
 
-				<input name="label" value={form.label} onChange={handleChange} />
-				<input
-					name="catalogueNumber"
-					value={form.catalogueNumber}
-					onChange={handleChange}
-				/>
-				<input
-					name="price"
-					type="number"
-					value={form.price}
-					onChange={handleChange}
-				/>
-
-				<select
-					name="vinylCondition"
-					value={form.vinylCondition}
-					onChange={handleChange}
-				>
-					{vinylConditions.map((v) => (
-						<option key={v}>{v}</option>
-					))}
-				</select>
-
-				<select
-					name="sleeveCondition"
-					value={form.sleeveCondition}
-					onChange={handleChange}
-				>
-					{vinylConditions.map((v) => (
-						<option key={v}>{v}</option>
-					))}
-				</select>
 				<label>
-					<input
-						type="checkbox"
-						name="albumOfTheWeek"
-						checked={form.albumOfTheWeek ?? false}
-						onChange={(e) =>
-							setForm({ ...form, albumOfTheWeek: e.target.checked })
-						}
-					/>
-					Album of the Week
+					Label
+					<input name="label" value={form.label} onChange={handleChange} />
 				</label>
 
-				<textarea
-					name="description"
-					value={form.description}
-					onChange={handleChange}
-					rows={4}
-				/>
+				<label>
+					Catalogue Number
+					<input
+						name="catalogueNumber"
+						value={form.catalogueNumber}
+						onChange={handleChange}
+					/>
+				</label>
+
+				<label>
+					Price
+					<input
+						name="price"
+						type="number"
+						value={form.price}
+						onChange={handleChange}
+					/>
+				</label>
+
+				<label>
+					Vinyl Condition
+					<select
+						name="vinylCondition"
+						value={form.vinylCondition}
+						onChange={handleChange}
+					>
+						{vinylConditions.map((v) => (
+							<option key={v}>{v}</option>
+						))}
+					</select>
+				</label>
+
+				<label>
+					Sleeve Condition
+					<select
+						name="sleeveCondition"
+						value={form.sleeveCondition}
+						onChange={handleChange}
+					>
+						{vinylConditions.map((v) => (
+							<option key={v}>{v}</option>
+						))}
+					</select>
+				</label>
+
+				<label>
+					Album of the Week
+					<select
+						name="albumOfTheWeek"
+						value={form.albumOfTheWeek ? "true" : "false"}
+						onChange={(e) =>
+							setForm({
+								...form,
+								albumOfTheWeek: e.target.value === "true",
+							})
+						}
+					>
+						<option value="false">No</option>
+						<option value="true">Yes</option>
+					</select>
+				</label>
+
+				<label>
+					Description
+					<textarea
+						name="description"
+						value={form.description}
+						onChange={handleChange}
+						rows={4}
+					/>
+				</label>
 
 				{form.coverImageUrl && !form.coverImageFile && (
 					<Image
@@ -228,20 +264,24 @@ export default function EditRecordPage() {
 						alt="Current Cover"
 						width={200}
 						height={200}
-						className="rounded mb-2"
 					/>
 				)}
-				<input
-					type="file"
-					accept="image/*"
-					ref={fileInputRef}
-					onChange={handleFileChange}
-				/>
+
+				<label>
+					Replace Cover Image
+					<input
+						type="file"
+						accept="image/*"
+						ref={fileInputRef}
+						onChange={handleFileChange}
+					/>
+				</label>
 
 				<button type="submit" disabled={submitting}>
 					{submitting ? "Updating..." : "Update Record"}
 				</button>
-				{status && <p className="admin-status">{status}</p>}
+
+				{status && <p>{status}</p>}
 			</form>
 		</div>
 	);
