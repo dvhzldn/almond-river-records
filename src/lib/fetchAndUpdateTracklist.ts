@@ -5,6 +5,7 @@ type RecordMetadata = {
 	title: string;
 	artist_names_text: string;
 	catalogue_number?: string;
+	label?: string;
 };
 
 interface DiscogsTrack {
@@ -69,6 +70,11 @@ async function fetchDiscogsReleaseId(
 	if (record.catalogue_number) {
 		query += ` ${record.catalogue_number}`;
 	}
+	if (record.label) {
+		query += ` ${record.label}`;
+		console.log(`🏷️ Including label in search: ${record.label}`);
+	}
+
 	const token = process.env.DISCOGS_TOKEN;
 	const auth = token ? `&token=${token}` : "";
 	const url = `https://api.discogs.com/database/search?q=${query}&type=release&format=Vinyl&${auth}`;
@@ -78,6 +84,16 @@ async function fetchDiscogsReleaseId(
 
 	const data = (await res.json()) as DiscogsSearchResponse;
 	const result = data.results?.[0];
+	if (!result && (record.catalogue_number || record.label)) {
+		console.warn(
+			"🔁 No match with full query — retrying without label/catalogue number..."
+		);
+		return await fetchDiscogsReleaseId({
+			...record,
+			catalogue_number: undefined,
+			label: undefined,
+		});
+	}
 	return result?.id?.toString() ?? null;
 }
 
