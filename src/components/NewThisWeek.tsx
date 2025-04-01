@@ -1,12 +1,18 @@
 "use client";
 import Image from "next/image";
-import Modal from "@/components/Modal";
 import { useState, KeyboardEvent } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+
+import dynamic from "next/dynamic";
+
+const Modal = dynamic(() => import("./Modal"), {
+	ssr: false,
+	loading: () => null,
+});
 
 interface Record {
 	id: string;

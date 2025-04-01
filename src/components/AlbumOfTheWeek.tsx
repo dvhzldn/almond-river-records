@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { supabase } from "@/lib/supabaseClient";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { Document } from "@contentful/rich-text-types";
 
@@ -16,63 +15,25 @@ interface Album {
 
 export default function AlbumOfTheWeek() {
 	const [album, setAlbum] = useState<Album | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchAlbum() {
 			try {
-				const { data, error } = await supabase
-					.from("vinyl_records")
-					.select(
-						`
-						id,
-						title,
-						artist_names,
-						description,
-						cover_image
-					`
-					)
-					.eq("album_of_the_week", true)
-					.order("updated_at", { ascending: false })
-					.limit(1);
-
-				if (error) {
-					console.error("Error fetching vinyl record data:", error);
-					throw error;
-				}
-
-				if (data && data.length > 0) {
-					const albumData = data[0];
-					const { data: coverImageData, error: coverError } =
-						await supabase
-							.from("contentful_assets")
-							.select("url")
-							.eq("id", albumData.cover_image)
-							.single();
-
-					if (coverError) {
-						console.error("Error fetching cover image data:", coverError);
-						throw coverError;
-					}
-
-					const coverImageUrl = coverImageData ? coverImageData.url : null;
-
-					setAlbum({
-						...albumData,
-						cover_image_url: coverImageUrl,
-					});
-				}
+				const res = await fetch("/api/album-of-the-week");
+				if (!res.ok) throw new Error("Failed to fetch album");
+				const data = await res.json();
+				setAlbum(data);
 			} catch (err) {
-				console.error("Error fetching album of the week:", err);
+				console.error("Failed to load album:", err);
 			} finally {
 				setLoading(false);
 			}
 		}
-
 		fetchAlbum();
 	}, []);
 
-	if (loading) return <p aria-live="polite">Loading Album of the Week...</p>;
+	if (loading) return <p>Loading Album of the Week...</p>;
 	if (!album) return <p>No album available at this time.</p>;
 
 	return (
@@ -96,10 +57,10 @@ export default function AlbumOfTheWeek() {
 				{album.cover_image_url ? (
 					<Image
 						src={album.cover_image_url}
-						alt={`Album cover for ${album.title} by ${album.artist_names.join(", ")}`}
-						className="featured-record-cover"
+						alt={`Album cover for ${album.title}`}
 						width={400}
 						height={400}
+						className="featured-record-cover"
 					/>
 				) : (
 					<p>No cover image available.</p>

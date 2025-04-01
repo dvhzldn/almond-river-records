@@ -1,12 +1,24 @@
 "use client";
-
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
 import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
-import OrderForm, { OrderData } from "@/components/OrderForm";
-import ReturnsPolicyModal from "@/components/ReturnsPolicyModal";
-import { useAnalytics } from "@/lib/useAnalytics";
+import type { OrderData } from "@/components/OrderForm";
+import { useTrackCheckout } from "@/hooks/useTrackCheckout";
+
+const OrderForm = dynamic(() => import("@/components/OrderForm"), {
+	ssr: false,
+	loading: () => <p>Loading form...</p>,
+});
+
+const ReturnsPolicyModal = dynamic(
+	() => import("@/components/ReturnsPolicyModal"),
+	{
+		ssr: false,
+		loading: () => null,
+	}
+);
 
 export default function BasketPage() {
 	const { basket, clearBasket } = useBasket();
@@ -26,7 +38,7 @@ export default function BasketPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [isReturnsPolicyOpen, setReturnsPolicyOpen] = useState(false);
 
-	const { track } = useAnalytics();
+	const trackCheckout = useTrackCheckout();
 
 	const handleOrderSubmit = async (orderData: OrderData) => {
 		setLoading(true);
@@ -65,7 +77,7 @@ export default function BasketPage() {
 				return;
 			}
 
-			track("checkout-started", {
+			trackCheckout({
 				artistTitle: basket
 					.map((item) => `${item.artist} - ${item.title}`)
 					.join(", "),

@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import Modal from "@/components/Modal";
 import { useRecords, VinylRecord } from "@/hooks/useRecords";
 import { useSupabaseOptions } from "@/hooks/useSupabaseOptions";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
@@ -11,6 +10,13 @@ import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 import { useAnalytics } from "@/lib/useAnalytics";
 import { useAddToBasketWithTracking } from "@/hooks/useAddToBasketWithTracking";
 import { useBuyNow } from "@/hooks/useBuyNow";
+
+import dynamic from "next/dynamic";
+
+const Modal = dynamic(() => import("@/components/Modal"), {
+	ssr: false,
+	loading: () => null,
+});
 
 export default function RecordsPage() {
 	const { track } = useAnalytics();

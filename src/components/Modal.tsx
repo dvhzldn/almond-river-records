@@ -1,9 +1,6 @@
+"use client";
+
 import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 import { useAddToBasketWithTracking } from "@/hooks/useAddToBasketWithTracking";
 import { useBuyNow } from "@/hooks/useBuyNow";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
@@ -34,10 +31,6 @@ interface ModalProps {
 }
 
 export default function Modal({ record, onClose }: ModalProps) {
-	const images: string[] = [];
-	if (record.coverImageUrl) images.push(record.coverImageUrl);
-	if (record.otherImages?.length) images.push(...record.otherImages);
-
 	const { basket } = useBasket();
 	const { handleAddToBasket } = useAddToBasketWithTracking();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
@@ -140,27 +133,14 @@ export default function Modal({ record, onClose }: ModalProps) {
 					Price: <strong>£{record.price}</strong>
 				</h3>
 
-				{images.length > 0 && (
-					<Swiper
-						modules={[Autoplay, Navigation, Pagination]}
-						autoplay={{ delay: 4000, disableOnInteraction: true }}
-						navigation
-						pagination={{ clickable: true }}
-						loop={images.length > 1}
-						slidesPerView={1}
-					>
-						{images.map((url, index) => (
-							<SwiperSlide key={index}>
-								<Image
-									className="modal-image"
-									src={url}
-									alt={`${record.title} image ${index + 1}`}
-									width={450}
-									height={450}
-								/>
-							</SwiperSlide>
-						))}
-					</Swiper>
+				{record.coverImageUrl && (
+					<Image
+						className="modal-image"
+						src={record.coverImageUrl}
+						alt={`Cover image for ${record.title}`}
+						width={450}
+						height={450}
+					/>
 				)}
 
 				<div className="modal-image-container" id="modal-description">

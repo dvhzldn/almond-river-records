@@ -1,12 +1,8 @@
-import { runFulfillment } from "@/lib/runFulfillment";
 import { createClient } from "@supabase/supabase-js";
+import { PaymentSuccessClient } from "@/components/PaymentSuccessClient";
+import { PaymentStatus } from "@/components/PaymentStatus";
 import Image from "next/image";
 import Link from "next/link";
-import ClearBasketOnSuccess from "@/components/ClearBasketOnSuccess";
-import TrackPurchaseComplete from "@/components/TrackPurchaseComplete";
-import TrackPurchaseFailed from "@/components/TrackPurchaseFailed";
-import TrackPurchasePending from "@/components/TrackPurchasePending";
-import { logOrderEvent } from "@/lib/logOrderEvent";
 
 const supabaseService = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -103,14 +99,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 	console.log("payment-success: SumUp status =", checkoutStatus);
 
 	// 3. Display appropriate message based on SumUp status
-	if (checkoutStatus === "PENDING") {
-		return <TrackPurchasePending />;
+	if (checkoutStatus === "PENDING" || checkoutStatus === "FAILED") {
+		return <PaymentStatus status={checkoutStatus} />;
 	}
-
-	if (checkoutStatus === "FAILED") {
-		return <TrackPurchaseFailed />;
-	}
-
 	if (checkoutStatus === "PAID") {
 		// 4. If Supabase hasn't updated to PAID, fix it here
 		if (order.sumup_status !== "PAID") {
@@ -120,6 +111,7 @@ export default async function PaymentSuccess({ params, searchParams }) {
 				.update({ sumup_status: "PAID" })
 				.eq("sumup_checkout_reference", checkoutId);
 
+			const { logOrderEvent } = await import("@/lib/logOrderEvent");
 			await logOrderEvent({
 				event: "checkout-status-update",
 				checkout_reference: checkoutId,
@@ -134,37 +126,20 @@ export default async function PaymentSuccess({ params, searchParams }) {
 
 		// 5. Fulfillment (includes email if not sent)
 		try {
+			const { runFulfillment } = await import("@/lib/runFulfillment");
 			await runFulfillment(checkoutId);
 			console.log("payment-success: Fulfillment completed");
 		} catch (err) {
 			console.error("PaymentSuccess: Fulfillment failed", err);
 		}
-
 		// 6. UI confirmation
 		return (
-			<>
-				<ClearBasketOnSuccess checkoutStatus={checkoutStatus} />
-				<TrackPurchaseComplete
-					orderId={order.id}
-					amount={order.sumup_amount}
-				/>
-				<div className="page-container">
-					<h1 className="page-title">Order complete</h1>
-					<div className="content-box">
-						<h3>Thank you for your purchase!</h3>
-						<p>Your order will be processed and dispatched soon.</p>
-						<hr />
-						<Image
-							src="/images/almond-river-logo.jpg"
-							alt="Almond River Records logo"
-							width={200}
-							height={200}
-							priority
-						/>
-						<p>Order reference: {order.sumup_checkout_reference}</p>
-					</div>
-				</div>
-			</>
+			<PaymentSuccessClient
+				checkoutStatus={checkoutStatus}
+				orderId={order.id}
+				amount={order.sumup_amount}
+				reference={order.sumup_checkout_reference}
+			/>
 		);
 	}
 
