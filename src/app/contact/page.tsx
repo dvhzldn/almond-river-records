@@ -130,7 +130,6 @@ export default function ContactPage() {
 							name="csrf_token"
 							value={formData.csrf_token}
 						/>
-
 						<label htmlFor="full_name">Name:</label>
 						<input
 							type="text"
@@ -145,11 +144,10 @@ export default function ContactPage() {
 							aria-describedby="name-error"
 						/>
 						{formData.full_name === "" && (
-							<p id="name-error" className="error-text">
+							<p id="name-error" className="text">
 								Please enter your name
 							</p>
 						)}
-
 						<label htmlFor="contact_email">Email:</label>
 						<input
 							type="email"
@@ -167,33 +165,21 @@ export default function ContactPage() {
 							aria-describedby="email-error"
 						/>
 						{formData.contact_email === "" && (
-							<p id="email-error" className="error-text">
+							<p id="email-error" className="text">
 								Please enter your email address
 							</p>
 						)}
-
-						<label htmlFor="phone_number">Phone:</label>
+						<label htmlFor="phone_number">Phone (optional):</label>
 						<input
 							type="tel"
 							id="phone_number"
 							name="phone_number"
 							value={formData.phone_number}
 							onChange={handleChange}
-							required
 							autoComplete="tel"
 							inputMode="tel"
-							aria-required="true"
-							aria-invalid={
-								formData.phone_number === "" ? "true" : "false"
-							}
-							aria-describedby="phone-error"
+							placeholder="Optional – include your contact number if you would like us to call you back."
 						/>
-						{formData.phone_number === "" && (
-							<p id="phone-error" className="error-text">
-								Please enter your phone number
-							</p>
-						)}
-
 						<label htmlFor="user_message">Message:</label>
 						<textarea
 							id="user_message"
@@ -209,11 +195,10 @@ export default function ContactPage() {
 							aria-describedby="message-error"
 						/>
 						{formData.user_message.length < 10 && (
-							<p id="message-error" className="error-text">
-								Message should be at least 10 characters long
+							<p id="message-error" className="text">
+								Message should be at least 10 characters long.
 							</p>
 						)}
-
 						{/* Honeypot (hidden) */}
 						<input
 							type="text"
@@ -224,11 +209,9 @@ export default function ContactPage() {
 							autoComplete="off"
 							tabIndex={-1}
 						/>
-
 						<button type="submit" disabled={!canSubmit || submitting}>
 							{submitting ? "Sending..." : "Send"}
 						</button>
-
 						{status !== "idle" && (
 							<div role="status" aria-live="polite">
 								{status === "success"

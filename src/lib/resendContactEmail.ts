@@ -11,11 +11,11 @@ export async function sendContactEmail(data: ContactFormData) {
 	const resend = new Resend(process.env.RESEND_TRANSACTIONAL_API_KEY!);
 
 	const text = `
-New Contact Form Submission
+Contact Form Submission
 
 Name: ${data.full_name}
 Email: ${data.contact_email}
-Phone: ${data.phone_number}
+${data.phone_number ? `Phone: ${data.phone_number}\n` : ""}
 
 Message:
 ${data.user_message}
@@ -28,9 +28,9 @@ Almond River Records
 
 	try {
 		await resend.emails.send({
-			from: "Almond River Contact Form <noreply@orders.almondriverrecords.online>",
+			from: "Almond River Records Contact Form <noreply@orders.almondriverrecords.online>",
 			to: [toEmail],
-			subject: "New Contact Form Submission",
+			subject: "Contact Form Submission",
 			replyTo: data.contact_email,
 			text,
 		});
