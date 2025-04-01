@@ -11,7 +11,7 @@ export default function ContactPage() {
 		contact_email: "",
 		phone_number: "",
 		user_message: "",
-		website: "", // honeypot
+		website: "",
 		csrf_token: "",
 	});
 	const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -37,6 +37,12 @@ export default function ContactPage() {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
+	const sanitize = (str: string): string =>
+		str
+			.replace(/<[^>]*>?/gm, "")
+			.trim()
+			.slice(0, 500);
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -47,21 +53,18 @@ export default function ContactPage() {
 			return;
 		}
 
-		// Honeypot check
 		if (formData.website) {
 			console.warn("Bot detected (honeypot triggered)");
 			setStatus("success");
 			return;
 		}
 
-		// CSRF check
 		const localToken = localStorage.getItem("csrf_token");
 		if (!localToken || formData.csrf_token !== localToken) {
 			alert("Security token mismatch. Please reload the form.");
 			return;
 		}
 
-		// Basic validation
 		if (
 			formData.user_message.length < 10 ||
 			!/([aeiou])/.test(formData.user_message)
@@ -72,13 +75,22 @@ export default function ContactPage() {
 
 		setSubmitting(true);
 
+		const sanitized = {
+			full_name: sanitize(formData.full_name),
+			contact_email: sanitize(formData.contact_email),
+			phone_number: sanitize(formData.phone_number),
+			user_message: sanitize(formData.user_message),
+			website: "",
+			csrf_token: formData.csrf_token,
+		};
+
 		try {
 			const res = await fetch("/api/contact", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(formData),
+				body: JSON.stringify(sanitized),
 			});
 
 			if (res.ok) {
@@ -128,7 +140,15 @@ export default function ContactPage() {
 							onChange={handleChange}
 							required
 							autoComplete="name"
+							aria-required="true"
+							aria-invalid={formData.full_name === "" ? "true" : "false"}
+							aria-describedby="name-error"
 						/>
+						{formData.full_name === "" && (
+							<p id="name-error" className="error-text">
+								Please enter your name
+							</p>
+						)}
 
 						<label htmlFor="contact_email">Email:</label>
 						<input
@@ -140,7 +160,17 @@ export default function ContactPage() {
 							required
 							autoComplete="email"
 							inputMode="email"
+							aria-required="true"
+							aria-invalid={
+								formData.contact_email === "" ? "true" : "false"
+							}
+							aria-describedby="email-error"
 						/>
+						{formData.contact_email === "" && (
+							<p id="email-error" className="error-text">
+								Please enter your email address
+							</p>
+						)}
 
 						<label htmlFor="phone_number">Phone:</label>
 						<input
@@ -152,7 +182,17 @@ export default function ContactPage() {
 							required
 							autoComplete="tel"
 							inputMode="tel"
+							aria-required="true"
+							aria-invalid={
+								formData.phone_number === "" ? "true" : "false"
+							}
+							aria-describedby="phone-error"
 						/>
+						{formData.phone_number === "" && (
+							<p id="phone-error" className="error-text">
+								Please enter your phone number
+							</p>
+						)}
 
 						<label htmlFor="user_message">Message:</label>
 						<textarea
@@ -162,7 +202,17 @@ export default function ContactPage() {
 							onChange={handleChange}
 							required
 							rows={5}
+							aria-required="true"
+							aria-invalid={
+								formData.user_message.length < 10 ? "true" : "false"
+							}
+							aria-describedby="message-error"
 						/>
+						{formData.user_message.length < 10 && (
+							<p id="message-error" className="error-text">
+								Message should be at least 10 characters long
+							</p>
+						)}
 
 						{/* Honeypot (hidden) */}
 						<input
