@@ -127,7 +127,10 @@ export default function ContactPage() {
 
 					<form
 						onKeyDown={(e) => {
-							if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+							if (
+								e.key === "Enter" &&
+								(e.target as HTMLElement).tagName !== "TEXTAREA"
+							) {
 								e.preventDefault();
 							}
 						}}
