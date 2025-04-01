@@ -32,20 +32,27 @@ export async function fetchAndUpdateTracklist(
 	record: RecordMetadata
 ): Promise<void> {
 	try {
+		console.log(
+			`🔍 Attempting Discogs search for "${record.title}" by ${record.artist_names_text}`
+		);
+
 		const releaseId = await fetchDiscogsReleaseId(record);
 		if (!releaseId) {
 			console.warn(`⚠️ No Discogs match found for "${record.title}"`);
 			return;
 		}
 
+		console.log(`🎯 Found Discogs releaseId: ${releaseId}`);
+
 		const tracklist = await fetchDiscogsTracklist(releaseId);
+		console.log(`📀 Tracklist retrieved:`, tracklist);
 
 		await supabase
 			.from("vinyl_records")
-			.update({ tracklist /*, discogs_release_id: releaseId */ })
+			.update({ tracklist })
 			.eq("id", record.id);
 
-		console.log(`✅ Tracklist added for "${record.title}"`);
+		console.log(`✅ Tracklist saved for "${record.title}"`);
 	} catch (error) {
 		console.error(
 			`❌ Error fetching Discogs data for "${record.title}":`,
