@@ -139,7 +139,7 @@ export default function EditRecordPage() {
 			<Link href="/admin/manage-records">← Back to Manage Records</Link>
 
 			<h1 className="admin-form-title">Edit Record</h1>
-			<form onSubmit={handleSubmit}>
+			<form onSubmit={handleSubmit} className="admin-form">
 				<label>
 					Title
 					<input name="title" value={form.title} onChange={handleChange} />
