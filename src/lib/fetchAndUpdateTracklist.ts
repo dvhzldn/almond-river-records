@@ -3,6 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 type RecordMetadata = {
 	id: string;
 	title: string;
+	sub_title?: string;
 	artist_names_text: string;
 	catalogue_number?: string;
 	label?: string;
@@ -66,9 +67,20 @@ export async function fetchAndUpdateTracklist(
 async function fetchDiscogsReleaseId(
 	record: RecordMetadata
 ): Promise<string | null> {
-	let query = `${record.title} ${record.artist_names_text}`;
+	let query = `${record.title}`;
+
+	if (record.sub_title) {
+		query += ` ${record.sub_title}`;
+		console.log(`📝 Including sub-title in search: ${record.sub_title}`);
+	}
+
+	query += ` ${record.artist_names_text}`;
+
 	if (record.catalogue_number) {
 		query += ` ${record.catalogue_number}`;
+		console.log(
+			`🔢 Including catalogue number in search: ${record.catalogue_number}`
+		);
 	}
 	if (record.label) {
 		query += ` ${record.label}`;
@@ -77,23 +89,30 @@ async function fetchDiscogsReleaseId(
 
 	const token = process.env.DISCOGS_TOKEN;
 	const auth = token ? `&token=${token}` : "";
-	const url = `https://api.discogs.com/database/search?q=${query}&type=release&format=Vinyl&${auth}`;
+	const encodedQuery = encodeURIComponent(query);
+	const url = `https://api.discogs.com/database/search?q=${encodedQuery}&type=release&format=Vinyl${auth ? `&${auth}` : ""}`;
 
 	const res = await fetch(url);
 	if (!res.ok) return null;
 
 	const data = (await res.json()) as DiscogsSearchResponse;
 	const result = data.results?.[0];
-	if (!result && (record.catalogue_number || record.label)) {
+
+	if (
+		!result &&
+		(record.catalogue_number || record.label || record.sub_title)
+	) {
 		console.warn(
-			"🔁 No match with full query — retrying without label/catalogue number..."
+			"🔁 No match with full query — retrying without label, subtitle, or catalogue number..."
 		);
 		return await fetchDiscogsReleaseId({
 			...record,
+			sub_title: undefined,
 			catalogue_number: undefined,
 			label: undefined,
 		});
 	}
+
 	return result?.id?.toString() ?? null;
 }
 
