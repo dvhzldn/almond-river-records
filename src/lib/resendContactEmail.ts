@@ -28,7 +28,7 @@ Almond River Records
 
 	try {
 		await resend.emails.send({
-			from: "Almond River Contact Form <noreply@contact.almondriverrecords.online>",
+			from: "Almond River Contact Form <noreply@orders.almondriverrecords.online>",
 			to: [toEmail],
 			subject: "New Contact Form Submission",
 			replyTo: data.contact_email,
