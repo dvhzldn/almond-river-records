@@ -7,7 +7,7 @@ export default function TrackList({ tracklist }: TrackListProps) {
 
 	return (
 		<div className="tracklist">
-			<h4>Track Listing</h4>
+			<p>Track Listing</p>
 			<ol>
 				{tracklist.map((track, index) => (
 					<li key={index}>{track}</li>

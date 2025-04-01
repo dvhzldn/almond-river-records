@@ -14,6 +14,7 @@ type VinylRecord = {
 	genre: string[];
 	cover_image_url: string;
 	other_images: string[];
+	tracklist?: string[];
 };
 
 export async function GET(request: Request) {
@@ -51,7 +52,8 @@ export async function GET(request: Request) {
 				release_year,
 				genre,
 				cover_image_url,
-				other_images
+				other_images,
+				tracklist
 			`,
 				{ count: "exact" }
 			)
@@ -122,6 +124,7 @@ export async function GET(request: Request) {
 			genre: r.genre || [],
 			coverImageUrl: r.cover_image_url,
 			otherImages: r.other_images ?? [],
+			tracklist: r.tracklist ?? [],
 		}));
 
 		return NextResponse.json(
