@@ -197,8 +197,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 					<p>
 						<strong>Year:</strong> {record.releaseYear ?? "N/A"}
 					</p>
+
 					{record.tracklist && record.tracklist.length > 0 ? (
-						<TrackList tracklist={record.tracklist} />
+						<div style={{ maxWidth: "500px", marginInline: "auto" }}>
+							<TrackList tracklist={record.tracklist} />
+						</div>
 					) : (
 						<p className="text"></p>
 					)}

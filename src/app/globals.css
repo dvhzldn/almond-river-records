@@ -460,6 +460,27 @@ textarea:focus-visible {
 	inset-inline-end: 5rem;
 }
 
+.tracklist {
+	text-align: left;
+	margin-block-start: 1.5rem;
+	padding-inline: 1rem;
+}
+
+.tracklist-title {
+	font-size: 1.1rem;
+	font-weight: bold;
+	margin-block-end: 0.5rem;
+	border-bottom: 1px solid var(--colour-4);
+	padding-block-end: 0.25rem;
+}
+
+.tracklist-list {
+	padding-inline-start: 1.5rem; /* Indent list numbers */
+	line-height: 1.6;
+	display: grid;
+	gap: 0.4rem;
+}
+
 /* Contact Info Layout */
 .contact-info {
 	display: flex;
