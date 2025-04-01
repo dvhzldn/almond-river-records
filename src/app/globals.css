@@ -87,7 +87,7 @@ h2,
 h3,
 h4 {
 	font-family: var(--heading-font);
-	margin-block-end: 0.3rem;
+	margin-block-end: 0.1rem;
 }
 
 h4,
@@ -408,8 +408,8 @@ textarea:focus-visible {
 
 .modalContent {
 	background: var(--colour-7);
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding-block: 0.1rem;
+	padding-inline: 0.1rem;
 	border-radius: var(--border-radius);
 	max-inline-size: 600px;
 	inline-size: 90%;
@@ -418,7 +418,7 @@ textarea:focus-visible {
 }
 
 .modal-image {
-	max-inline-size: 500px;
+	max-inline-size: 400px;
 	block-size: auto;
 	border-radius: 5px;
 	display: block;
@@ -439,7 +439,7 @@ textarea:focus-visible {
 
 .modal-image-container {
 	position: relative;
-	margin-block-end: 1rem;
+	margin-block-end: 0.1rem;
 }
 
 /* Generic class to ensure buttons float above the image */
@@ -462,23 +462,25 @@ textarea:focus-visible {
 
 .tracklist {
 	text-align: left;
-	margin-block-start: 1.5rem;
+	margin-block-start: 0.5rem;
 	padding-inline: 1rem;
 }
 
 .tracklist-title {
-	font-size: 1.1rem;
+	font-size: 0.9rem;
 	font-weight: bold;
-	margin-block-end: 0.5rem;
+	margin-block-end: 0.1rem;
 	border-bottom: 1px solid var(--colour-4);
-	padding-block-end: 0.25rem;
+	padding-block-end: 0.1rem;
 }
 
-.tracklist-list {
-	padding-inline-start: 1.5rem; /* Indent list numbers */
-	line-height: 1.6;
+.tracklist-list li {
+	font-size: 0.8rem;
+	list-style: none;
+	padding-inline-start: 1.5rem;
+	line-height: 1.1;
 	display: grid;
-	gap: 0.4rem;
+	gap: 0.1rem;
 }
 
 /* Contact Info Layout */
