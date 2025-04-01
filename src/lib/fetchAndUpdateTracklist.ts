@@ -67,7 +67,10 @@ async function fetchDiscogsReleaseId(
 	const query = encodeURIComponent(
 		`${record.title} ${record.artist_names_text}`
 	);
-	const url = `https://api.discogs.com/database/search?q=${query}&type=release&format=Vinyl`;
+
+	const token = process.env.DISCOGS_TOKEN;
+	const auth = token ? `&token=${token}` : "";
+	const url = `https://api.discogs.com/database/search?q=${query}&type=release&format=Vinyl&${auth}`;
 
 	const res = await fetch(url);
 	if (!res.ok) return null;
