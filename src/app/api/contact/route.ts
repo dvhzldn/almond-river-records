@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendContactEmail } from "@/lib/resendContactEmail";
 
 export async function POST(req: NextRequest) {
 	try {
@@ -18,39 +19,14 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: "Invalid token" }, { status: 400 });
 		}
 
-		const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
-		if (!accessKey) {
-			console.error("❌ WEB3FORMS_ACCESS_KEY is not set");
-			return NextResponse.json(
-				{ error: "Server config error" },
-				{ status: 500 }
-			);
-		}
-
-		const payload = {
-			access_key: accessKey,
-			name: body.full_name,
-			email: body.contact_email,
-			phone: body.phone_number,
-			message: body.user_message,
-			from_name: "Almond River Contact Form",
-			subject: "New contact form submission",
+		const contactData = {
+			full_name: body.full_name,
+			contact_email: body.contact_email,
+			phone_number: body.phone_number,
+			user_message: body.user_message,
 		};
 
-		const res = await fetch("https://api.web3forms.com/submit", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Accept: "application/json",
-			},
-			body: JSON.stringify(payload),
-		});
-
-		const result = await res.json();
-		if (!result.success) {
-			console.error("❌ Web3Forms Error", result);
-			return NextResponse.json({ error: "Failed to send" }, { status: 500 });
-		}
+		await sendContactEmail(contactData);
 
 		return NextResponse.json({ success: true });
 	} catch (err) {
