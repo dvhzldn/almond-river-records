@@ -466,6 +466,13 @@ textarea:focus-visible {
 	padding-inline: 1rem;
 }
 
+.tracklist-wrapper {
+	max-block-size: 200px; /* Adjust height as needed */
+	overflow-y: auto;
+	margin-block-start: 1rem;
+	padding-inline: 1rem;
+}
+
 .tracklist-title {
 	font-size: 0.9rem;
 	font-weight: bold;
@@ -1379,14 +1386,14 @@ hr {
 
 	/* Top-left corner */
 	.modal-top-left {
-		inset-block-start: 5rem;
-		inset-inline-start: 2rem;
+		inset-block-start: 3.7rem;
+		inset-inline-start: 1rem;
 	}
 
 	/* Top-right corner */
 	.modal-top-right {
-		inset-block-start: 5rem;
-		inset-inline-end: 2rem;
+		inset-block-start: 3.7rem;
+		inset-inline-end: 1rem;
 	}
 
 	/* Show burger icon */
@@ -1549,5 +1556,9 @@ hr {
 	/* When open, display filter controls in mobile view */
 	.filter-controls.open {
 		display: flex;
+	}
+
+	.tracklist-wrapper {
+		max-block-size: 150px;
 	}
 }
