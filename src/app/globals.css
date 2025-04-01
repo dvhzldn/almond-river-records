@@ -467,7 +467,7 @@ textarea:focus-visible {
 }
 
 .tracklist-wrapper {
-	max-block-size: 200px; /* Adjust height as needed */
+	max-block-size: 200px;
 	overflow-y: auto;
 	margin-block-start: 1rem;
 	padding-inline: 1rem;

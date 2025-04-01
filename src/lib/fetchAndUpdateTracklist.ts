@@ -4,6 +4,7 @@ type RecordMetadata = {
 	id: string;
 	title: string;
 	artist_names_text: string;
+	catalogue_number?: string;
 };
 
 interface DiscogsTrack {
@@ -64,10 +65,10 @@ export async function fetchAndUpdateTracklist(
 async function fetchDiscogsReleaseId(
 	record: RecordMetadata
 ): Promise<string | null> {
-	const query = encodeURIComponent(
-		`${record.title} ${record.artist_names_text}`
-	);
-
+	let query = `${record.title} ${record.artist_names_text}`;
+	if (record.catalogue_number) {
+		query += ` ${record.catalogue_number}`;
+	}
 	const token = process.env.DISCOGS_TOKEN;
 	const auth = token ? `&token=${token}` : "";
 	const url = `https://api.discogs.com/database/search?q=${query}&type=release&format=Vinyl&${auth}`;
