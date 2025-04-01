@@ -1,18 +1,35 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ContactPage() {
+	const router = useRouter();
+
 	const [formData, setFormData] = useState({
-		name: "",
-		email: "",
-		phone: "",
-		message: "",
+		full_name: "",
+		contact_email: "",
+		phone_number: "",
+		user_message: "",
+		website: "", // honeypot
+		csrf_token: "",
 	});
 	const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 	const [submitting, setSubmitting] = useState(false);
+	const [canSubmit, setCanSubmit] = useState(false);
 
-	const router = useRouter();
+	// Delay submission to prevent bots
+	useEffect(() => {
+		const timer = setTimeout(() => setCanSubmit(true), 2000);
+		return () => clearTimeout(timer);
+	}, []);
+
+	// CSRF token generation
+	useEffect(() => {
+		const token = crypto.randomUUID();
+		localStorage.setItem("csrf_token", token);
+		setFormData((prev) => ({ ...prev, csrf_token: token }));
+	}, []);
 
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -22,24 +39,58 @@ export default function ContactPage() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		// Rate limiting
+		const lastSent = localStorage.getItem("lastContactTime");
+		if (lastSent && Date.now() - parseInt(lastSent) < 60000) {
+			alert("Please wait a moment before submitting again.");
+			return;
+		}
+
+		// Honeypot check
+		if (formData.website) {
+			console.warn("Bot detected (honeypot triggered)");
+			setStatus("success");
+			return;
+		}
+
+		// CSRF check
+		const localToken = localStorage.getItem("csrf_token");
+		if (!localToken || formData.csrf_token !== localToken) {
+			alert("Security token mismatch. Please reload the form.");
+			return;
+		}
+
+		// Basic validation
+		if (
+			formData.user_message.length < 10 ||
+			!/([aeiou])/.test(formData.user_message)
+		) {
+			alert("Please enter a valid message.");
+			return;
+		}
+
 		setSubmitting(true);
 
 		try {
-			const response = await fetch("https://api.web3forms.com/submit", {
+			const res = await fetch("/api/contact", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Accept: "application/json",
 				},
-				body: JSON.stringify({
-					access_key: "1136990a-d70a-42f2-8fde-1e44fad8ee7f",
-					...formData,
-				}),
+				body: JSON.stringify(formData),
 			});
 
-			const result = await response.json();
-			if (result.success) {
-				setFormData({ name: "", email: "", phone: "", message: "" });
+			if (res.ok) {
+				setFormData({
+					full_name: "",
+					contact_email: "",
+					phone_number: "",
+					user_message: "",
+					website: "",
+					csrf_token: "",
+				});
+				localStorage.setItem("lastContactTime", Date.now().toString());
 				setStatus("success");
 				setTimeout(() => router.push("/"), 3000);
 			} else {
@@ -62,83 +113,78 @@ export default function ContactPage() {
 					<h2 id="contact-form-heading">Send us a message</h2>
 
 					<form onSubmit={handleSubmit} className="form" noValidate>
-						<label htmlFor="name">Name:</label>
+						<input
+							type="hidden"
+							name="csrf_token"
+							value={formData.csrf_token}
+						/>
+
+						<label htmlFor="full_name">Name:</label>
 						<input
 							type="text"
-							id="name"
-							name="name"
-							value={formData.name}
+							id="full_name"
+							name="full_name"
+							value={formData.full_name}
 							onChange={handleChange}
 							required
-							aria-required="true"
 							autoComplete="name"
 						/>
 
-						<label htmlFor="email">Email:</label>
+						<label htmlFor="contact_email">Email:</label>
 						<input
 							type="email"
-							id="email"
-							name="email"
-							value={formData.email}
+							id="contact_email"
+							name="contact_email"
+							value={formData.contact_email}
 							onChange={handleChange}
 							required
-							aria-required="true"
 							autoComplete="email"
 							inputMode="email"
 						/>
 
-						<label htmlFor="phone">Phone:</label>
+						<label htmlFor="phone_number">Phone:</label>
 						<input
 							type="tel"
-							id="phone"
-							name="phone"
-							value={formData.phone}
+							id="phone_number"
+							name="phone_number"
+							value={formData.phone_number}
 							onChange={handleChange}
 							required
-							aria-required="true"
 							autoComplete="tel"
 							inputMode="tel"
 						/>
 
-						<label htmlFor="message">Message:</label>
+						<label htmlFor="user_message">Message:</label>
 						<textarea
-							id="message"
-							name="message"
-							value={formData.message}
+							id="user_message"
+							name="user_message"
+							value={formData.user_message}
 							onChange={handleChange}
 							required
-							aria-required="true"
 							rows={5}
 						/>
 
-						<button type="submit" disabled={submitting}>
+						{/* Honeypot (hidden) */}
+						<input
+							type="text"
+							name="website"
+							value={formData.website}
+							onChange={handleChange}
+							style={{ display: "none" }}
+							autoComplete="off"
+							tabIndex={-1}
+						/>
+
+						<button type="submit" disabled={!canSubmit || submitting}>
 							{submitting ? "Sending..." : "Send"}
 						</button>
 
 						{status !== "idle" && (
-							<>
-								{/* Visible message */}
-								<div
-									className={`form-status ${status}`}
-									role="status"
-									aria-live="polite"
-								>
-									{status === "success"
-										? "Thanks for getting in touch. Redirecting to homepage..."
-										: "Message failed to send. Please try again."}
-								</div>
-
-								{/* SR-only duplicate for assistive tech (in case visual one is styled away) */}
-								<div
-									className="sr-only"
-									aria-live="polite"
-									role="status"
-								>
-									{status === "success"
-										? "Thanks for getting in touch. Redirecting to homepage..."
-										: "Message failed to send. Please try again."}
-								</div>
-							</>
+							<div role="status" aria-live="polite">
+								{status === "success"
+									? "✅ Thanks for getting in touch. Redirecting..."
+									: "❌ Message failed to send. Please try again."}
+							</div>
 						)}
 					</form>
 				</section>
