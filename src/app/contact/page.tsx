@@ -94,6 +94,7 @@ export default function ContactPage() {
 			});
 
 			if (res.ok) {
+				window.scrollTo({ top: 0, behavior: "smooth" });
 				setFormData({
 					full_name: "",
 					contact_email: "",
@@ -124,7 +125,16 @@ export default function ContactPage() {
 				<section aria-labelledby="contact-form-heading">
 					<h2 id="contact-form-heading">Send us a message</h2>
 
-					<form onSubmit={handleSubmit} className="form" noValidate>
+					<form
+						onKeyDown={(e) => {
+							if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+								e.preventDefault();
+							}
+						}}
+						onSubmit={handleSubmit}
+						className="form"
+						noValidate
+					>
 						<input
 							type="hidden"
 							name="csrf_token"
@@ -138,16 +148,14 @@ export default function ContactPage() {
 							value={formData.full_name}
 							onChange={handleChange}
 							required
+							minLength={3}
 							autoComplete="name"
+							inputMode="text"
 							aria-required="true"
 							aria-invalid={formData.full_name === "" ? "true" : "false"}
-							aria-describedby="name-error"
+							placeholder="Enter your name"
+							autoCapitalize="words"
 						/>
-						{formData.full_name === "" && (
-							<p id="name-error" className="text">
-								Please enter your name
-							</p>
-						)}
 						<label htmlFor="contact_email">Email:</label>
 						<input
 							type="email"
@@ -156,19 +164,16 @@ export default function ContactPage() {
 							value={formData.contact_email}
 							onChange={handleChange}
 							required
+							minLength={5}
 							autoComplete="email"
 							inputMode="email"
 							aria-required="true"
 							aria-invalid={
 								formData.contact_email === "" ? "true" : "false"
 							}
-							aria-describedby="email-error"
+							placeholder="Enter your email address"
+							pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
 						/>
-						{formData.contact_email === "" && (
-							<p id="email-error" className="text">
-								Please enter your email address
-							</p>
-						)}
 						<label htmlFor="phone_number">Phone (optional):</label>
 						<input
 							type="tel"
@@ -178,7 +183,7 @@ export default function ContactPage() {
 							onChange={handleChange}
 							autoComplete="tel"
 							inputMode="tel"
-							placeholder="Optional – include your contact number if you would like us to call you back."
+							placeholder="Contact number if you would like a call back."
 						/>
 						<label htmlFor="user_message">Message:</label>
 						<textarea
@@ -187,18 +192,15 @@ export default function ContactPage() {
 							value={formData.user_message}
 							onChange={handleChange}
 							required
-							rows={5}
+							rows={6}
+							inputMode="text"
 							aria-required="true"
 							aria-invalid={
 								formData.user_message.length < 10 ? "true" : "false"
 							}
-							aria-describedby="message-error"
+							placeholder="Message should be at least 10 characters long."
+							minLength={10}
 						/>
-						{formData.user_message.length < 10 && (
-							<p id="message-error" className="text">
-								Message should be at least 10 characters long.
-							</p>
-						)}
 						{/* Honeypot (hidden) */}
 						<input
 							type="text"
@@ -209,14 +211,25 @@ export default function ContactPage() {
 							autoComplete="off"
 							tabIndex={-1}
 						/>
-						<button type="submit" disabled={!canSubmit || submitting}>
-							{submitting ? "Sending..." : "Send"}
+						<button disabled={!canSubmit || submitting}>
+							{submitting
+								? "Sending..."
+								: status === "success"
+									? "Sent!"
+									: "Send"}
 						</button>
 						{status !== "idle" && (
 							<div role="status" aria-live="polite">
-								{status === "success"
-									? "✅ Thanks for getting in touch. Redirecting..."
-									: "❌ Message failed to send. Please try again."}
+								{status === "success" && (
+									<p className="success-text">
+										✅ Message sent successfully!
+									</p>
+								)}
+								{status === "error" && (
+									<p className="error-text">
+										❌ Something went wrong. Please try again.
+									</p>
+								)}
 							</div>
 						)}
 					</form>

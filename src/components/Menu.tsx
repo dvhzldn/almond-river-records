@@ -97,6 +97,11 @@ export default function Menu() {
 							Visit The Shop
 						</Link>
 					</li>
+					<li className={isActive("/record-cleaning") ? "active" : ""}>
+						<Link href="/record-cleaning" onClick={closeMenu}>
+							Record Cleaning
+						</Link>
+					</li>
 					<li className={isActive("/contact") ? "active" : ""}>
 						<Link href="/contact" onClick={closeMenu}>
 							Get In Touch
