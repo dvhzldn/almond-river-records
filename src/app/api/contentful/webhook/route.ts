@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { fetchAndUpdateTracklist } from "@/lib/fetchAndUpdateTracklist";
 
 const supabase = createClient(
 	process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -218,6 +219,14 @@ export async function POST(req: Request) {
 		const { error } = await supabase
 			.from("vinyl_records")
 			.upsert(record, { onConflict: "id" });
+
+		if (!error) {
+			await fetchAndUpdateTracklist(supabase, {
+				id,
+				title: record.title,
+				artist_names_text: record.artist_names_text,
+			});
+		}
 
 		if (error) {
 			console.error("❌ Error inserting vinyl record:", error);

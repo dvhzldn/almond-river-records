@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 import TrackRecordView from "./TrackRecordView";
 import { useEffect, useRef } from "react";
+import TrackList from "./TrackList";
 
 interface ModalProps {
 	record: {
@@ -27,6 +28,7 @@ interface ModalProps {
 		releaseYear?: number | null;
 		genre?: string[] | string;
 		id: string;
+		tracklist?: string[];
 	};
 	onClose: () => void;
 }
@@ -168,7 +170,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 					>
 						Buy
 					</button>
-
 					{isInBasket ? (
 						<button
 							className="remove-button modal-above-image modal-top-right"
@@ -184,7 +185,6 @@ export default function Modal({ record, onClose }: ModalProps) {
 							Add <FontAwesomeIcon icon={faShoppingBasket} />
 						</button>
 					)}
-
 					<p>
 						<strong>Label:</strong> {record.label}
 					</p>
@@ -197,6 +197,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 					<p>
 						<strong>Year:</strong> {record.releaseYear ?? "N/A"}
 					</p>
+					{record.tracklist && record.tracklist.length > 0 ? (
+						<TrackList tracklist={record.tracklist} />
+					) : (
+						<p className="text"></p>
+					)}
 				</div>
 			</div>
 			<div
