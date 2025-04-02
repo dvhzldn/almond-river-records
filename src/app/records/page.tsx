@@ -1,33 +1,36 @@
 import { Metadata } from "next";
-import { supabase } from "@/lib/supabaseClient";
 import ClientRecordBrowser from "@/components/ClientRecordBrowser";
 import type { VinylRecord } from "@/hooks/useRecords";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const metadata: Metadata = {
 	title: "Records for Sale – Almond River",
 };
 
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
 export default async function RecordsPage() {
-	const { data: recordsData } = await supabase
+	const { data: recordsData } = await supabaseAdmin
 		.from("vinyl_records")
 		.select(
 			`
-			id,
-			title,
-			sub_title,
-			artist_names,
-			cover_image_url,
-			release_year,
-			price,
-			genre,
-			vinyl_condition,
-			sleeve_condition,
-			label,
-			quantity,
-			tracklist
-		`
+      id,
+      title,
+      sub_title,
+      artist_names,
+      cover_image_url,
+      release_year,
+      price,
+      genre,
+      vinyl_condition,
+      sleeve_condition,
+      label,
+      quantity,
+      tracklist
+    `
 		)
-		.gt("quantity", 0) // Only include records that are in stock
+		.gt("quantity", 0)
 		.limit(100);
 
 	const records: VinylRecord[] = (recordsData ?? []).map((r) => ({
@@ -46,11 +49,11 @@ export default async function RecordsPage() {
 		tracklist: r.tracklist ?? [],
 	}));
 
-	const artistOptions = Array.from(
+	const artistOptions: string[] = Array.from(
 		new Set(records.flatMap((r) => r.artistName))
 	).sort();
 
-	const genreOptions = Array.from(
+	const genreOptions: string[] = Array.from(
 		new Set(records.flatMap((r) => r.genre))
 	).sort();
 

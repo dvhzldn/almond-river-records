@@ -14,17 +14,17 @@ import Image from "next/image";
 const Modal = dynamic(() => import("@/components/Modal"), { ssr: false });
 
 interface Props {
-	initialRecords: VinylRecord[];
-	artistOptions: string[];
-	genreOptions: string[];
+	initialRecords?: VinylRecord[];
+	artistOptions?: string[];
+	genreOptions?: string[];
 }
 
 const pageSize = 24;
 
 export default function ClientRecordBrowser({
-	initialRecords,
-	artistOptions,
-	genreOptions,
+	initialRecords = [],
+	artistOptions = [],
+	genreOptions = [],
 }: Props) {
 	const { handleAddToBasket } = useAddToBasketWithTracking();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
@@ -61,31 +61,34 @@ export default function ClientRecordBrowser({
 	);
 
 	useEffect(() => {
-		async function fetchRecords() {
-			setLoading(true);
-			const params = new URLSearchParams();
-			if (search) params.append("search", search);
-			if (condition) params.append("condition", condition);
-			if (artist) params.append("artist", artist);
-			if (genre) params.append("genre", genre);
-			if (decade) params.append("decade", decade);
-			if (sort) params.append("sort", sort);
-			params.append("limit", pageSize.toString());
-			params.append("skip", ((page - 1) * pageSize).toString());
+		const debounce = setTimeout(() => {
+			async function fetchRecords() {
+				setLoading(true);
+				const params = new URLSearchParams();
+				if (search) params.append("search", search);
+				if (condition) params.append("condition", condition);
+				if (artist) params.append("artist", artist);
+				if (genre) params.append("genre", genre);
+				if (decade) params.append("decade", decade);
+				if (sort) params.append("sort", sort);
+				params.append("limit", pageSize.toString());
+				params.append("skip", ((page - 1) * pageSize).toString());
 
-			try {
-				const res = await fetch(`/api/records?${params.toString()}`);
-				const data = await res.json();
-				setRecords(data.records);
-				setTotal(data.total);
-			} catch (err) {
-				console.error("Failed to load records", err);
-			} finally {
-				setLoading(false);
+				try {
+					const res = await fetch(`/api/records?${params.toString()}`);
+					const data = await res.json();
+					setRecords(data.records);
+					setTotal(data.total);
+				} catch (err) {
+					console.error("Failed to load records", err);
+				} finally {
+					setLoading(false);
+				}
 			}
-		}
+			fetchRecords();
+		}, 300);
 
-		fetchRecords();
+		return () => clearTimeout(debounce);
 	}, [search, condition, artist, genre, decade, sort, page]);
 
 	const renderedRecords = useMemo(() => {
@@ -104,7 +107,7 @@ export default function ClientRecordBrowser({
 						height={250}
 						sizes="(max-width: 768px) 100vw, 250px"
 						quality={60}
-						priority
+						loading="lazy"
 					/>
 					<div className="record-price">£{record.price}</div>
 				</div>
