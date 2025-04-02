@@ -6,6 +6,7 @@ import SiteMenu from "@/components/Menu";
 import Footer from "@/components/Footer";
 import { BasketProvider } from "./api/context/BasketContext";
 import { Suspense } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 const lato = Lato({
 	subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
 					<Suspense fallback={<div>Loading...</div>}>
 						<main>{children}</main>
 					</Suspense>
+					<Analytics />
 					<footer>
 						<Footer />
 					</footer>
