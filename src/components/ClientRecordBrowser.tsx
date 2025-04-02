@@ -143,9 +143,9 @@ export default function ClientRecordBrowser({
 									handleAddToBasket({
 										id: record.id,
 										title: record.title,
-										artistName: record.artist_names,
+										artistName: record.artistName,
 										price: record.price,
-										coverImage: record.cover_image_url,
+										coverImage: record.coverImageUrl,
 									});
 								}}
 							>
