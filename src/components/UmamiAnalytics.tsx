@@ -7,7 +7,7 @@ import React from "react";
 const UMAMI_SCRIPT_URL = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL;
 const UMAMI_WEBSITE_ID = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
 
-export default function Analytics(): React.ReactElement | null {
+export default function UmamiAnalytics(): React.ReactElement | null {
 	const pathname = usePathname();
 
 	const isExcludedPath =

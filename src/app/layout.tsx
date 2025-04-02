@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Analytics from "@/components/Analytics";
+import UmamiAnalytics from "@/components/UmamiAnalytics";
 import { Lato, Oswald } from "next/font/google";
 import "./globals.css";
 import SiteMenu from "@/components/Menu";
@@ -38,7 +38,7 @@ export default function RootLayout({
 					content="width=device-width, initial-scale=1"
 				/>
 
-				<Analytics />
+				<UmamiAnalytics />
 			</head>
 			<BasketProvider>
 				<body>
@@ -48,12 +48,12 @@ export default function RootLayout({
 					<Suspense fallback={<div>Loading...</div>}>
 						<main>{children}</main>
 					</Suspense>
-					<Analytics />
 					<footer>
 						<Footer />
 					</footer>
 				</body>
 			</BasketProvider>
+			<Analytics />
 		</html>
 	);
 }
