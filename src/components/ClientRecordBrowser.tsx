@@ -271,7 +271,7 @@ export default function ClientRecordBrowser({
 					</button>
 				</div>
 
-				<h4>Sort results by:</h4>
+				<h4>Sort records by:</h4>
 				<select
 					value={sort}
 					onChange={(e) => {

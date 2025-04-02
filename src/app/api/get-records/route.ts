@@ -1,55 +1,154 @@
 import { NextResponse } from "next/server";
-import { createClient, Asset } from "contentful";
-import { Document } from "@contentful/rich-text-types";
+import { supabase } from "@/lib/supabaseClient";
 
-type VinylRecordFields = {
+type VinylRecord = {
+	id: string;
 	title: string;
-	artistName: string[];
-	releaseYear: number;
-	genre: string[];
-	label: string;
+	artist_names: string[];
+	artist_names_text: string;
 	price: number;
-	catalogueNumber: string;
-	vinylCondition: string;
-	sleeveCondition: string;
-	description: Document;
-	coverImage?: Asset;
+	vinyl_condition: string;
+	sleeve_condition: string;
+	label: string;
+	release_year: number;
+	genre: string[];
+	cover_image_url: string;
+	other_images: string[];
+	tracklist?: string[];
 };
 
-const client = createClient({
-	space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID!,
-	accessToken: process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN!,
-});
-
-export async function GET() {
+export async function GET(request: Request) {
 	try {
-		const entries = await client.getEntries({
-			content_type: "vinylRecord",
-			order: ["-sys.updatedAt"],
-			limit: 1000,
-		});
+		const { searchParams } = new URL(request.url);
+		const getParam = (key: string): string | undefined => {
+			const value = searchParams.get(key);
+			return value?.trim() || undefined;
+		};
 
-		const records = entries.items.map((entry) => {
-			const fields = entry.fields as unknown as VinylRecordFields;
+		// Query parameters
+		const newThisWeek = getParam("newThisWeek");
+		const searchQuery = getParam("search");
+		const condition = getParam("condition");
+		const artist = getParam("artist");
+		const genre = getParam("genre");
+		const decadeParam = getParam("decade");
 
-			const coverImageUrl = fields.coverImage?.fields?.file?.url
-				? `https:${fields.coverImage.fields.file.url}`
-				: undefined;
+		// Pagination settings
+		const limit = Number(getParam("limit")) || 24; // Default to 24 items per page
+		const skip = Number(getParam("skip")) || 0; // Default to the first page
 
-			return {
-				id: entry.sys.id,
-				title: fields.title,
-				artistName: fields.artistName,
-				price: fields.price,
-				coverImageUrl,
-			};
-		});
+		// Sort parameter (can be 'recent' or 'artist')
+		const sort = getParam("sort") || "recent";
 
-		return NextResponse.json(records);
-	} catch (err) {
-		console.error("[Contentful Fetch Error]", err);
+		// Initialize the query to get records from Supabase
+		let query = supabase
+			.from("vinyl_records")
+			.select(
+				`
+				id,
+				title,
+				artist_names,
+				artist_names_text,
+				price,
+				vinyl_condition,
+				sleeve_condition,
+				label,
+				release_year,
+				genre,
+				cover_image_url,
+				other_images,
+				tracklist
+			`,
+				{ count: "exact" } // We need the exact count for pagination
+			)
+			.eq("in_stock", true)
+			.eq("sold", false)
+			.gt("quantity", 0); // Only in-stock and unsold records
+
+		// Apply sorting
+		if (sort === "artist") {
+			query = query.order("artist_names", { ascending: true });
+		} else if (sort === "recent") {
+			query = query.order("created_at", { ascending: false });
+		}
+
+		// Apply the pagination range
+		query = query.range(skip, skip + limit - 1);
+
+		// Apply filters based on query parameters
+		if (newThisWeek === "true") {
+			const sevenDaysAgo = new Date();
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			query = query.gte("created_at", sevenDaysAgo.toISOString());
+		}
+
+		if (searchQuery) {
+			query = query.or(
+				`title.ilike.%${searchQuery}%,artist_names_text.ilike.%${searchQuery}%`
+			);
+		}
+
+		if (decadeParam) {
+			const decadeNum = parseInt(decadeParam, 10);
+			if (!isNaN(decadeNum)) {
+				query = query
+					.gte("release_year", decadeNum)
+					.lte("release_year", decadeNum + 9);
+			}
+		}
+
+		if (condition) {
+			query = query.eq("vinyl_condition", condition);
+		}
+
+		if (artist) {
+			query = query.ilike("artist_names_text", `%${artist}%`);
+		}
+
+		if (genre) {
+			query = query.contains("genre", [genre]);
+		}
+
+		// Execute the query
+		const { data, error, count } = await query;
+
+		if (error || !data) {
+			console.error("❌ Supabase query error:", error);
+			return NextResponse.json(
+				{ error: "Failed to fetch records", details: error?.message },
+				{ status: 500 }
+			);
+		}
+
+		// Map the result to match the frontend needs
+		const records = data.map((r: VinylRecord) => ({
+			id: r.id,
+			title: r.title,
+			artistName: r.artist_names,
+			price: r.price,
+			vinylCondition: r.vinyl_condition,
+			sleeveCondition: r.sleeve_condition,
+			label: r.label,
+			releaseYear: r.release_year,
+			genre: r.genre || [],
+			coverImageUrl: r.cover_image_url,
+			otherImages: r.other_images ?? [],
+			tracklist: r.tracklist ?? [],
+		}));
+
+		// Return the response with the records and total count
 		return NextResponse.json(
-			{ error: "Failed to load records" },
+			{ records, total: count ?? 0 },
+			{
+				headers: {
+					"Cache-Control": "s-maxage=3600, stale-while-revalidate",
+				},
+			}
+		);
+	} catch (err) {
+		console.error("❌ Error in /api/records route:", err);
+		return NextResponse.json(
+			{ error: "Failed to fetch records" },
 			{ status: 500 }
 		);
 	}
