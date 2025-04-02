@@ -12,9 +12,9 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useMediaQuery } from "react-responsive";
 
-const Modal = dynamic(() => import("@/components/Modal"), {
+const Modal = dynamic(() => import("./Modal"), {
 	ssr: false,
-	loading: () => <div className="modal-loading">Loading…</div>,
+	loading: () => null,
 });
 
 interface Props {
