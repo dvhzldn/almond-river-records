@@ -100,7 +100,9 @@ export default function BasketPage() {
 							{basket.map((item, index) => {
 								const imageSrc =
 									item.coverImage && item.coverImage.trim() !== ""
-										? `${item.coverImage}?t=${Date.now()}`
+										? item.coverImage.includes("?")
+											? `${item.coverImage}&t=${Date.now()}`
+											: `${item.coverImage}?t=${Date.now()}`
 										: defaultImage;
 								const artistName = Array.isArray(item.artistName)
 									? item.artistName.join(", ")
