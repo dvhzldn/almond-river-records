@@ -102,6 +102,9 @@ export default function ClientRecordBrowser({
 						alt={`${record.title} by ${record.artistName.join(", ")}`}
 						width={250}
 						height={250}
+						sizes="(max-width: 768px) 100vw, 250px"
+						quality={60}
+						loading="lazy"
 					/>
 					<div className="record-price">£{record.price}</div>
 				</div>

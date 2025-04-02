@@ -163,7 +163,9 @@ export default function AboutPage() {
 								width={500}
 								height={350}
 								className="responsive-image"
-								priority
+								sizes="(max-width: 768px) 100vw, 250px"
+								quality={60}
+								loading="lazy"
 							/>
 							<figcaption>
 								Andy of Almond River Records outside the shop. Image:

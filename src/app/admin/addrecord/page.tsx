@@ -322,6 +322,9 @@ export default function AddRecordPage() {
 								alt="Cover preview"
 								width={400}
 								height={400}
+								sizes="(max-width: 768px) 100vw, 250px"
+								quality={60}
+								loading="lazy"
 								style={{
 									maxWidth: "100%",
 									borderRadius: "8px",

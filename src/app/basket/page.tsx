@@ -125,6 +125,9 @@ export default function BasketPage() {
 											width={90}
 											height={90}
 											className="basket-cover"
+											sizes="(max-width: 768px) 100vw, 250px"
+											quality={60}
+											loading="lazy"
 										/>
 									</div>
 									<div>

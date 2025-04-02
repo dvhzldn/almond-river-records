@@ -49,7 +49,9 @@ export default async function PaymentSuccess({ params, searchParams }) {
 						alt="Logo"
 						width={100}
 						height={100}
-						priority
+						sizes="(max-width: 768px) 100vw, 250px"
+						quality={60}
+						loading="lazy"
 					/>
 				</div>
 			</div>

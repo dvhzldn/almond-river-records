@@ -50,7 +50,9 @@ export default function RecordCleaning() {
 								width={500}
 								height={450}
 								className="responsive-image"
-								priority
+								sizes="(max-width: 768px) 100vw, 250px"
+								quality={60}
+								loading="lazy"
 							/>
 							<figcaption className="sr-only">
 								Vinyl record cleaning service available in-store at

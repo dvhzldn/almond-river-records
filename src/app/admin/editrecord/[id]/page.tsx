@@ -264,6 +264,9 @@ export default function EditRecordPage() {
 						alt="Current Cover"
 						width={200}
 						height={200}
+						sizes="(max-width: 768px) 100vw, 250px"
+						quality={60}
+						loading="lazy"
 					/>
 				)}
 

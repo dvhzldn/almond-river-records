@@ -91,6 +91,9 @@ export default function ManageRecordsPage() {
 												alt={record.title}
 												width={40}
 												height={40}
+												sizes="(max-width: 768px) 100vw, 250px"
+												quality={60}
+												loading="lazy"
 											/>
 										) : (
 											<span>No Image</span>

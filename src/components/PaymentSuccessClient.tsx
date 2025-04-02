@@ -40,6 +40,9 @@ export function PaymentSuccessClient({
 						alt="Almond River Records logo"
 						width={200}
 						height={200}
+						sizes="(max-width: 768px) 100vw, 250px"
+						quality={60}
+						loading="lazy"
 					/>
 					<p>Order reference: {reference}</p>
 				</div>

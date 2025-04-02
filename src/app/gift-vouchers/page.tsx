@@ -38,7 +38,9 @@ export default function GiftVouchers() {
 								width={400}
 								height={400}
 								className="responsive-image"
-								priority
+								sizes="(max-width: 768px) 100vw, 250px"
+								quality={60}
+								loading="lazy"
 							/>
 							<figcaption className="sr-only">
 								A sample Almond River Records gift voucher, available

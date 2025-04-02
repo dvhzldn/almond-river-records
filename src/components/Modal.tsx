@@ -139,6 +139,9 @@ export default function Modal({ record, onClose }: ModalProps) {
 						alt={`Cover image for ${record.title}`}
 						width={450}
 						height={450}
+						sizes="(max-width: 768px) 100vw, 250px"
+						quality={60}
+						loading="lazy"
 					/>
 				)}
 
