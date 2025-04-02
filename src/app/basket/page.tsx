@@ -115,38 +115,50 @@ export default function BasketPage() {
 							className="basket-list"
 						>
 							<h2 id="basket-items-heading">Your Items</h2>
+							{basket.map((item, index) => {
+								const imageSrc =
+									item.coverImage && item.coverImage.trim() !== ""
+										? item.coverImage
+										: defaultImage;
 
-							{basket.map((item) => (
-								<div key={item.id} className="basket-item">
-									<div>
-										<Image
-											src={item.coverImage || defaultImage}
-											alt={`Cover of ${item.title} by ${item.artist}`}
-											width={90}
-											height={90}
-											className="basket-cover"
-											sizes="(max-width: 768px) 100vw, 250px"
-											quality={60}
-											loading="lazy"
-											unoptimized
-										/>
+								return (
+									<div
+										key={`${item.id}-${index}`}
+										className="basket-item"
+									>
+										<div>
+											<Image
+												key={imageSrc}
+												src={imageSrc}
+												alt={`Cover of ${item.title} by ${item.artist}`}
+												width={90}
+												height={90}
+												className="basket-cover"
+												sizes="(max-width: 768px) 100vw, 250px"
+												quality={60}
+												loading="lazy"
+												unoptimized
+											/>
+										</div>
+										<div>
+											<p>
+												<strong>{item.title}</strong>
+											</p>
+											<p>{item.artist}</p>
+											<h4>£{item.price}</h4>
+											<button
+												className="remove-button"
+												onClick={() =>
+													handleRemoveFromBasket(item.id)
+												}
+												aria-label={`Remove ${item.title} by ${item.artist} from basket`}
+											>
+												Remove
+											</button>
+										</div>
 									</div>
-									<div>
-										<p>
-											<strong>{item.title}</strong>
-										</p>
-										<p>{item.artist}</p>
-										<h4>£{item.price}</h4>
-										<button
-											className="remove-button"
-											onClick={() => handleRemoveFromBasket(item.id)}
-											aria-label={`Remove ${item.title} by ${item.artist} from basket`}
-										>
-											Remove
-										</button>
-									</div>
-								</div>
-							))}
+								);
+							})}
 
 							<div>
 								<button
