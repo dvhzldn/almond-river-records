@@ -116,9 +116,7 @@ export default function BasketPage() {
 										<div>
 											<Image
 												src={imageSrc}
-												alt={`Cover of ${item.title} by ${item.artistName.join(
-													", "
-												)}`}
+												alt={`Cover of ${item.title} by ${item.artistName.join(", ")}`}
 												width={90}
 												height={90}
 												className="basket-cover"
@@ -127,8 +125,15 @@ export default function BasketPage() {
 												loading="lazy"
 												priority={true}
 												unoptimized={true}
-												onError={(e) => {
-													e.target.src = defaultImage; // Fallback image if error occurs
+												onError={(
+													e: React.SyntheticEvent<
+														HTMLImageElement,
+														Event
+													>
+												) => {
+													const target =
+														e.target as HTMLImageElement;
+													target.src = defaultImage;
 												}}
 											/>
 										</div>
