@@ -21,8 +21,13 @@ export default function Footer() {
 								rel="noopener noreferrer"
 								aria-label="Email Almond River Records"
 							>
-								<Mail className="footer-icon" aria-hidden="true" />
-								<span>Email: almondriverrecords@gmail.com</span>
+								<Mail
+									className="footer-icon"
+									width={18}
+									height={18}
+									aria-hidden="true"
+								/>
+								<span>almondriverrecords@gmail.com</span>
 							</a>
 						</li>
 						<li>
@@ -32,8 +37,13 @@ export default function Footer() {
 								rel="noopener noreferrer"
 								aria-label="Call Almond River Records at 07729 421682"
 							>
-								<Phone className="footer-icon" aria-hidden="true" />
-								<span>Call: 07729 421682</span>
+								<Phone
+									className="footer-icon"
+									width={18}
+									height={18}
+									aria-hidden="true"
+								/>
+								<span>07729 421682</span>
 							</a>
 						</li>
 						<li>
@@ -43,7 +53,12 @@ export default function Footer() {
 								rel="noopener noreferrer"
 								aria-label="Visit us at 253 St John's Road, Edinburgh"
 							>
-								<Home className="footer-icon" aria-hidden="true" />
+								<Home
+									className="footer-icon"
+									width={18}
+									height={18}
+									aria-hidden="true"
+								/>
 								<span>{`253 St John's Rd, Edinburgh EH12 7XD`}</span>
 							</a>
 						</li>
@@ -64,7 +79,8 @@ export default function Footer() {
 					>
 						<Facebook
 							className="footer-icon"
-							size={40}
+							width={40}
+							height={40}
 							aria-hidden="true"
 						/>
 						<span>Facebook</span>
@@ -77,7 +93,8 @@ export default function Footer() {
 					>
 						<Instagram
 							className="footer-icon"
-							size={40}
+							height={40}
+							width={40}
 							aria-hidden="true"
 						/>
 						<span>Instagram</span>
@@ -90,9 +107,7 @@ export default function Footer() {
 					<Link href="/privacy">Privacy Policy</Link>
 				</p>
 				<p>© {new Date().getFullYear()} Almond River Records</p>
-				<p>
-					<small>Made by DH</small>
-				</p>
+				<p>Made by DH</p>
 			</section>
 		</footer>
 	);

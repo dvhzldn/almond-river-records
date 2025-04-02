@@ -18,7 +18,7 @@
 	--background: linear-gradient(to bottom, var(--colour-4), var(--colour-1));
 	--border-radius: 5px;
 	--box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	--footer-height: 180px;
+	--footer-height: 100px;
 
 	/* New Color Variables */
 	--colour-1: #40798c;
@@ -332,13 +332,16 @@ textarea:focus-visible {
 	background: var(--colour-4);
 	padding-block: 0.8rem;
 	padding-inline: 1rem;
-
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 1rem;
 	text-align: start;
-	line-height: 1.6;
+	line-height: 2.2;
 	margin-block-start: auto;
+}
+
+footer.footer {
+	min-block-size: var(--footer-height);
 }
 
 .footer ul {
@@ -351,24 +354,20 @@ textarea:focus-visible {
 
 .footer a,
 .footer p {
-	font-size: 1.1rem;
+	font-size: 0.8rem;
 	color: var(--colour-7);
 	font-weight: lighter;
 }
 
 .footer-icon {
-	font-size: 0.2rem;
+	font-size: unset;
 	vertical-align: middle;
 	margin-inline-end: 0.5rem;
 }
 
-.footer-icon a svg {
-	inline-size: 1rem;
-	block-size: 1rem;
-}
-
 .footer-contact span {
 	font-style: normal;
+	font-size: 0.8rem;
 }
 
 /* Social Links */
@@ -399,10 +398,8 @@ textarea:focus-visible {
 }
 
 .socialLinks .footer-icon {
-	width: 2rem;
-	height: 2rem;
 	display: block;
-	margin-bottom: 0; /* pushes the icon closer to text */
+	margin-bottom: 0;
 }
 
 /* Modal */

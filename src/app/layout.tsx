@@ -11,11 +11,13 @@ const lato = Lato({
 	subsets: ["latin"],
 	weight: ["300", "400", "700"],
 	variable: "--font-lato",
+	display: "swap",
 });
 const oswald = Oswald({
 	subsets: ["latin"],
 	weight: ["300", "400", "700"],
 	variable: "--font-oswald",
+	display: "swap",
 });
 
 export const metadata: Metadata = {
