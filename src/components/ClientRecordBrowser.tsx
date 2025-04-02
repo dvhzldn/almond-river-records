@@ -112,7 +112,7 @@ export default function ClientRecordBrowser({
 						height={250}
 						sizes="(max-width: 768px) 100vw, 250px"
 						quality={60}
-						loading="eager"
+						loading="lazy"
 					/>
 					<div className="record-price">£{record.price}</div>
 				</div>

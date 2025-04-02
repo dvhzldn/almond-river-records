@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -17,6 +19,7 @@ export default async function Home() {
 
 	const res = await fetch(endpoint, {
 		next: { revalidate: 60 },
+		cache: "force-cache",
 	});
 
 	if (!res.ok) {

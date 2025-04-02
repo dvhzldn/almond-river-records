@@ -24,6 +24,7 @@
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.54.2",
 		"react-responsive": "^10.0.1",
+		"react-window": "^1.8.11",
 		"resend": "^4.1.2",
 		"swiper": "^11.2.5"
 	},
