@@ -10,6 +10,7 @@ import { useAnalytics } from "@/lib/useAnalytics";
 import { ShoppingBasket } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useMediaQuery } from "react-responsive";
 
 const Modal = dynamic(() => import("@/components/Modal"), {
 	ssr: false,
@@ -22,13 +23,14 @@ interface Props {
 	genreOptions?: string[];
 }
 
-const pageSize = 24;
-
 export default function ClientRecordBrowser({
 	initialRecords = [],
 	artistOptions = [],
 	genreOptions = [],
 }: Props) {
+	const isMobile = useMediaQuery({ maxWidth: 768 });
+	const pageSize = isMobile ? 12 : 24;
+
 	const { handleAddToBasket } = useAddToBasketWithTracking();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
 	const { handleBuyNow } = useBuyNow();
@@ -92,7 +94,7 @@ export default function ClientRecordBrowser({
 		}, 300);
 
 		return () => clearTimeout(debounce);
-	}, [search, condition, artist, genre, decade, sort, page]);
+	}, [search, condition, artist, genre, decade, sort, page, pageSize]);
 
 	const renderedRecords = useMemo(() => {
 		return records.map((record) => (
