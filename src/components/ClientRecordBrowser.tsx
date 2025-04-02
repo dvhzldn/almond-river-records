@@ -11,7 +11,10 @@ import { ShoppingBasket } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-const Modal = dynamic(() => import("@/components/Modal"), { ssr: false });
+const Modal = dynamic(() => import("@/components/Modal"), {
+	ssr: false,
+	loading: () => <div className="modal-loading">Loading…</div>,
+});
 
 interface Props {
 	initialRecords?: VinylRecord[];

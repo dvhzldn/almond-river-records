@@ -31,7 +31,7 @@ export default async function RecordsPage() {
     `
 		)
 		.gt("quantity", 0)
-		.limit(100);
+		.limit(24);
 
 	const records: VinylRecord[] = (recordsData ?? []).map((r) => ({
 		id: r.id,
