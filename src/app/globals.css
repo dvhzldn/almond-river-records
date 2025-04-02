@@ -902,7 +902,16 @@ fieldset div {
 }
 
 /* Filter Menu*/
+
+fieldset {
+	margin-inline: auto;
+	display: block;
+}
+
 .filter-menu {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	text-align: center;
 	margin-block-start: 0.1rem;
 	margin-block-end: 1.2rem;
