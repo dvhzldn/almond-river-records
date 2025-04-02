@@ -100,10 +100,9 @@ export default function BasketPage() {
 							{basket.map((item, index) => {
 								const imageSrc =
 									item.coverImage && item.coverImage.trim() !== ""
-										? item.coverImage.includes("?")
-											? `${item.coverImage}&t=${Date.now()}`
-											: `${item.coverImage}?t=${Date.now()}`
+										? item.coverImage
 										: defaultImage;
+
 								const artistName = Array.isArray(item.artistName)
 									? item.artistName.join(", ")
 									: item.artistName;
@@ -125,7 +124,8 @@ export default function BasketPage() {
 												sizes="(max-width: 768px) 100vw, 250px"
 												quality={60}
 												loading="lazy"
-												unoptimized
+												priority={true}
+												unoptimized={true}
 											/>
 										</div>
 										<div>
