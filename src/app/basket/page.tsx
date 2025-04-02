@@ -1,6 +1,5 @@
 "use client";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useState } from "react";
 import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
@@ -127,17 +126,13 @@ export default function BasketPage() {
 										className="basket-item"
 									>
 										<div>
-											<Image
-												key={imageSrc}
+											<img
 												src={imageSrc}
 												alt={`Cover of ${item.title} by ${item.artist}`}
 												width={90}
 												height={90}
 												className="basket-cover"
-												sizes="(max-width: 768px) 100vw, 250px"
-												quality={60}
 												loading="lazy"
-												unoptimized
 											/>
 										</div>
 										<div>
