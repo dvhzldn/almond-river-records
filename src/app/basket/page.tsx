@@ -30,7 +30,8 @@ export default function BasketPage() {
 
 	const defaultImage = "/images/almond-river-logo.jpg";
 
-	if (!hydrated) return null; // ✅ safe now
+	// Ensure rendering only occurs once data is hydrated
+	if (!hydrated) return null;
 
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
@@ -126,6 +127,9 @@ export default function BasketPage() {
 												loading="lazy"
 												priority={true}
 												unoptimized={true}
+												onError={(e) => {
+													e.target.src = defaultImage; // Fallback image if error occurs
+												}}
 											/>
 										</div>
 										<div>
