@@ -51,7 +51,14 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 				) {
 					const age = now - parsed.savedAt;
 					if (age <= EXPIRY_MS) {
-						setBasket(parsed.items);
+						const sanitizedItems = parsed.items.map((item) => ({
+							...item,
+							coverImage:
+								item.coverImage && item.coverImage.trim() !== ""
+									? item.coverImage
+									: "/images/almond-river-logo.jpg",
+						}));
+						setBasket(sanitizedItems);
 					} else {
 						console.info("Basket expired, clearing localStorage.");
 						localStorage.removeItem(BASKET_STORAGE_KEY);
