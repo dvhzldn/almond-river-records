@@ -157,7 +157,13 @@ export default function ClientRecordBrowser({
 							className="buy-button"
 							onClick={(e) => {
 								e.stopPropagation();
-								handleBuyNow(record);
+								handleBuyNow({
+									id: record.id,
+									title: record.title,
+									artistName: record.artistName,
+									price: record.price,
+									coverImage: record.coverImageUrl,
+								});
 							}}
 						>
 							Buy
