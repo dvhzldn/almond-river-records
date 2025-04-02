@@ -21,6 +21,7 @@ interface BasketContextType {
 	addToBasket: (item: BasketItem) => void;
 	removeFromBasket: (id: string) => void;
 	clearBasket: () => void;
+	hydrated: boolean;
 }
 
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
@@ -35,8 +36,8 @@ type StoredBasket = {
 
 export const BasketProvider = ({ children }: { children: ReactNode }) => {
 	const [basket, setBasket] = useState<BasketItem[]>([]);
+	const [hydrated, setHydrated] = useState(false);
 
-	// Load basket from localStorage on mount
 	useEffect(() => {
 		const stored = localStorage.getItem(BASKET_STORAGE_KEY);
 		if (stored) {
@@ -68,9 +69,9 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 				console.error("Failed to parse stored basket:", err);
 			}
 		}
+		setHydrated(true); // ✅ Set hydrated when done loading
 	}, []);
 
-	// Save basket to localStorage on change
 	useEffect(() => {
 		const payload: StoredBasket = {
 			items: basket,
@@ -96,7 +97,13 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 
 	return (
 		<BasketContext.Provider
-			value={{ basket, addToBasket, removeFromBasket, clearBasket }}
+			value={{
+				basket,
+				addToBasket,
+				removeFromBasket,
+				clearBasket,
+				hydrated,
+			}}
 		>
 			{children}
 		</BasketContext.Provider>

@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useState } from "react";
 import { useBasket } from "../api/context/BasketContext";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
@@ -20,9 +21,16 @@ const ReturnsPolicyModal = dynamic(
 );
 
 export default function BasketPage() {
-	const { basket, clearBasket } = useBasket();
+	const { basket, clearBasket, hydrated } = useBasket();
 	const { handleRemoveFromBasket } = useRemoveFromBasket();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [isReturnsPolicyOpen, setReturnsPolicyOpen] = useState(false);
+	const trackCheckout = useTrackCheckout();
+
 	const defaultImage = "/images/almond-river-logo.jpg";
+
+	if (!hydrated) return null; // ✅ safe now
 
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
@@ -32,12 +40,6 @@ export default function BasketPage() {
 	const description = basket
 		.map((item) => `${item.artist} - ${item.title}`)
 		.join(", ");
-
-	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
-	const [isReturnsPolicyOpen, setReturnsPolicyOpen] = useState(false);
-
-	const trackCheckout = useTrackCheckout();
 
 	const handleOrderSubmit = async (orderData: OrderData) => {
 		setLoading(true);
@@ -49,30 +51,18 @@ export default function BasketPage() {
 				recordIds,
 				orderData,
 			};
-			console.debug("Submitting order with payload:", payload);
-
-			const processOrderUrl =
-				process.env.NEXT_PUBLIC_BASE_URL + `/api/processOrder`;
-			console.debug("ProcessOrder URL:", processOrderUrl);
-
-			const response = await fetch(processOrderUrl, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(payload),
-			});
-
+			const response = await fetch(
+				process.env.NEXT_PUBLIC_BASE_URL + `/api/processOrder`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				}
+			);
 			const data = await response.json();
-			console.debug("Response data:", data);
 
-			if (!response.ok) {
-				console.error("Error processing order:", data);
+			if (!response.ok || !data.hosted_checkout_url) {
 				setError(data.error || "Error processing order");
-				return;
-			}
-
-			if (!data.hosted_checkout_url) {
-				console.error("Missing hosted_checkout_url in response:", data);
-				setError("No checkout URL returned");
 				return;
 			}
 
@@ -85,21 +75,12 @@ export default function BasketPage() {
 			});
 
 			window.location.href = data.hosted_checkout_url;
-		} catch (err: unknown) {
-			if (err instanceof Error) {
-				console.error("Exception caught during order submission:", err);
-				setError(err.message);
-			} else {
-				console.error("Unexpected error:", err);
-				setError("Unexpected error");
-			}
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Unexpected error");
 		} finally {
 			setLoading(false);
 		}
 	};
-
-	const openReturnsPolicy = () => setReturnsPolicyOpen(true);
-	const closeReturnsPolicy = () => setReturnsPolicyOpen(false);
 
 	return (
 		<div className="page-container">
@@ -126,12 +107,14 @@ export default function BasketPage() {
 										className="basket-item"
 									>
 										<div>
-											<img
+											<Image
 												src={imageSrc}
 												alt={`Cover of ${item.title} by ${item.artist}`}
 												width={90}
 												height={90}
 												className="basket-cover"
+												sizes="(max-width: 768px) 100vw, 250px"
+												quality={60}
 												loading="lazy"
 											/>
 										</div>
@@ -192,15 +175,16 @@ export default function BasketPage() {
 
 							<button
 								className="returns-policy"
-								onClick={openReturnsPolicy}
+								onClick={() => setReturnsPolicyOpen(true)}
 								aria-haspopup="dialog"
 							>
 								Returns Policy
 							</button>
 
-							{/* Conditionally render the ReturnsPolicyModal */}
 							{isReturnsPolicyOpen && (
-								<ReturnsPolicyModal onClose={closeReturnsPolicy} />
+								<ReturnsPolicyModal
+									onClose={() => setReturnsPolicyOpen(false)}
+								/>
 							)}
 
 							<hr />
