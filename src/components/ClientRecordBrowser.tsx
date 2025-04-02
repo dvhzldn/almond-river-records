@@ -121,6 +121,7 @@ export default function ClientRecordBrowser({
 					<div className="record-actions">
 						{isInBasket(record.id) ? (
 							<button
+								aria-label={`Remove ${record.title} by ${record.artistName.join(", ")} from your basket`}
 								className="remove-button-grid"
 								onClick={(e) => {
 									e.stopPropagation();
@@ -131,6 +132,7 @@ export default function ClientRecordBrowser({
 							</button>
 						) : (
 							<button
+								aria-label={`Add ${record.title} by ${record.artistName.join(", ")} to your basket`}
 								className="basket-button"
 								onClick={(e) => {
 									e.stopPropagation();
@@ -141,6 +143,7 @@ export default function ClientRecordBrowser({
 							</button>
 						)}
 						<button
+							aria-label={`Buy ${record.title} by ${record.artistName.join(", ")}`}
 							className="buy-button"
 							onClick={(e) => {
 								e.stopPropagation();
@@ -167,153 +170,161 @@ export default function ClientRecordBrowser({
 
 	return (
 		<div className="content-box-grid">
-			<div className="filter-menu">
-				<button
-					className="filter-toggle"
-					onClick={() => setFiltersOpen(!filtersOpen)}
-				>
-					{filtersOpen ? "Close Filters" : "Show Filters"}
-				</button>
-				<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
-					<select
-						value={artist}
-						onChange={(e) => {
-							setArtist(e.target.value);
-							setPage(1);
-							track("filter-applied", {
-								filter: "artist",
-								value: e.target.value,
-							});
-						}}
+			<fieldset>
+				<legend className="sr-only">Filter records</legend>
+				<div className="filter-menu">
+					<button
+						className="filter-toggle"
+						onClick={() => setFiltersOpen(!filtersOpen)}
 					>
-						<option value="">All Artists</option>
-						{artistOptions.map((option) => (
-							<option key={option} value={option}>
-								{option}
-							</option>
-						))}
-					</select>
+						{filtersOpen ? "Close Filters" : "Show Filters"}
+					</button>
+					<div className={`filter-controls ${filtersOpen ? "open" : ""}`}>
+						<select
+							aria-label="Filter results by artist"
+							value={artist}
+							onChange={(e) => {
+								setArtist(e.target.value);
+								setPage(1);
+								track("filter-applied", {
+									filter: "artist",
+									value: e.target.value,
+								});
+							}}
+						>
+							<option value="">All Artists</option>
+							{artistOptions.map((option) => (
+								<option key={option} value={option}>
+									{option}
+								</option>
+							))}
+						</select>
 
-					<select
-						value={genre}
-						onChange={(e) => {
-							setGenre(e.target.value);
-							setPage(1);
-							track("filter-applied", {
-								filter: "genre",
-								value: e.target.value,
-							});
-						}}
-					>
-						<option value="">All Genres</option>
-						{genreOptions.map((option) => (
-							<option key={option} value={option}>
-								{option}
-							</option>
-						))}
-					</select>
+						<select
+							aria-label="Filter results by genre"
+							value={genre}
+							onChange={(e) => {
+								setGenre(e.target.value);
+								setPage(1);
+								track("filter-applied", {
+									filter: "genre",
+									value: e.target.value,
+								});
+							}}
+						>
+							<option value="">All Genres</option>
+							{genreOptions.map((option) => (
+								<option key={option} value={option}>
+									{option}
+								</option>
+							))}
+						</select>
 
-					<select
-						value={decade}
-						onChange={(e) => {
-							setDecade(e.target.value);
-							setPage(1);
-							track("filter-applied", {
-								filter: "decade",
-								value: e.target.value,
-							});
-						}}
-					>
-						<option value="">All Decades</option>
-						<option value="1950">1950s</option>
-						<option value="1960">1960s</option>
-						<option value="1970">1970s</option>
-						<option value="1980">1980s</option>
-						<option value="1990">1990s</option>
-						<option value="2000">2000s</option>
-						<option value="2010">2010s</option>
-						<option value="2020">2020s</option>
-					</select>
+						<select
+							aria-label="Filter results by decade of release"
+							value={decade}
+							onChange={(e) => {
+								setDecade(e.target.value);
+								setPage(1);
+								track("filter-applied", {
+									filter: "decade",
+									value: e.target.value,
+								});
+							}}
+						>
+							<option value="">All Decades</option>
+							<option value="1950">1950s</option>
+							<option value="1960">1960s</option>
+							<option value="1970">1970s</option>
+							<option value="1980">1980s</option>
+							<option value="1990">1990s</option>
+							<option value="2000">2000s</option>
+							<option value="2010">2010s</option>
+							<option value="2020">2020s</option>
+						</select>
 
-					<select
-						value={condition}
-						onChange={(e) => {
-							setCondition(e.target.value);
-							setPage(1);
-							track("filter-applied", {
-								filter: "condition",
-								value: e.target.value,
-							});
-						}}
-					>
-						<option value="">All Conditions</option>
-						<option value="Mint">Mint</option>
-						<option value="Near Mint">Near Mint</option>
-						<option value="Very Good Plus">Very Good Plus</option>
-						<option value="Very Good">Very Good</option>
-						<option value="Good">Good</option>
-					</select>
+						<select
+							aria-label="Filter results by condition of record"
+							value={condition}
+							onChange={(e) => {
+								setCondition(e.target.value);
+								setPage(1);
+								track("filter-applied", {
+									filter: "condition",
+									value: e.target.value,
+								});
+							}}
+						>
+							<option value="">All Conditions</option>
+							<option value="Mint">Mint</option>
+							<option value="Near Mint">Near Mint</option>
+							<option value="Very Good Plus">Very Good Plus</option>
+							<option value="Very Good">Very Good</option>
+							<option value="Good">Good</option>
+						</select>
 
-					<input
-						type="text"
-						placeholder="Search all records..."
-						aria-label="Search records"
-						value={searchInput}
-						onChange={(e) => setSearchInput(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
+						<input
+							type="text"
+							placeholder="Search all records..."
+							aria-label="Search records"
+							value={searchInput}
+							onChange={(e) => setSearchInput(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									setSearch(searchInput);
+									setPage(1);
+									track("record-search", { term: searchInput.trim() });
+								}
+							}}
+						/>
+
+						<button
+							onClick={() => {
 								setSearch(searchInput);
 								setPage(1);
 								track("record-search", { term: searchInput.trim() });
-							}
-						}}
-					/>
-
-					<button
-						onClick={() => {
-							setSearch(searchInput);
-							setPage(1);
-							track("record-search", { term: searchInput.trim() });
-						}}
-					>
-						Search
-					</button>
-				</div>
-
-				<h4>Sort records by:</h4>
-				<select
-					value={sort}
-					onChange={(e) => {
-						setSort(e.target.value);
-						setPage(1);
-						track("sort-changed", { sortOption: e.target.value });
-					}}
-				>
-					<option value="recent">Recently Added</option>
-					<option value="artist">Artist Name (A-Z)</option>
-				</select>
-
-				{filtersApplied && (
-					<div>
-						<button
-							className="clear-filters-button"
-							onClick={() => {
-								setSearch("");
-								setSearchInput("");
-								setCondition("");
-								setArtist("");
-								setGenre("");
-								setDecade("");
-								setPage(1);
 							}}
 						>
-							Reset Filters
+							Search
 						</button>
 					</div>
-				)}
-			</div>
 
-			<div className="records-grid">
+					<h4>Sort records by:</h4>
+					<select
+						aria-label="Select the ordering of the records"
+						value={sort}
+						onChange={(e) => {
+							setSort(e.target.value);
+							setPage(1);
+							track("sort-changed", { sortOption: e.target.value });
+						}}
+					>
+						<option value="recent">Recently Added</option>
+						<option value="artist">Artist Name (A-Z)</option>
+					</select>
+
+					{filtersApplied && (
+						<div>
+							<button
+								className="clear-filters-button"
+								onClick={() => {
+									setSearch("");
+									setSearchInput("");
+									setCondition("");
+									setArtist("");
+									setGenre("");
+									setDecade("");
+									setPage(1);
+								}}
+							>
+								Reset Filters
+							</button>
+						</div>
+					)}
+				</div>
+			</fieldset>
+
+			<div aria-live="polite" aria-busy={loading} className="records-grid">
 				{loading ? (
 					<p>Loading...</p>
 				) : records.length > 0 ? (

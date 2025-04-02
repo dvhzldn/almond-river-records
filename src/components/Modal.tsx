@@ -70,10 +70,11 @@ export default function Modal({ record, onClose }: ModalProps) {
 	};
 
 	// 🔒 Focus trap setup
-	const modalRef = useRef<HTMLDivElement>(null);
+	const closeButtonRef = useRef<HTMLButtonElement>(null);
+
 	useEffect(() => {
 		const previouslyFocused = document.activeElement as HTMLElement;
-		modalRef.current?.focus();
+		closeButtonRef.current?.focus();
 
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
@@ -91,19 +92,22 @@ export default function Modal({ record, onClose }: ModalProps) {
 	return (
 		<div
 			className="backdrop"
-			role="presentation"
 			aria-hidden="true"
 			onClick={onClose}
 			tabIndex={-1}
 		>
+			{" "}
+			<div
+				tabIndex={0}
+				aria-hidden="true"
+				onFocus={() => modalRef.current?.focus()}
+			/>
 			<div
 				className="modalContent"
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="modal-title"
 				aria-describedby="modal-description"
-				tabIndex={-1}
-				ref={modalRef}
 				onClick={(e) => e.stopPropagation()}
 			>
 				<TrackRecordView
@@ -122,6 +126,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 					className="closeButton"
 					onClick={onClose}
 					aria-label="Close modal"
+					ref={closeButtonRef}
 				>
 					×
 				</button>
