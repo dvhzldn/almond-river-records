@@ -37,6 +37,7 @@ export default function ClientRecordBrowser({
 	const { basket } = useBasket();
 	const { track } = useAnalytics();
 
+	// Local state for fetched records, filters, and pagination
 	const [selectedRecord, setSelectedRecord] = useState<VinylRecord | null>(
 		null
 	);
@@ -53,6 +54,7 @@ export default function ClientRecordBrowser({
 	const [total, setTotal] = useState(initialRecords.length);
 	const [loading, setLoading] = useState(false);
 
+	// Memoizing filters to avoid unnecessary re-renders
 	const filtersApplied =
 		searchInput.trim() !== "" ||
 		condition.trim() !== "" ||
@@ -65,37 +67,37 @@ export default function ClientRecordBrowser({
 		[basket]
 	);
 
+	// Fetch records when the filters or page change
 	useEffect(() => {
-		const debounce = setTimeout(() => {
-			async function fetchRecords() {
-				setLoading(true);
-				const params = new URLSearchParams();
-				if (search) params.append("search", search);
-				if (condition) params.append("condition", condition);
-				if (artist) params.append("artist", artist);
-				if (genre) params.append("genre", genre);
-				if (decade) params.append("decade", decade);
-				if (sort) params.append("sort", sort);
-				params.append("limit", pageSize.toString());
-				params.append("skip", ((page - 1) * pageSize).toString());
+		const fetchRecords = async () => {
+			setLoading(true);
+			const params = new URLSearchParams();
+			if (search) params.append("search", search);
+			if (condition) params.append("condition", condition);
+			if (artist) params.append("artist", artist);
+			if (genre) params.append("genre", genre);
+			if (decade) params.append("decade", decade);
+			if (sort) params.append("sort", sort);
+			params.append("limit", pageSize.toString());
+			params.append("skip", ((page - 1) * pageSize).toString());
 
-				try {
-					const res = await fetch(`/api/records?${params.toString()}`);
-					const data = await res.json();
-					setRecords(data.records);
-					setTotal(data.total);
-				} catch (err) {
-					console.error("Failed to load records", err);
-				} finally {
-					setLoading(false);
-				}
+			try {
+				const res = await fetch(`/api/records?${params.toString()}`);
+				const data = await res.json();
+				setRecords(data.records);
+				setTotal(data.total);
+			} catch (err) {
+				console.error("Failed to load records", err);
+			} finally {
+				setLoading(false);
 			}
-			fetchRecords();
-		}, 300);
+		};
 
-		return () => clearTimeout(debounce);
+		// Only trigger the fetch if there is a change in filters, page, or page size
+		fetchRecords();
 	}, [search, condition, artist, genre, decade, sort, page, pageSize]);
 
+	// Memoize rendered records to prevent unnecessary re-renders
 	const renderedRecords = useMemo(() => {
 		return records.map((record) => (
 			<div
@@ -166,6 +168,7 @@ export default function ClientRecordBrowser({
 		isInBasket,
 	]);
 
+	// Pagination handling
 	const totalPages = Math.ceil(total / pageSize);
 	const prevPage = () => setPage((p) => Math.max(p - 1, 1));
 	const nextPage = () => setPage((p) => p + 1);
