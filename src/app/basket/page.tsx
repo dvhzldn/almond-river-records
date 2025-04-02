@@ -128,6 +128,7 @@ export default function BasketPage() {
 											sizes="(max-width: 768px) 100vw, 250px"
 											quality={60}
 											loading="lazy"
+											unoptimized
 										/>
 									</div>
 									<div>
