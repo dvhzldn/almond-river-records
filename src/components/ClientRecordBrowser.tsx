@@ -140,7 +140,13 @@ export default function ClientRecordBrowser({
 								className="basket-button"
 								onClick={(e) => {
 									e.stopPropagation();
-									handleAddToBasket(record);
+									handleAddToBasket({
+										id: record.id,
+										title: record.title,
+										artistName: record.artist_names,
+										price: record.price,
+										coverImage: record.cover_image_url,
+									});
 								}}
 							>
 								Add <ShoppingBasket size={12} />
