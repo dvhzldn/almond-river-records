@@ -424,7 +424,7 @@ textarea:focus-visible {
 	padding-block: 0.1rem;
 	padding-inline: 0.1rem;
 	border-radius: var(--border-radius);
-	max-inline-size: 600px;
+	max-inline-size: 700px;
 	inline-size: 90%;
 	position: relative;
 	text-align: center;

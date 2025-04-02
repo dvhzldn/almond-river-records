@@ -107,7 +107,7 @@ export default function ClientRecordBrowser({
 				</div>
 				<div className="record-details">
 					<h3 className="record-title">{record.title}</h3>
-					<h4 className="artist-name">{record.artistName.join(", ")}</h4>
+					<h4 className="artist-name">{record.artistName.join(" & ")}</h4>
 					<p className="condition">Condition: {record.vinylCondition}</p>
 					<div className="record-actions">
 						{isInBasket(record.id) ? (

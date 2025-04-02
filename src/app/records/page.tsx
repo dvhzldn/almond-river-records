@@ -8,44 +8,51 @@ export const metadata: Metadata = {
 };
 
 export default async function RecordsPage() {
-	// Fetch all in-stock records
 	const { data: recordsData } = await supabase
 		.from("vinyl_records")
-		.select("*")
-		.eq("in_stock", true)
-		.limit(100); // consider pagination here later
+		.select(
+			`
+			id,
+			title,
+			sub_title,
+			artist_names,
+			cover_image_url,
+			release_year,
+			price,
+			genre,
+			vinyl_condition,
+			sleeve_condition,
+			label,
+			quantity,
+			tracklist
+		`
+		)
+		.gt("quantity", 0) // Only include records that are in stock
+		.limit(100);
 
-	const records = (recordsData ?? []).map(
-		(r): VinylRecord => ({
-			id: r.id,
-			title: r.title,
-			artistName: r.artist_names,
-			price: r.price,
-			vinylCondition: r.vinyl_condition,
-			sleeveCondition: r.sleeve_condition,
-			label: r.label,
-			releaseYear: r.release_year,
-			genre: r.genre || [],
-			coverImageUrl: r.cover_image_url,
-			otherImages: r.other_images ?? [],
-			tracklist: r.tracklist ?? [],
-			inStock: r.in_stock,
-		})
-	);
+	const records: VinylRecord[] = (recordsData ?? []).map((r) => ({
+		id: r.id,
+		title: r.title,
+		subTitle: r.sub_title ?? "",
+		artistName: r.artist_names,
+		coverImageUrl: r.cover_image_url,
+		releaseYear: r.release_year,
+		price: r.price,
+		genre: r.genre ?? [],
+		vinylCondition: r.vinyl_condition,
+		sleeveCondition: r.sleeve_condition,
+		label: r.label,
+		inStock: r.quantity > 0,
+		tracklist: r.tracklist ?? [],
+	}));
 
-	// Fetch artist options
-	const { data: artistData } = await supabase
-		.from("vinyl_records")
-		.select("artist_names");
-	const allArtists = (artistData ?? []).flatMap((r) => r.artist_names || []);
-	const artistOptions = Array.from(new Set(allArtists)).sort();
+	const artistOptions = Array.from(
+		new Set(records.flatMap((r) => r.artistName))
+	).sort();
 
-	// Fetch genre options
-	const { data: genreData } = await supabase
-		.from("vinyl_records")
-		.select("genre");
-	const allGenres = (genreData ?? []).flatMap((r) => r.genre || []);
-	const genreOptions = Array.from(new Set(allGenres)).sort();
+	const genreOptions = Array.from(
+		new Set(records.flatMap((r) => r.genre))
+	).sort();
 
 	return (
 		<main className="page-container">
