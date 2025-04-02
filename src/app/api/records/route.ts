@@ -25,17 +25,18 @@ export async function GET(request: Request) {
 			return value?.trim() || undefined;
 		};
 
-		const newThisWeek = getParam("newThisWeek");
+		const newThisWeek = getParam("newThisWeek") === "true";
 		const searchQuery = getParam("search");
 		const condition = getParam("condition");
 		const artist = getParam("artist");
 		const genre = getParam("genre");
 		const decadeParam = getParam("decade");
+		const sort = getParam("sort") || "recent";
 
 		const limit = Number(getParam("limit")) || 24;
 		const skip = Number(getParam("skip")) || 0;
 
-		const sort = getParam("sort") || "recent";
+		const includeCount = !newThisWeek;
 
 		let query = supabase
 			.from("vinyl_records")
@@ -55,26 +56,30 @@ export async function GET(request: Request) {
 				other_images,
 				tracklist
 			`,
-				{ count: "exact" }
+				includeCount ? { count: "exact" } : undefined
 			)
 			.eq("in_stock", true)
 			.eq("sold", false)
 			.gt("quantity", 0);
 
+		// Apply sorting
 		if (sort === "artist") {
 			query = query.order("artist_names", { ascending: true });
-		} else if (sort === "recent") {
+		} else {
 			query = query.order("created_at", { ascending: false });
 		}
 
-		query = query.range(skip, skip + limit - 1);
-
-		if (newThisWeek === "true") {
+		// Filter for "new this week"
+		if (newThisWeek) {
 			const sevenDaysAgo = new Date();
 			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 			query = query.gte("created_at", sevenDaysAgo.toISOString());
+			query = query.limit(limit); // no need for range + count
+		} else {
+			query = query.range(skip, skip + limit - 1);
 		}
 
+		// Additional filters
 		if (searchQuery) {
 			query = query.or(
 				`title.ilike.%${searchQuery}%,artist_names_text.ilike.%${searchQuery}%`
@@ -128,7 +133,10 @@ export async function GET(request: Request) {
 		}));
 
 		return NextResponse.json(
-			{ records, total: count ?? 0 },
+			{
+				records,
+				total: includeCount ? (count ?? 0) : undefined,
+			},
 			{
 				headers: {
 					"Cache-Control": "s-maxage=3600, stale-while-revalidate",
