@@ -33,6 +33,7 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 	const [hydrated, setHydrated] = useState(false);
 
 	useEffect(() => {
+		// Load basket data from localStorage
 		const stored = localStorage.getItem(BASKET_STORAGE_KEY);
 		if (stored) {
 			try {
@@ -46,27 +47,29 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 				) {
 					const age = now - parsed.savedAt;
 					if (age <= EXPIRY_MS) {
+						// Only load items if they are not expired
 						const sanitizedItems = parsed.items.map((item) => ({
 							...item,
 							coverImage:
 								item.coverImage && item.coverImage.trim() !== ""
 									? item.coverImage
-									: "/images/almond-river-logo.jpg",
+									: "/images/almond-river-logo.jpg", // Default image if empty
 						}));
 						setBasket(sanitizedItems);
 					} else {
 						console.info("Basket expired, clearing localStorage.");
-						localStorage.removeItem(BASKET_STORAGE_KEY);
+						localStorage.removeItem(BASKET_STORAGE_KEY); // Clear expired items
 					}
 				}
 			} catch (err) {
 				console.error("Failed to parse stored basket:", err);
 			}
 		}
-		setHydrated(true); // ✅ Set hydrated when done loading
+		setHydrated(true); // Mark as hydrated after basket data is processed
 	}, []);
 
 	useEffect(() => {
+		// Update localStorage whenever basket state changes
 		const payload: StoredBasket = {
 			items: basket,
 			savedAt: Date.now(),
@@ -86,7 +89,7 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 
 	const clearBasket = () => {
 		setBasket([]);
-		localStorage.removeItem(BASKET_STORAGE_KEY);
+		localStorage.removeItem(BASKET_STORAGE_KEY); // Clear the basket from localStorage
 	};
 
 	return (
@@ -96,7 +99,7 @@ export const BasketProvider = ({ children }: { children: ReactNode }) => {
 				addToBasket,
 				removeFromBasket,
 				clearBasket,
-				hydrated,
+				hydrated, // Provide hydrated state to other components
 			}}
 		>
 			{children}
