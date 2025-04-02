@@ -6,11 +6,10 @@ import { useBuyNow } from "@/hooks/useBuyNow";
 import { useRemoveFromBasket } from "@/hooks/useRemoveFromBasket";
 import { useBasket } from "@/app/api/context/BasketContext";
 import { useRouter } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
 import TrackRecordView from "./TrackRecordView";
 import { useEffect, useRef } from "react";
 import TrackList from "./TrackList";
+import { ShoppingBasket } from "lucide-react";
 
 interface ModalProps {
 	record: {
@@ -155,14 +154,16 @@ export default function Modal({ record, onClose }: ModalProps) {
 							className="remove-button modal-above-image modal-top-right"
 							onClick={onRemoveFromBasket}
 						>
-							Remove <FontAwesomeIcon icon={faShoppingBasket} />
+							Remove{` `}
+							<ShoppingBasket size={12} />
 						</button>
 					) : (
 						<button
 							className="basket-button modal-above-image modal-top-right"
 							onClick={onAddToBasket}
 						>
-							Add <FontAwesomeIcon icon={faShoppingBasket} />
+							Add{` `}
+							<ShoppingBasket size={12} />
 						</button>
 					)}
 					<p>

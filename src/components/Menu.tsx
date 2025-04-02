@@ -2,15 +2,10 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-	faShoppingBasket,
-	faBars,
-	faTimes,
-} from "@fortawesome/free-solid-svg-icons";
 import { useBasket } from "@/app/api/context/BasketContext";
+import { ShoppingBasket, Menu, X } from "lucide-react";
 
-export default function Menu() {
+export default function SiteMenu() {
 	const [hasMounted, setHasMounted] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const { basket } = useBasket();
@@ -77,7 +72,7 @@ export default function Menu() {
 					aria-label={isOpen ? "Close menu" : "Open menu"}
 					ref={burgerButtonRef}
 				>
-					<FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
+					{isOpen ? <X size={20} /> : <Menu size={20} />}
 				</button>
 
 				{/* Navigation Links */}
@@ -114,14 +109,16 @@ export default function Menu() {
 					</li>
 				</ul>
 
-				{/* Basket Icon */}
 				<div className={`basket-wrapper ${animateBasket ? "animate" : ""}`}>
 					<Link
 						href="/basket"
 						className="basket-link"
 						aria-label={`Basket with ${basketCount} item${basketCount !== 1 ? "s" : ""}`}
 					>
-						<FontAwesomeIcon icon={faShoppingBasket} />
+						<ShoppingBasket
+							size={25}
+							className={`basket-icon ${animateBasket ? "animate" : ""}`}
+						/>
 						{basketCount > 0 && (
 							<span className="basket-count">{basketCount}</span>
 						)}

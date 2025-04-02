@@ -150,16 +150,23 @@ p {
 	transform: translateY(-50%);
 }
 
-.basket-wrapper.animate {
-	animation: rotate 0.2s;
+.basket-icon {
+	transform-origin: center;
+}
+
+.basket-icon.animate {
+	animation: rotate 0.3s;
 }
 
 @keyframes rotate {
 	0% {
 		transform: rotate(0deg);
 	}
-	50% {
-		transform: rotate(-15deg);
+	25% {
+		transform: rotate(-30deg);
+	}
+	75% {
+		transform: rotate(30deg);
 	}
 	100% {
 		transform: rotate(0deg);
@@ -292,6 +299,7 @@ img.logo-home:hover {
 	color: var(--colour-7);
 	background: transparent;
 	cursor: pointer;
+	border: none;
 }
 
 /* screen reader only sr-only */
@@ -366,12 +374,12 @@ textarea:focus-visible {
 /* Social Links */
 .socialWrapper {
 	display: inline-block;
+	margin-block-start: 1rem; /* pushes entire section down */
 }
 
 .socialLinks {
 	display: flex;
-	gap: 1.5rem;
-	font-size: 1rem;
+	gap: 2.5rem;
 	align-items: center;
 	justify-content: center;
 }
@@ -381,15 +389,20 @@ textarea:focus-visible {
 	flex-direction: column;
 	align-items: center;
 	color: var(--colour-5);
+	text-decoration: none;
+	line-height: 2; /* prevent extra spacing */
+	transition: transform 0.2s ease;
 }
 
 .socialLinks a:hover {
 	transform: scale(1.2);
 }
 
-.socialLinks a svg {
-	inline-size: 4rem;
-	block-size: 4rem;
+.socialLinks .footer-icon {
+	width: 2rem;
+	height: 2rem;
+	display: block;
+	margin-bottom: 0; /* pushes the icon closer to text */
 }
 
 /* Modal */
@@ -418,7 +431,7 @@ textarea:focus-visible {
 }
 
 .modal-image {
-	max-inline-size: 400px;
+	max-inline-size: 350px;
 	block-size: auto;
 	border-radius: 5px;
 	display: block;
@@ -771,8 +784,8 @@ fieldset div {
 
 .record-image {
 	align-items: center;
-	max-inline-size: 220px;
-	max-block-size: 220px;
+	max-inline-size: 240px;
+	max-block-size: 240px;
 	inline-size: auto;
 	display: block;
 	aspect-ratio: 1 / 1;
@@ -954,6 +967,7 @@ fieldset div {
 .clear-filters-button,
 .clear-button,
 .remove-button {
+	margin-block: 5px;
 	background: darkslategray;
 }
 
@@ -1371,7 +1385,7 @@ hr {
 	}
 
 	.modal-image {
-		max-inline-size: 300px;
+		max-inline-size: 250px;
 	}
 
 	.modal-image-container {
@@ -1462,14 +1476,19 @@ hr {
 	}
 
 	.records-grid {
-		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-		gap: 0.2rem;
-		padding-block: 0.1rem;
-		padding-inline: 0.1rem;
-		margin-block: auto;
-		margin-inline: auto;
-		justify-content: center;
-		list-style: none;
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		justify-items: center;
+	}
+
+	.record-card {
+		max-width: 220px;
+		width: 100%;
+	}
+
+	.record-image {
+		max-inline-size: 220px;
+		aspect-ratio: 1 / 1;
+		object-fit: contain;
 	}
 
 	h3.record-title {
@@ -1501,7 +1520,6 @@ hr {
 		align-items: center;
 		text-align: center;
 	}
-
 	.responsive-image {
 		max-block-size: 300px;
 	}

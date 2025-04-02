@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
-import { faEnvelope, faPhone, faHome } from "@fortawesome/free-solid-svg-icons";
+import { Mail, Phone, Home, Facebook, Instagram } from "lucide-react";
 
 export default function Footer() {
 	return (
@@ -23,11 +21,7 @@ export default function Footer() {
 								rel="noopener noreferrer"
 								aria-label="Email Almond River Records"
 							>
-								<FontAwesomeIcon
-									icon={faEnvelope}
-									className="footer-icon"
-									aria-hidden="true"
-								/>
+								<Mail className="footer-icon" aria-hidden="true" />
 								<span>Email: almondriverrecords@gmail.com</span>
 							</a>
 						</li>
@@ -38,11 +32,7 @@ export default function Footer() {
 								rel="noopener noreferrer"
 								aria-label="Call Almond River Records at 07729 421682"
 							>
-								<FontAwesomeIcon
-									icon={faPhone}
-									className="footer-icon"
-									aria-hidden="true"
-								/>
+								<Phone className="footer-icon" aria-hidden="true" />
 								<span>Call: 07729 421682</span>
 							</a>
 						</li>
@@ -53,11 +43,7 @@ export default function Footer() {
 								rel="noopener noreferrer"
 								aria-label="Visit us at 253 St John's Road, Edinburgh"
 							>
-								<FontAwesomeIcon
-									icon={faHome}
-									className="footer-icon"
-									aria-hidden="true"
-								/>
+								<Home className="footer-icon" aria-hidden="true" />
 								<span>{`253 St John's Rd, Edinburgh EH12 7XD`}</span>
 							</a>
 						</li>
@@ -76,7 +62,11 @@ export default function Footer() {
 						rel="noopener noreferrer"
 						aria-label="Follow Almond River Records on Facebook"
 					>
-						<FontAwesomeIcon icon={faFacebook} aria-hidden="true" />
+						<Facebook
+							className="footer-icon"
+							size={40}
+							aria-hidden="true"
+						/>
 						<span>Facebook</span>
 					</a>
 					<a
@@ -85,7 +75,11 @@ export default function Footer() {
 						rel="noopener noreferrer"
 						aria-label="Follow Almond River Records on Instagram"
 					>
-						<FontAwesomeIcon icon={faInstagram} aria-hidden="true" />
+						<Instagram
+							className="footer-icon"
+							size={40}
+							aria-hidden="true"
+						/>
 						<span>Instagram</span>
 					</a>
 				</div>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Analytics from "@/components/Analytics";
 import { Lato, Oswald } from "next/font/google";
 import "./globals.css";
-import Menu from "@/components/Menu";
+import SiteMenu from "@/components/Menu";
 import Footer from "@/components/Footer";
 import { BasketProvider } from "./api/context/BasketContext";
 import { Suspense } from "react";
@@ -40,7 +40,7 @@ export default function RootLayout({
 			<BasketProvider>
 				<body>
 					<header>
-						<Menu />
+						<SiteMenu />
 					</header>
 					<Suspense fallback={<div>Loading...</div>}>
 						<main>{children}</main>

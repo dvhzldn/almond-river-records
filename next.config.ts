@@ -8,10 +8,9 @@ const withAnalyzer = withBundleAnalyzer({
 const nextConfig: NextConfig = {
 	experimental: {
 		optimizePackageImports: [
-			"@fortawesome/react-fontawesome",
-			"@fortawesome/free-solid-svg-icons",
 			"@contentful/rich-text-react-renderer",
 			"@supabase/supabase-js",
+			"lucide-react",
 		],
 	},
 	images: {

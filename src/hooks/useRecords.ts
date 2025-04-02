@@ -13,6 +13,7 @@ export interface VinylRecord {
 	inStock: boolean;
 	otherImages?: string[];
 	coverImageUrl: string;
+	tracklist?: string[];
 }
 
 interface UseRecordsParams {
