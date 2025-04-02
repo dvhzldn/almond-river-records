@@ -100,7 +100,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 			<div
 				tabIndex={0}
 				aria-hidden="true"
-				onFocus={() => modalRef.current?.focus()}
+				onFocus={() => closeButtonRef.current?.focus()}
 			/>
 			<div
 				className="modalContent"
@@ -152,6 +152,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 
 				<div className="modal-image-container" id="modal-description">
 					<button
+						aria-label={`Buy ${record.title} by ${record.artistName.join(", ")}`}
 						className="buy-button modal-above-image modal-top-left"
 						onClick={onBuy}
 					>
@@ -159,6 +160,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 					</button>
 					{isInBasket ? (
 						<button
+							aria-label={`Remove ${record.title} by ${record.artistName.join(", ")} from your basket`}
 							className="remove-button modal-above-image modal-top-right"
 							onClick={onRemoveFromBasket}
 						>
@@ -167,6 +169,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 						</button>
 					) : (
 						<button
+							aria-label={`Add ${record.title} by ${record.artistName.join(", ")} to your basket`}
 							className="basket-button modal-above-image modal-top-right"
 							onClick={onAddToBasket}
 						>
@@ -199,7 +202,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 			<div
 				tabIndex={0}
 				aria-hidden="true"
-				onFocus={() => modalRef.current?.focus()}
+				onFocus={() => closeButtonRef.current?.focus()}
 			/>
 		</div>
 	);
