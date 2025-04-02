@@ -103,6 +103,10 @@ export default function BasketPage() {
 										? item.coverImage
 										: defaultImage;
 
+								const artistName = Array.isArray(item.artistName)
+									? item.artistName.join(", ")
+									: item.artistName;
+
 								return (
 									<div
 										key={`${item.id}-${index}`}
@@ -126,7 +130,7 @@ export default function BasketPage() {
 											<p>
 												<strong>{item.title}</strong>
 											</p>
-											<p>{item.artistName.join(", ")}</p>
+											<p>{artistName}</p>
 											<h4>£{item.price}</h4>
 											<button
 												className="remove-button"

@@ -6,7 +6,7 @@ import { useAnalytics } from "@/lib/useAnalytics";
 export interface AddToBasketPayload {
 	id: string;
 	title: string;
-	artistName: string[];
+	artistName: string | string[];
 	price: number;
 	coverImage?: string | null;
 }
