@@ -38,7 +38,7 @@ export default function BasketPage() {
 
 	const recordIds = basket.map((item) => item.id);
 	const description = basket
-		.map((item) => `${item.artist} - ${item.title}`)
+		.map((item) => `${item.artistName.join(", ")} - ${item.title}`)
 		.join(", ");
 
 	const handleOrderSubmit = async (orderData: OrderData) => {
@@ -68,9 +68,11 @@ export default function BasketPage() {
 
 			trackCheckout({
 				artistTitle: basket
-					.map((item) => `${item.artist} - ${item.title}`)
+					.map((item) => `${item.artistName.join(", ")} - ${item.title}`)
 					.join(", "),
-				artists: basket.map((item) => item.artist).join(", "),
+				artists: basket
+					.map((item) => item.artistName.join(", "))
+					.join(", "),
 				titles: basket.map((item) => item.title).join(", "),
 			});
 
@@ -109,7 +111,9 @@ export default function BasketPage() {
 										<div>
 											<Image
 												src={imageSrc}
-												alt={`Cover of ${item.title} by ${item.artist}`}
+												alt={`Cover of ${item.title} by ${item.artistName.join(
+													", "
+												)}`}
 												width={90}
 												height={90}
 												className="basket-cover"
@@ -122,14 +126,16 @@ export default function BasketPage() {
 											<p>
 												<strong>{item.title}</strong>
 											</p>
-											<p>{item.artist}</p>
+											<p>{item.artistName.join(", ")}</p>
 											<h4>£{item.price}</h4>
 											<button
 												className="remove-button"
 												onClick={() =>
 													handleRemoveFromBasket(item.id)
 												}
-												aria-label={`Remove ${item.title} by ${item.artist} from basket`}
+												aria-label={`Remove ${item.title} by ${item.artistName.join(
+													", "
+												)} from basket`}
 											>
 												Remove
 											</button>

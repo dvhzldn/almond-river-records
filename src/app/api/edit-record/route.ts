@@ -75,8 +75,8 @@ export async function POST(req: NextRequest) {
 		const artistName = formData.getAll("artistName[]").map(String);
 		const genre = formData.getAll("genre[]").map(String);
 
-		const artistNamesJoined = artistName.join(", ");
-		const imageMeta = `${artistNamesJoined} - ${title} (cover)`;
+		const artistNameJoined = artistName.join(", ");
+		const imageMeta = `${artistNameJoined} - ${title} (cover)`;
 
 		const albumOfTheWeek =
 			formData.get("albumOfTheWeek")?.toString() === "true";

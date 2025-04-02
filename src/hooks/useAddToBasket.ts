@@ -20,7 +20,9 @@ export const useAddToBasket = () => {
 			const basketItem = {
 				id: item.id,
 				title: item.title,
-				artist: item.artistName.join(" & "),
+				artistName: Array.isArray(item.artistName)
+					? item.artistName
+					: [item.artistName],
 				price: item.price,
 				coverImage: item.coverImage || "",
 			};

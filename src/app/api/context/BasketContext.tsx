@@ -8,13 +8,7 @@ import {
 	ReactNode,
 } from "react";
 
-interface BasketItem {
-	id: string;
-	title: string;
-	artist: string;
-	price: number;
-	coverImage?: string;
-}
+import { BasketItem } from "@/types/BasketItem";
 
 interface BasketContextType {
 	basket: BasketItem[];

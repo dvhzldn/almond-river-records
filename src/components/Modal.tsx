@@ -19,7 +19,7 @@ interface ModalProps {
 		price: number;
 		vinylCondition: string;
 		sleeveCondition: string;
-		coverImageUrl?: string;
+		coverImageUrl: string;
 		otherImages?: string[];
 		releaseYear?: number | null;
 		genre?: string[] | string;

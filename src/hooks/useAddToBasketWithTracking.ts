@@ -2,40 +2,21 @@
 import { useCallback } from "react";
 import { useAnalytics } from "@/lib/useAnalytics";
 import { useAddToBasket as useCoreAddToBasket } from "./useAddToBasket";
+import type { BasketItem } from "@/types/BasketItem";
 
 export const useAddToBasketWithTracking = () => {
 	const { track } = useAnalytics();
 	const { handleAddToBasket: baseAddToBasket } = useCoreAddToBasket();
 
 	const handleAddToBasket = useCallback(
-		(
-			record: {
-				id: string;
-				title: string;
-				artistName: string[];
-				price: number;
-				coverImage: string;
-			},
-			onSuccess?: () => void
-		) => {
-			// Analytics
+		(record: BasketItem, onSuccess?: () => void) => {
 			track("add-to-basket", {
 				title: record.title,
 				artist: record.artistName.join(", "),
 				artistTitle: `${record.artistName.join(", ")} - ${record.title}`,
 			});
 
-			// ✅ Fix basket structure to match BasketItem type
-			baseAddToBasket(
-				{
-					id: record.id,
-					title: record.title,
-					artist: record.artistName.join(", "),
-					price: record.price,
-					coverImage: record.coverImage,
-				},
-				onSuccess
-			);
+			baseAddToBasket(record, onSuccess);
 		},
 		[baseAddToBasket, track]
 	);
