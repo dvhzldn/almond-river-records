@@ -4,6 +4,7 @@ type RecordItem = {
 	price: number;
 	vinylCondition: string;
 	coverImageUrl: string;
+	id: string;
 };
 
 interface Props {
@@ -14,9 +15,9 @@ export default function RecordStructuredData({ records }: Props) {
 	const structuredData = records.map((record) => ({
 		"@context": "https://schema.org",
 		"@type": "Product",
-		name: `${record.artist} – ${record.title}`,
-		image: [`https://almondriverrecords.online${record.imageUrl}`],
-		description: `Condition: ${record.condition}`,
+		name: `${record.artistName.join(" & ")} – ${record.title}`,
+		image: [`https://almondriverrecords.online${record.coverImageUrl}`],
+		description: `Condition: ${record.vinylCondition}`,
 		offers: {
 			"@type": "Offer",
 			priceCurrency: "GBP",
