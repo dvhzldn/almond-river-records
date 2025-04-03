@@ -1,6 +1,6 @@
 type RecordItem = {
 	title: string;
-	artistName: string;
+	artistName: string[];
 	price: number;
 	vinylCondition: string;
 	coverImageUrl: string;
