@@ -61,15 +61,7 @@ export default async function RecordsPage() {
 	return (
 		<main className="page-container">
 			<h1 className="page-title">Records for Sale</h1>
-			<RecordStructuredData
-				records={records.map((r) => ({
-					title: r.title,
-					artistName: r.artistName,
-					price: r.price,
-					vinylCondition: r.vinylCondition,
-					coverImageUrl: r.coverImageUrl,
-				}))}
-			/>
+			<RecordStructuredData records={records} />
 			<ClientRecordBrowser
 				initialRecords={records}
 				artistOptions={artistOptions}
