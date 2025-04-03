@@ -97,6 +97,14 @@ export default function ClientRecordBrowser({
 		fetchRecords();
 	}, [search, condition, artist, genre, decade, sort, page, pageSize]);
 
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}, 100);
+
+		return () => clearTimeout(timeout);
+	}, [page]);
+
 	// Memoize rendered records to prevent unnecessary re-renders
 	const renderedRecords = useMemo(() => {
 		return records.map((record) => (
