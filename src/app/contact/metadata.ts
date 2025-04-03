@@ -3,19 +3,19 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
 	title: "Contact Us | Almond River Records",
 	description:
-		"Got a question about our vinyl collection, store hours, or services? Contact Almond River Records in Edinburgh via our form, email, or phone.",
+		"Get in touch with Almond River Records. Visit our vinyl shop in Corstorphine, Edinburgh or drop us a message.",
 	openGraph: {
 		title: "Contact Us | Almond River Records",
 		description:
-			"Reach out to Almond River Records for enquiries about vinyl, our shop, or selling your collection. Located in Corstorphine, Edinburgh.",
-		url: "https://beta.almondriverrecords.online/contact",
+			"Need help or want to ask about a record? Contact Almond River Records in Corstorphine, Edinburgh.",
+		url: "https://almondriverrecords.online/contact",
 		siteName: "Almond River Records",
 		images: [
 			{
-				url: "https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
-				width: 600,
+				url: "https://almondriverrecords.online/images/shop-front.webp",
+				width: 800,
 				height: 600,
-				alt: "Almond River Records logo",
+				alt: "Front of Almond River Records shop in Edinburgh",
 			},
 		],
 		locale: "en_GB",
@@ -23,14 +23,12 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Contact Us | Almond River Records",
+		title: "Contact Almond River Records",
 		description:
-			"We're happy to hear from you. Use our contact form to get in touch about records, services, or shop details.",
-		images: [
-			"https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
-		],
+			"Message or visit Almond River Records – your second-hand vinyl specialists in Corstorphine, Edinburgh.",
+		images: ["https://almondriverrecords.online/images/shop-front.webp"],
 	},
 	alternates: {
-		canonical: "https://beta.almondriverrecords.online/contact",
+		canonical: "https://almondriverrecords.online/contact",
 	},
 };

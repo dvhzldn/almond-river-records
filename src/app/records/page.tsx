@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import ClientRecordBrowser from "@/components/ClientRecordBrowser";
 import type { VinylRecord } from "@/hooks/useRecords";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import RecordStructuredData from "@/components/RecordStructuredData";
 
 export const metadata: Metadata = {
 	title: "Records for Sale – Almond River",
@@ -60,6 +61,15 @@ export default async function RecordsPage() {
 	return (
 		<main className="page-container">
 			<h1 className="page-title">Records for Sale</h1>
+			<RecordStructuredData
+				records={records.map((r) => ({
+					title: r.title,
+					artistName: r.artistName,
+					price: r.price,
+					vinylCondition: r.vinylCondition,
+					coverImageUrl: r.coverImageUrl,
+				}))}
+			/>
 			<ClientRecordBrowser
 				initialRecords={records}
 				artistOptions={artistOptions}

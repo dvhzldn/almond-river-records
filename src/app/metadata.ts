@@ -8,18 +8,21 @@ export const metadata: Metadata = {
 		title: "Almond River Records | Second-Hand Vinyl in Edinburgh",
 		description:
 			"Discover second-hand vinyl online and in-store at Almond River Records, Edinburgh. Weekly new arrivals, classic finds, and collector pieces.",
-		url: "https://beta.almondriverrecords.online/",
+		url: "https://almondriverrecords.online/",
 		siteName: "Almond River Records",
 		images: [
 			{
-				url: "https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
-				width: 600,
-				height: 600,
+				url: "https://almondriverrecords.online/images/almond-river-logo.jpg",
+				width: 800,
+				height: 800,
 				alt: "Almond River Records logo",
 			},
 		],
 		locale: "en_GB",
 		type: "website",
+	},
+	alternates: {
+		canonical: "https://almondriverrecords.online",
 	},
 	twitter: {
 		card: "summary_large_image",
@@ -29,8 +32,5 @@ export const metadata: Metadata = {
 		images: [
 			"https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
 		],
-	},
-	alternates: {
-		canonical: "https://beta.almondriverrecords.online/",
 	},
 };

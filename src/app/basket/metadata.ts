@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 		title: "Your Basket | Almond River Records",
 		description:
 			"You're almost there. Complete your order of second-hand vinyl records with Almond River Records, Edinburgh.",
-		url: "https://beta.almondriverrecords.online/basket",
+		url: "https://almondriverrecords.online/basket",
 		siteName: "Almond River Records",
 		images: [
 			{
-				url: "https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
+				url: "https://almondriverrecords.online/images/almond-river-logo.jpg",
 				width: 600,
 				height: 600,
 				alt: "Almond River Records logo",
@@ -25,12 +25,16 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Your Basket | Almond River Records",
 		description:
-			"Ready to checkout? Finalize your record order at Almond River Records.",
+			"Ready to checkout? Finalise your record order at Almond River Records.",
 		images: [
-			"https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
+			"https://almondriverrecords.online/images/almond-river-logo.jpg",
 		],
 	},
 	alternates: {
-		canonical: "https://beta.almondriverrecords.online/basket",
+		canonical: "https://almondriverrecords.online/basket",
+	},
+	robots: {
+		index: false,
+		follow: true,
 	},
 };

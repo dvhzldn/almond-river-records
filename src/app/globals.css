@@ -24,6 +24,7 @@
 	--colour-5: #c8fffd;
 	--colour-6: #32ba10;
 	--colour-7: #ffffff;
+	--colour-background: #f9fafb;
 	--blur: rgba(0, 0, 0, 0.2);
 }
 
@@ -34,7 +35,7 @@ html {
 }
 
 body {
-	background-color: #f9fafb;
+	background-color: var(--colour-background);
 	font-family: var(--body-font);
 	text-align: center;
 	display: flex;
@@ -63,14 +64,14 @@ body {
 main {
 	flex: 1;
 	inline-size: 100%;
-	background-color: #f9fafb;
+	background-color: var(--colour-background);
 }
 
 .container {
 	padding-inline: 1.2rem;
 	inline-size: 100%;
 	text-align: center;
-	background-color: #f9fafb;
+	background-color: var(--colour-background);
 }
 
 .section {
@@ -84,7 +85,7 @@ main {
 
 /* Page Container */
 .page-container {
-	background: #f9fafb;
+	background: var(--colour-background);
 	padding-block: 1.5rem;
 	padding-inline: 0;
 	display: flex;
@@ -96,8 +97,6 @@ main {
 /* Page Title */
 .page-title {
 	text-align: center;
-	font-size: 2rem;
-	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 2px;
 	color: #222;
@@ -109,8 +108,7 @@ main {
 	background: var(--colour-7);
 	max-inline-size: 1100px;
 	inline-size: 90%;
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding: 1rem;
 	box-shadow: var(--box-shadow);
 	border-radius: var(--border-radius);
 }
@@ -145,7 +143,6 @@ main {
 
 .text {
 	font-size: 1.1rem;
-	color: var(--colour-4);
 	font-weight: 400;
 	line-height: 1.4;
 	text-align: start;
@@ -231,17 +228,13 @@ p {
 /* =====================
    LINKS
    ===================== */
-Link,
-a,
-.hyperLink {
+a {
 	color: var(--colour-1);
 	font-weight: bold;
 	text-decoration: none;
 }
 
-Link:hover,
-a:hover,
-.hyperLink:hover {
+a:hover {
 	color: var(--colour-6);
 	text-decoration: underline solid;
 }
@@ -302,8 +295,7 @@ img.logo-home:hover {
 	gap: 2rem;
 	margin-block: 0;
 	margin-inline: auto;
-	padding-block: 0;
-	padding-inline: 0;
+	padding: 0;
 	white-space: nowrap;
 }
 
@@ -363,8 +355,7 @@ footer.footer {
 
 .footer ul {
 	list-style: none;
-	margin-block: 0;
-	margin-inline: 0;
+	margin: 0;
 	text-align: end;
 	line-height: 1.6;
 }
@@ -426,8 +417,7 @@ footer.footer {
 	background: var(--colour-4);
 	margin-block: 10px;
 	margin-inline: 15%;
-	padding-block: 5px;
-	padding-inline: 5px;
+	padding: 5px;
 	border: 4px solid var(--colour-2);
 }
 
@@ -447,8 +437,7 @@ footer.footer {
 
 .modalContent {
 	background: var(--colour-7);
-	padding-block: 0.1rem;
-	padding-inline: 0.1rem;
+	padding: 0.1rem;
 	border-radius: var(--border-radius);
 	max-inline-size: 700px;
 	inline-size: 90%;
@@ -533,8 +522,7 @@ footer.footer {
 .form {
 	background: var(--colour-1);
 	border-radius: var(--border-radius);
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding: 1rem;
 	max-inline-size: 600px;
 	margin-block: 2rem;
 	margin-inline: auto;
@@ -552,8 +540,7 @@ footer.footer {
 .form input,
 .form textarea {
 	inline-size: 100%;
-	padding-block: 0.75rem;
-	padding-inline: 0.75rem;
+	padding: 0.75rem;
 	border: 1px solid var(--colour-4);
 	border-radius: var(--border-radius);
 	margin-block-end: 1rem;
@@ -570,8 +557,7 @@ footer.footer {
 /* Visually styled form status */
 .form-status {
 	margin-block-start: 1rem;
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding: 1rem;
 	border-radius: 0.5rem;
 	font-weight: 600;
 	font-size: 1rem;
@@ -592,8 +578,7 @@ footer.footer {
 /* Order Form Styling */
 .order-form {
 	background: var(--colour-7);
-	padding-block: 0.2rem;
-	padding-inline: 0.2rem;
+	padding: 0.2rem;
 	max-inline-size: 80%;
 	margin-block: 0;
 	margin-inline: auto;
@@ -612,8 +597,7 @@ footer.footer {
 .order-form input,
 .order-form textarea {
 	inline-size: 100%;
-	padding-block: 0.2rem;
-	padding-inline: 0.2rem;
+	padding: 0.2rem;
 	border: 1px solid lightgrey;
 	margin-block-end: 0.1rem;
 	font-family: inherit;
@@ -662,8 +646,7 @@ footer.footer {
 .opening-hours-container {
 	inline-size: 100%;
 	max-inline-size: 400px;
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding: 1rem;
 	margin-block: 0;
 	margin-inline: auto;
 }
@@ -674,8 +657,7 @@ footer.footer {
 	border-collapse: collapse;
 	background: var(--colour-1);
 	color: var(--colour-7);
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding: 1rem;
 	border-radius: var(--border-radius);
 	box-shadow: var(--box-shadow);
 	text-align: start;
@@ -710,8 +692,7 @@ footer.footer {
 .review-container {
 	position: relative;
 	min-block-size: 60px;
-	padding-block: 0.2rem;
-	padding-inline: 0.2rem;
+	padding: 0.2rem;
 }
 
 /* Star Rating */
@@ -725,7 +706,6 @@ footer.footer {
 .review-text {
 	font-size: 1.1rem;
 	font-weight: 400;
-	color: var(--colour-4);
 	line-height: 1.2;
 	font-style: italic;
 	margin-block-end: 0.4rem;
@@ -742,27 +722,13 @@ footer.footer {
 }
 
 /* Records page */
-/* Filters */
-fieldset {
-	inline-size: 220px;
-	border: 0;
-}
-
-legend {
-	margin-block-end: 10px;
-}
-
-fieldset div {
-	margin-block-end: 10px;
-}
 
 /* Grid Layout for Records */
 .records-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(250px, 250px));
 	gap: 0.8rem;
-	padding-block: 0.2rem;
-	padding-inline: 0.2rem;
+	padding: 0.2rem;
 	max-inline-size: 1200px;
 	margin-block: auto;
 	margin-inline: auto;
@@ -773,8 +739,7 @@ fieldset div {
 .record-card {
 	position: relative;
 	background: var(--colour-7);
-	padding-block: 0.2rem;
-	padding-inline: 0.2rem;
+	padding: 0.2rem;
 	border-radius: var(--border-radius);
 	cursor: pointer;
 	transition: transform 0.2s;
@@ -857,10 +822,17 @@ fieldset div {
 }
 
 /* Filter Menu*/
-
+/* Filters */
 fieldset {
+	inline-size: 220px;
+	border: 0;
 	margin-inline: auto;
 	display: block;
+}
+
+legend,
+fieldset div {
+	margin-block-end: 10px;
 }
 
 .filter-menu {
@@ -1028,8 +1000,7 @@ fieldset {
 .featured-record-details {
 	min-inline-size: 0;
 	overflow-wrap: break-word;
-	padding-block: 0rem;
-	padding-inline: 0rem;
+	padding: 0rem;
 	margin-inline-start: 2rem;
 }
 
@@ -1102,8 +1073,7 @@ fieldset {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	padding-block: 0.5rem;
-	padding-inline: 0.5rem;
+	padding: 0.5rem;
 	inline-size: 100%;
 	font-size: 0.8rem;
 }
@@ -1116,8 +1086,7 @@ fieldset {
 .basket-item .remove-button {
 	margin-block: 0;
 	margin-inline: auto;
-	padding-block: 0.2rem;
-	padding-inline: 0.2rem;
+	padding: 0.2rem;
 	font-size: 0.7rem;
 }
 
@@ -1254,8 +1223,7 @@ address.policy {
 /* Admin pages */
 /* Admin Form Styling */
 .admin-form-container {
-	padding-block: 1rem;
-	padding-inline: 1rem;
+	padding: 1rem;
 	max-inline-size: 40rem;
 	margin-block: 0;
 	margin-inline: auto;
@@ -1279,8 +1247,7 @@ address.policy {
 .admin-form textarea,
 .admin-form select {
 	inline-size: 100%;
-	padding-block: 0.5rem;
-	padding-inline: 0.5rem;
+	padding: 0.5rem;
 	border: 1px solid #ccc;
 	font-size: 1rem;
 }
@@ -1316,8 +1283,7 @@ address.policy {
 
 	.featured-record {
 		grid-template-columns: 1fr;
-		padding-block: 1.5rem;
-		padding-inline: 1.5rem;
+		padding: 1.5rem;
 	}
 
 	.featured-record-details {
@@ -1360,25 +1326,12 @@ address.policy {
 		inline-size: 95%;
 	}
 	.content-box-grid {
-		padding-block: 0;
-		padding-inline: 0;
+		padding: 0;
 		inline-size: 95%;
 	}
 	.text-image-container {
 		flex-direction: column;
 		text-align: center;
-	}
-	.text-content {
-		text-align: start;
-		max-inline-size: 100%;
-	}
-	.image-container {
-		max-inline-size: 100%;
-		text-align: center;
-	}
-	.image-container img {
-		inline-size: 100%;
-		block-size: auto;
 	}
 
 	.modal-image {
@@ -1449,8 +1402,7 @@ address.policy {
 		inline-size: 100%;
 		display: block;
 		block-size: auto;
-		margin-block: 0;
-		margin-inline: 0;
+		margin: 0;
 	}
 
 	.footer {
@@ -1468,8 +1420,7 @@ address.policy {
 	}
 
 	.section {
-		padding-block: 1rem;
-		padding-inline: 1rem;
+		padding: 1rem;
 	}
 
 	.records-grid {
@@ -1517,9 +1468,6 @@ address.policy {
 		align-items: center;
 		text-align: center;
 	}
-	.responsive-image {
-		max-block-size: 300px;
-	}
 
 	.info-container {
 		flex-direction: column;
@@ -1534,8 +1482,7 @@ address.policy {
 	.map iframe {
 		min-block-size: 150px;
 		block-size: 200px;
-		padding-block: 10px;
-		padding-inline: 10px;
+		padding: 10px;
 	}
 
 	/* Show the toggle button on mobile */
@@ -1555,8 +1502,7 @@ address.policy {
 	}
 
 	.page-title {
-		margin-block: 0;
-		margin-inline: 0;
+		margin: 0;
 	}
 	.filter-controls {
 		display: none;

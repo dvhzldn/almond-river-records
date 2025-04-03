@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-	title: "Browse Vinyl Records | Almond River Records",
+	title: "Browse Second-Hand Vinyl Records | Almond River Records",
 	description:
-		"Explore our wide range of second-hand vinyl records. Filter by artist, genre, decade, or condition. New arrivals added weekly at Almond River Records.",
+		"Explore our full range of second-hand vinyl records, sorted by artist, genre, decade, and condition. Shipping UK-wide or pick up in Edinburgh.",
 	openGraph: {
-		title: "Browse Vinyl Records | Almond River Records",
+		title: "Browse Second-Hand Vinyl Records | Almond River Records",
 		description:
-			"Dig through our growing collection of second-hand vinyl. Shop by genre, decade, or artist. Based in Corstorphine, Edinburgh.",
-		url: "https://beta.almondriverrecords.online/records",
+			"Shop second-hand vinyl from artists like Bob Dylan, Genesis, and The Rolling Stones. Filter by genre, decade, and condition. Based in Edinburgh.",
+		url: "https://almondriverrecords.online/records",
 		siteName: "Almond River Records",
 		images: [
 			{
-				url: "https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
-				width: 600,
-				height: 600,
+				url: "https://almondriverrecords.online/images/almond-river-logo.jpg",
+				width: 800,
+				height: 800,
 				alt: "Almond River Records logo",
 			},
 		],
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Browse Vinyl Records | Almond River Records",
+		title: "Shop Vinyl Records Online | Almond River Records",
 		description:
-			"Find your next vinyl gem. Discover second-hand records online or visit our Edinburgh shop.",
+			"Buy used vinyl online or visit our record shop in Edinburgh. Filter by artist, genre, decade, and more.",
 		images: [
-			"https://beta.almondriverrecords.online/images/almond-river-logo.jpg",
+			"https://almondriverrecords.online/images/almond-river-logo.jpg",
 		],
 	},
 	alternates: {
-		canonical: "https://beta.almondriverrecords.online/records",
+		canonical: "https://almondriverrecords.online/records",
 	},
 };

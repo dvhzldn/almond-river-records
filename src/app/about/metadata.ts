@@ -8,20 +8,27 @@ export const metadata: Metadata = {
 		title: "About Us | Almond River Records",
 		description:
 			"Learn more about Almond River Records and our welcoming shop in Corstorphine, Edinburgh.",
-		url: "https://beta.almondriverrecords.online/about",
+		url: "https://almondriverrecords.online/about",
 		siteName: "Almond River Records",
 		images: [
 			{
-				url: "https://beta.almondriverrecords.online/images/shop-front.webp",
+				url: "https://almondriverrecords.online/images/shop-front.webp",
 				width: 800,
 				height: 600,
-				alt: "Andy Barbour of Almond River Records stsanding outside the shop.",
+				alt: "Andy Barbour of Almond River Records outside our shop.",
 			},
 		],
 		locale: "en_GB",
 		type: "website",
 	},
 	alternates: {
-		canonical: "https://beta.almondriverrecords.online/about",
+		canonical: "https://almondriverrecords.online/about",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "About Almond River Records",
+		description:
+			"About Almond River Records, the second-hand vinyl record shop based in Corstorphine, Edinburgh.",
+		images: ["https://almondriverrecords.online/images/shop-front.webp"],
 	},
 };

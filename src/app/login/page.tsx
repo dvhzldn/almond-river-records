@@ -94,8 +94,12 @@ export default function LoginPage() {
 						data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 					></div>
 
-					<button type="submit" disabled={loading} className="form-button">
-						{loading ? "Logging in..." : "Login"}
+					<button
+						type="submit"
+						disabled={loading}
+						className="button button--success button--large"
+					>
+						{loading ? "Logging in..." : "Log In"}
 					</button>
 
 					{error ? <p className="error-text">{error}</p> : null}
