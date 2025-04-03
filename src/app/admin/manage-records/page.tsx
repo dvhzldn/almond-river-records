@@ -100,7 +100,7 @@ export default function ManageRecordsPage() {
 										)}
 									</td>
 									<td>{record.title}</td>
-									<td>{record.artistName.join(", ")}</td>
+									<td>{record.artistName.join(" & ")}</td>
 									<td>{record.price}</td>
 									<td>
 										<button

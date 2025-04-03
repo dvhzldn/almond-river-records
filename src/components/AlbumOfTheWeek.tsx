@@ -40,7 +40,7 @@ export default function AlbumOfTheWeek() {
 		<div className="featured-record">
 			<div className="featured-record-details">
 				<h3>
-					{album.title} by {album.artist_names.join(", ")}
+					{album.title} by {album.artist_names.join(" & ")}
 				</h3>
 				<div>
 					{album.description ? (

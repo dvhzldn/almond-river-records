@@ -19,8 +19,8 @@ export const useBuyNow = () => {
 	}) => {
 		track("buy-record", {
 			title: record.title,
-			artist: record.artistName.join(", "),
-			artistTitle: `${record.artistName.join(", ")} - ${record.title}`,
+			artist: record.artistName.join(" & "),
+			artistTitle: `${record.artistName.join(" & ")} - ${record.title}`,
 		});
 
 		const coverImage = record.coverImage || DEFAULT_COVER_IMAGE;

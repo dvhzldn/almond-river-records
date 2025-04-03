@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
 		const title = formData.get("title")?.toString() ?? "";
 		const artistName = getValues("artistName[]");
-		const displayArtist = artistName.join(", ");
+		const displayArtist = artistName.join(" & ");
 		const displayTitle = `${displayArtist} - ${title} (cover)`;
 		const normalizedFileName = `${displayTitle}.jpg`.replace(
 			/[/\\?%*:|"<>]/g,

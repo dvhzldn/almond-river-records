@@ -83,13 +83,13 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 											onKeyDown={(e) => handleKeyDown(e, record)}
 											role="button"
 											tabIndex={0}
-											aria-label={`View details for ${record.title} by ${record.artistName.join(", ")}`}
+											aria-label={`View details for ${record.title} by ${record.artistName.join(" & ")}`}
 										>
 											{record.coverImageUrl && (
 												<Image
 													className="record-image"
 													src={record.coverImageUrl}
-													alt={`${record.title} by ${record.artistName.join(", ")} cover art`}
+													alt={`${record.title} by ${record.artistName.join(" & ")} cover art`}
 													width={250}
 													height={250}
 													sizes="(max-width: 768px) 100vw, 250px"
@@ -100,7 +100,7 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 											<p>
 												<strong>{record.title}</strong>
 											</p>
-											<p>{record.artistName.join(", ")}</p>
+											<p>{record.artistName.join(" & ")}</p>
 											<p>£{record.price.toFixed(0)}</p>
 										</div>
 									</SwiperSlide>

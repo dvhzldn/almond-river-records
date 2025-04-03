@@ -30,14 +30,14 @@ export async function sendOrderConfirmationEmail(
 	const itemsText = orderItems
 		.map(
 			(item) =>
-				`- ${item.artist_names.join(", ")} – ${item.title} (£${item.price.toFixed(2)})`
+				`- ${item.artist_names.join(" & ")} – ${item.title} (£${item.price.toFixed(2)})`
 		)
 		.join("\n");
 
 	const shippingAddress =
 		[order.address1, order.address2, order.address3]
 			.filter(Boolean)
-			.join(", ") + `, ${order.city}, ${order.postcode}`;
+			.join(" & ") + `, ${order.city}, ${order.postcode}`;
 
 	const text = `
 Hi ${order.customer_name},

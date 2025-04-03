@@ -39,8 +39,8 @@ export default function BasketPage() {
 
 	const recordIds = basket.map((item) => item.id);
 	const description = basket
-		.map((item) => `${item.artistName.join(", ")} - ${item.title}`)
-		.join(", ");
+		.map((item) => `${item.artistName.join(" & ")} - ${item.title}`)
+		.join(" & ");
 
 	const handleOrderSubmit = async (orderData: OrderData) => {
 		setLoading(true);
@@ -69,12 +69,12 @@ export default function BasketPage() {
 
 			trackCheckout({
 				artistTitle: basket
-					.map((item) => `${item.artistName.join(", ")} - ${item.title}`)
-					.join(", "),
+					.map((item) => `${item.artistName.join(" & ")} - ${item.title}`)
+					.join(" & "),
 				artists: basket
-					.map((item) => item.artistName.join(", "))
-					.join(", "),
-				titles: basket.map((item) => item.title).join(", "),
+					.map((item) => item.artistName.join(" & "))
+					.join(" & "),
+				titles: basket.map((item) => item.title).join(" & "),
 			});
 
 			window.location.href = data.hosted_checkout_url;
@@ -105,7 +105,7 @@ export default function BasketPage() {
 										: defaultImage;
 
 								const artistName = Array.isArray(item.artistName)
-									? item.artistName.join(", ")
+									? item.artistName.join(" & ")
 									: item.artistName;
 
 								return (
@@ -116,7 +116,7 @@ export default function BasketPage() {
 										<div>
 											<Image
 												src={imageSrc}
-												alt={`Cover of ${item.title} by ${item.artistName.join(", ")}`}
+												alt={`Cover of ${item.title} by ${item.artistName.join(" & ")}`}
 												width={90}
 												height={90}
 												className="basket-cover"

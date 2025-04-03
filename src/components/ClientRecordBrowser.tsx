@@ -109,7 +109,7 @@ export default function ClientRecordBrowser({
 					<Image
 						className="record-image"
 						src={record.coverImageUrl || "/placeholder.jpg"}
-						alt={`${record.title} by ${record.artistName.join(", ")}`}
+						alt={`${record.title} by ${record.artistName.join(" & ")}`}
 						width={250}
 						height={250}
 						sizes="(max-width: 768px) 100vw, 250px"
@@ -125,7 +125,7 @@ export default function ClientRecordBrowser({
 					<div className="record-actions">
 						{isInBasket(record.id) ? (
 							<button
-								aria-label={`Remove ${record.title} by ${record.artistName.join(", ")} from your basket`}
+								aria-label={`Remove ${record.title} by ${record.artistName.join(" & ")} from your basket`}
 								className="remove-button-grid"
 								onClick={(e) => {
 									e.stopPropagation();
@@ -136,7 +136,7 @@ export default function ClientRecordBrowser({
 							</button>
 						) : (
 							<button
-								aria-label={`Add ${record.title} by ${record.artistName.join(", ")} to your basket`}
+								aria-label={`Add ${record.title} by ${record.artistName.join(" & ")} to your basket`}
 								className="basket-button"
 								onClick={(e) => {
 									e.stopPropagation();
@@ -153,7 +153,7 @@ export default function ClientRecordBrowser({
 							</button>
 						)}
 						<button
-							aria-label={`Buy ${record.title} by ${record.artistName.join(", ")}`}
+							aria-label={`Buy ${record.title} by ${record.artistName.join(" & ")}`}
 							className="buy-button"
 							onClick={(e) => {
 								e.stopPropagation();

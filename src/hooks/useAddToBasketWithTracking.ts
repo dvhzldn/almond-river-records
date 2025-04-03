@@ -12,8 +12,8 @@ export const useAddToBasketWithTracking = () => {
 		(record: BasketItem, onSuccess?: () => void) => {
 			track("add-to-basket", {
 				title: record.title,
-				artist: record.artistName.join(", "),
-				artistTitle: `${record.artistName.join(", ")} - ${record.title}`,
+				artist: record.artistName.join(" & "),
+				artistTitle: `${record.artistName.join(" & ")} - ${record.title}`,
 			});
 
 			baseAddToBasket(record, onSuccess);
