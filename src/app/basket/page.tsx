@@ -122,7 +122,6 @@ export default function BasketPage() {
 												className="basket-cover"
 												sizes="(max-width: 768px) 100vw, 250px"
 												quality={60}
-												loading="lazy"
 												priority={true}
 												unoptimized={true}
 												onError={(
