@@ -781,8 +781,8 @@ fieldset div {
 
 .record-image {
 	align-items: center;
-	max-inline-size: 240px;
-	max-block-size: 240px;
+	max-inline-size: 200px;
+	max-block-size: 200px;
 	inline-size: auto;
 	display: block;
 	aspect-ratio: 1 / 1;
@@ -855,31 +855,35 @@ fieldset div {
 	display: block;
 }
 
-.swiper-slide {
-	display: flex;
-	justify-content: center;
+/* New This Week Swiper */
+.new-this-week-carousel {
+	position: relative;
+	width: 95%;
+	margin-inline: auto;
+	padding-inline: 0.5rem;
+	box-sizing: content-box; /* <-- CRUCIAL to prevent slide cropping */
+}
+
+.new-this-week-carousel .swiper {
+	width: 95%;
+	overflow: hidden;
 }
 
 .swiper-button-prev,
 .swiper-button-next {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 10;
+	cursor: pointer;
 }
 
-/* Move the prev arrow to the left */
 .swiper-button-prev {
-	inset-inline-start: 1;
+	left: 0;
 }
 
-/* Move the next arrow to the right */
 .swiper-button-next {
-	inset-inline-end: 0;
-}
-
-.swiper {
-	padding-block: 0;
-	padding-inline: 40px;
+	right: 0;
 }
 
 /* Button Container */

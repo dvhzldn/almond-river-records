@@ -48,65 +48,76 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 
 	return (
 		<section aria-labelledby="new-this-week-carousel">
-			<h3 id="new-this-week-carousel" className="sr-only">
-				New This Week Record Carousel
-			</h3>
+			<div className="new-this-week">
+				<h3 id="new-this-week-carousel" className="sr-only">
+					New This Week Record Carousel
+				</h3>
 
-			{records.length === 0 ? (
-				<p>No new records added this week.</p>
-			) : (
-				<Swiper
-					modules={[Autoplay, Navigation, Pagination]}
-					autoplay={{ delay: 2000, disableOnInteraction: true }}
-					navigation
-					loop={records.length > 4}
-					breakpoints={{
-						0: { slidesPerView: 1, spaceBetween: 10 },
-						640: { slidesPerView: 2, spaceBetween: 10 },
-						768: { slidesPerView: 3, spaceBetween: 20 },
-						1024: { slidesPerView: 4, spaceBetween: 30 },
-					}}
-					aria-label="New records carousel"
-				>
-					{records.map((record) => (
-						<SwiperSlide key={record.id}>
-							<div
-								className="record-card-slider"
-								onClick={() => handleRecordClick(record)}
-								onKeyDown={(e) => handleKeyDown(e, record)}
-								role="button"
-								tabIndex={0}
-								aria-label={`View details for ${record.title} by ${record.artistName.join(", ")}`}
+				{records.length === 0 ? (
+					<p>No new records added this week.</p>
+				) : (
+					<div className="new-this-week-carousel">
+						<div className="swiper-button-prev"></div>
+						<div className="swiper-container">
+							<Swiper
+								modules={[Autoplay, Navigation, Pagination]}
+								autoplay={{ delay: 2000, disableOnInteraction: true }}
+								navigation={{
+									nextEl: ".swiper-button-next",
+									prevEl: ".swiper-button-prev",
+								}}
+								loop={records.length > 4}
+								breakpoints={{
+									0: { slidesPerView: 1, spaceBetween: 10 },
+									640: { slidesPerView: 2, spaceBetween: 10 },
+									768: { slidesPerView: 3, spaceBetween: 20 },
+									1024: { slidesPerView: 4, spaceBetween: 30 },
+								}}
+								aria-label="New records carousel"
 							>
-								{record.coverImageUrl && (
-									<Image
-										className="record-image"
-										src={record.coverImageUrl}
-										alt={`${record.title} by ${record.artistName.join(", ")} cover art`}
-										width={250}
-										height={250}
-										sizes="(max-width: 768px) 100vw, 250px"
-										quality={60}
-										loading="lazy"
-									/>
-								)}
-								<p>
-									<strong>{record.title}</strong>
-								</p>
-								<p>{record.artistName.join(", ")}</p>
-								<p>£{record.price.toFixed(0)}</p>
-							</div>
-						</SwiperSlide>
-					))}
-				</Swiper>
-			)}
+								{records.map((record) => (
+									<SwiperSlide key={record.id}>
+										<div
+											className="record-card-slider"
+											onClick={() => handleRecordClick(record)}
+											onKeyDown={(e) => handleKeyDown(e, record)}
+											role="button"
+											tabIndex={0}
+											aria-label={`View details for ${record.title} by ${record.artistName.join(", ")}`}
+										>
+											{record.coverImageUrl && (
+												<Image
+													className="record-image"
+													src={record.coverImageUrl}
+													alt={`${record.title} by ${record.artistName.join(", ")} cover art`}
+													width={250}
+													height={250}
+													sizes="(max-width: 768px) 100vw, 250px"
+													quality={60}
+													loading="lazy"
+												/>
+											)}
+											<p>
+												<strong>{record.title}</strong>
+											</p>
+											<p>{record.artistName.join(", ")}</p>
+											<p>£{record.price.toFixed(0)}</p>
+										</div>
+									</SwiperSlide>
+								))}
+							</Swiper>
+						</div>
+						<div className="swiper-button-next"></div>
+					</div>
+				)}
 
-			{selectedRecord && (
-				<Modal
-					record={selectedRecord}
-					onClose={() => setSelectedRecord(null)}
-				/>
-			)}
+				{selectedRecord && (
+					<Modal
+						record={selectedRecord}
+						onClose={() => setSelectedRecord(null)}
+					/>
+				)}
+			</div>
 		</section>
 	);
 }
