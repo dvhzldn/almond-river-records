@@ -781,8 +781,8 @@ fieldset div {
 
 .record-image {
 	align-items: center;
-	max-inline-size: 200px;
-	max-block-size: 200px;
+	max-inline-size: 240px;
+	max-block-size: 240px;
 	inline-size: auto;
 	display: block;
 	aspect-ratio: 1 / 1;
