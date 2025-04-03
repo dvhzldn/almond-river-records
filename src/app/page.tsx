@@ -45,8 +45,8 @@ export default async function Home() {
 							className="logo-home"
 							src="/images/almond-river-logo.jpg"
 							alt="Almond River Records logo"
-							width={382}
-							height={382}
+							width={300}
+							height={300}
 							priority
 							sizes="(max-width: 768px) 100vw, 250px"
 						/>
