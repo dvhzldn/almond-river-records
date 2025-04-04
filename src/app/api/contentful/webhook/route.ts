@@ -1,3 +1,4 @@
+import { logEvent } from "@/lib/logger"; // Axiom logger
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { fetchAndUpdateTracklist } from "@/lib/fetchAndUpdateTracklist";
@@ -36,6 +37,12 @@ export async function POST(req: Request) {
 		// ---- Handle Deleted Assets ----
 		if (sys?.type === "DeletedAsset") {
 			const assetId = sys.id;
+			await logEvent("contentful-asset-deleted", {
+				source: "contentful-webhook",
+				status: "success",
+				assetId,
+				message: "Asset deleted via Contentful webhook",
+			});
 			const { error } = await supabase
 				.from("contentful_assets")
 				.delete()
@@ -43,6 +50,12 @@ export async function POST(req: Request) {
 
 			if (error) {
 				console.error("❌ Error deleting asset:", error);
+				await logEvent("contentful-asset-delete-error", {
+					source: "contentful-webhook",
+					status: "error",
+					assetId,
+					error: error.message,
+				});
 				return NextResponse.json(
 					{ error: "Error deleting asset" },
 					{ status: 500 }
@@ -59,6 +72,12 @@ export async function POST(req: Request) {
 			sys?.contentType?.sys?.id === "vinylRecord"
 		) {
 			const recordId = sys.id;
+			await logEvent("vinyl-record-deleted", {
+				source: "contentful-webhook",
+				status: "success",
+				recordId,
+				message: "Record deleted via Contentful webhook",
+			});
 			const { error } = await supabase
 				.from("vinyl_records")
 				.delete()
@@ -66,6 +85,12 @@ export async function POST(req: Request) {
 
 			if (error) {
 				console.error("❌ Error deleting vinyl record:", error);
+				await logEvent("vinyl-record-delete-error", {
+					source: "contentful-webhook",
+					status: "error",
+					recordId,
+					error: error.message,
+				});
 				return NextResponse.json(
 					{ error: "Error deleting vinyl record" },
 					{ status: 500 }
@@ -94,6 +119,12 @@ export async function POST(req: Request) {
 				revision: sys.revision ?? null,
 				published_version: sys.publishedVersion ?? null,
 			};
+			await logEvent("contentful-asset-inserted", {
+				source: "contentful-webhook",
+				status: "success",
+				assetId: id,
+				message: "Asset inserted via Contentful webhook",
+			});
 
 			const { error } = await supabase
 				.from("contentful_assets")
@@ -101,6 +132,12 @@ export async function POST(req: Request) {
 
 			if (error) {
 				console.error("❌ Error inserting asset:", error);
+				await logEvent("contentful-asset-insert-error", {
+					source: "contentful-webhook",
+					status: "error",
+					assetId: id,
+					error: error.message,
+				});
 				return NextResponse.json(
 					{ error: "Error inserting asset" },
 					{ status: 500 }
@@ -230,10 +267,24 @@ export async function POST(req: Request) {
 
 		if (error) {
 			console.error("❌ Error inserting vinyl record:", error);
+			await logEvent("vinyl-record-insert-error", {
+				source: "contentful-webhook",
+				status: "error",
+				id,
+				error: error.message,
+			});
 			return NextResponse.json({ error: error.message }, { status: 500 });
 		}
 
 		console.log(`✅ Record ${id} inserted/updated successfully.`);
+		await logEvent("vinyl-record-inserted", {
+			source: "contentful-webhook",
+			status: "success",
+			recordId: id,
+			title: record.title,
+			artist_names: record.artist_names,
+			cover_image_url: record.cover_image_url,
+		});
 		return NextResponse.json({ success: true }, { status: 200 });
 	} catch (err) {
 		console.error("❌ Webhook error:", err);

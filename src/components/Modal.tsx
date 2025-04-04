@@ -10,6 +10,7 @@ import TrackRecordView from "./TrackRecordView";
 import { useEffect, useRef } from "react";
 import TrackList from "./TrackList";
 import { ShoppingBasket } from "lucide-react";
+import { logClientEvent } from "@/lib/useClientLogger";
 
 interface ModalProps {
 	record: {
@@ -88,6 +89,17 @@ export default function Modal({ record, onClose }: ModalProps) {
 			previouslyFocused?.focus();
 		};
 	}, [onClose]);
+
+	useEffect(() => {
+		logClientEvent("record-viewed", {
+			recordId: record.id,
+			title: record.title,
+			artistNames: record.artistName,
+			price: record.price,
+			genre: record.genre,
+			source: "Modal.tsx",
+		});
+	}, [record.id, record.title, record.artistName, record.price, record.genre]);
 
 	return (
 		<div
