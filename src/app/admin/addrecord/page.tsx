@@ -159,13 +159,32 @@ export default function AddRecordPage() {
 	};
 
 	const addArrayField = (key: "artistName" | "genre") => {
-		setForm((prev) => ({ ...prev, [key]: [...prev[key], ""] }));
+		const lastItem = form[key][form[key].length - 1];
+		if (lastItem.trim() !== "") {
+			setForm((prev) => ({ ...prev, [key]: [...prev[key], ""] }));
+		} else {
+			setStatus(
+				"Please fill the current artist field before adding another."
+			);
+		}
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setSubmitting(true);
 		setStatus(null);
+
+		if (form.artistName.every((artist) => artist.trim() === "")) {
+			setStatus("Please add at least one artist.");
+			setSubmitting(false);
+			return;
+		}
+
+		const filteredArtistNames = form.artistName.filter(
+			(artist) => artist.trim() !== ""
+		);
+
+		const formData = { ...form, artistName: filteredArtistNames };
 
 		try {
 			const {
@@ -182,7 +201,7 @@ export default function AddRecordPage() {
 				headers: {
 					Authorization: `Bearer ${session.access_token}`,
 				},
-				body: toFormData(form),
+				body: toFormData(formData),
 			});
 
 			if (res.ok) {
@@ -233,7 +252,6 @@ export default function AddRecordPage() {
 							value={artist}
 							onChange={(e) => handleArrayChange(e, "artistName", i)}
 							placeholder={`Name of artist ${i + 1}`}
-							required
 						/>
 					))}
 					<button
