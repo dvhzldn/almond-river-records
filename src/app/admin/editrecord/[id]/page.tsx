@@ -42,10 +42,12 @@ export default function EditRecordPage() {
 			try {
 				const res = await fetch(`/api/get-record?id=${recordId}`);
 				const data = await res.json();
-				setForm({
-					...data,
-					albumOfTheWeek: data.albumOfTheWeek ?? false,
-				});
+				if (data) {
+					setForm({
+						...data,
+						albumOfTheWeek: data.albumOfTheWeek ?? false,
+					});
+				}
 			} catch (err) {
 				console.error("Failed to load record", err);
 				setStatus("Failed to load record.");
@@ -56,13 +58,10 @@ export default function EditRecordPage() {
 	}, [recordId]);
 
 	const handleChange = (
-		e: React.ChangeEvent<
-			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-		>
+		e: React.ChangeEvent<HTMLElement & { name: string; value: string }>
 	) => {
-		const { name, value } = e.target;
 		if (!form) return;
-		setForm({ ...form, [name]: value });
+		setForm({ ...form, [e.target.name]: e.target.value });
 	};
 
 	const handleArrayChange = (
@@ -81,10 +80,9 @@ export default function EditRecordPage() {
 		setForm({ ...form, [key]: [...form[key], ""] });
 	};
 
-	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!form) return;
 		const file = e.target.files?.[0];
-		if (!form || !file) return;
-
 		setForm({ ...form, coverImageFile: file });
 	};
 
@@ -119,7 +117,7 @@ export default function EditRecordPage() {
 			} = await supabase.auth.getSession();
 
 			if (!session) {
-				setStatus("You must be logged in to add a record.");
+				setStatus("You must be logged in to update a record.");
 				return;
 			}
 
@@ -277,7 +275,6 @@ export default function EditRecordPage() {
 						alt="Current Cover"
 						width={200}
 						height={200}
-						sizes="(max-width: 768px) 100vw, 250px"
 						quality={60}
 						loading="lazy"
 					/>

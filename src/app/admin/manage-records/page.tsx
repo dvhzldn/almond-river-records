@@ -81,6 +81,8 @@ export default function ManageRecordsPage() {
 			});
 			if (!res.ok) throw new Error("Deletion failed");
 
+			// Show success confirmation message
+			setStatus("✅ Record deleted successfully!");
 			// Refresh the page to get the updated list of records
 			router.refresh(); // Trigger a page refresh and refetch the data
 		} catch (err) {
