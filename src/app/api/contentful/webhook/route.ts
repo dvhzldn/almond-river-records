@@ -34,6 +34,43 @@ export async function POST(req: Request) {
 		const payload = await req.json();
 		const sys = payload.sys;
 
+		// Handle Archived Vinyl Records
+		if (
+			sys?.type === "ArchivedEntry" &&
+			sys?.contentType?.sys?.id === "vinylRecord"
+		) {
+			const recordId = sys.id;
+			await logEvent("vinyl-record-archived", {
+				source: "contentful-webhook",
+				status: "success",
+				recordId,
+				message: "Record archived via Contentful webhook",
+			});
+
+			// Delete the archived record from Supabase
+			const { error } = await supabase
+				.from("vinyl_records")
+				.delete()
+				.eq("id", recordId);
+
+			if (error) {
+				console.error("❌ Error deleting vinyl record:", error);
+				await logEvent("vinyl-record-archive-error", {
+					source: "contentful-webhook",
+					status: "error",
+					recordId,
+					error: error.message,
+				});
+				return NextResponse.json(
+					{ error: "Error deleting vinyl record" },
+					{ status: 500 }
+				);
+			}
+
+			console.log(`✅ Vinyl record ${recordId} deleted from Supabase.`);
+			return NextResponse.json({ success: true }, { status: 200 });
+		}
+
 		// ---- Handle Deleted Assets ----
 		if (sys?.type === "DeletedAsset") {
 			const assetId = sys.id;
