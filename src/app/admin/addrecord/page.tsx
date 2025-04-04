@@ -221,6 +221,8 @@ export default function AddRecordPage() {
 					description: "",
 					coverImage: undefined,
 				});
+
+				router.push("/admin/home");
 			} else {
 				const error = await res.text();
 				setStatus(`Error: ${error}`);
