@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -41,6 +42,8 @@ export default function AddRecordPage() {
 
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+	const router = useRouter();
 
 	// Function to resize and crop the image to 800x800 px
 	const resizeAndCropImage = (
@@ -206,7 +209,9 @@ export default function AddRecordPage() {
 
 			if (res.ok) {
 				setStatus("Record added successfully!");
-				alert("✅ Record added successfully.");
+				alert(
+					`✅ ${formData.artistName.join(", ")} - ${formData.title} added successfully.`
+				);
 
 				setForm({
 					title: "",

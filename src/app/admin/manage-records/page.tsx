@@ -86,7 +86,7 @@ export default function ManageRecordsPage() {
 			if (!res.ok) throw new Error("Deletion failed");
 
 			// Show success confirmation message
-			alert(`Deletion of ${artist.join(" & ")} - ${title} successful`);
+			alert(`${artist.join(" & ")} - ${title} has been deleted.`);
 
 			// Redirect to the admin home page after successful deletion
 			router.push("/admin/home");

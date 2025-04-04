@@ -26,9 +26,9 @@ type RecordFormData = {
 };
 
 export default function EditRecordPage() {
-	const router = useRouter();
 	const params = useParams();
 	const recordId = params.id as string;
+	const router = useRouter();
 
 	const [form, setForm] = useState<RecordFormData | null>(null);
 	const [submitting, setSubmitting] = useState(false);
@@ -131,6 +131,8 @@ export default function EditRecordPage() {
 
 			if (res.ok) {
 				setStatus("✅ Record updated.");
+				alert(`✅ ${form.artistName.join(", ")} - ${form.title} updated`);
+
 				router.push("/admin/manage-records");
 			} else {
 				setStatus("❌ Failed to update.");
