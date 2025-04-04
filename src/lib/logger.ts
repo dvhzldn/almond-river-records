@@ -10,7 +10,7 @@ const axiom = new Axiom({
 	orgId: process.env.AXIOM_ORG_ID,
 });
 
-const DATASET = "app-logs";
+const DATASET = "almond";
 
 export const logEvent = async (
 	eventName: string,
