@@ -57,6 +57,15 @@ export default function ManageRecordsPage() {
 		if (!confirmed) return;
 
 		try {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+
+			if (!session) {
+				setStatus("You must be logged in to delete a record.");
+				return;
+			}
+
 			const res = await fetch(`/api/delete-record?id=${id}`, {
 				method: "DELETE",
 				headers: {
