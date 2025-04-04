@@ -30,10 +30,10 @@ const nextConfig: NextConfig = {
 			config.optimization.minimizer.push(
 				new TerserPlugin({
 					terserOptions: {
-						compress: {
-							drop_console: true, // Removes console logs in production
-						},
-						mangle: true, // Mangles variable and function names
+						// compress: {
+						// 	drop_console: true, // Removes console logs in production
+						// },
+						// mangle: true, // Mangles variable and function names
 						output: {
 							comments: false, // Removes comments from output
 						},

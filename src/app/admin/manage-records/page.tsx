@@ -51,6 +51,7 @@ export default function ManageRecordsPage() {
 		checkAuthAndFetchRecords();
 	}, [router]);
 
+	// Archive (delete) a record and refresh the page
 	const handleArchive = async (id: string) => {
 		const confirmed = confirm("Delete this record?");
 		if (!confirmed) return;
@@ -60,7 +61,9 @@ export default function ManageRecordsPage() {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error("Deletion failed");
-			setRecords((prev) => prev.filter((r) => r.id !== id));
+
+			// Refresh the page to get the updated list of records
+			router.refresh(); // Trigger a page refresh and refetch the data
 		} catch (err) {
 			console.error("[Deletion Error]", err);
 			alert("❌ Failed to delete record.");
