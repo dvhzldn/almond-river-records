@@ -91,7 +91,7 @@ export default async function handler(_req: Request): Promise<Response> {
 
 			// Trigger fulfillment
 			const fulfillRes = await fetch(
-				`${Deno.env.get("NEXT_PUBLIC_BASE_URL")}/api/fulfillOrder`,
+				`${Deno.env.get("NEXT_PUBLIC_BASE_URL")}/api/fulfill-order`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
