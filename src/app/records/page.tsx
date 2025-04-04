@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-static";
-export const revalidate = 3600;
+export const revalidate = 30;
 
 export default async function RecordsPage() {
 	const { data: recordsData } = await supabaseAdmin

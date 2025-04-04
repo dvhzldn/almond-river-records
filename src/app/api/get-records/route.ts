@@ -157,7 +157,7 @@ export async function GET(request: Request) {
 			{ records, total: count ?? 0 },
 			{
 				headers: {
-					"Cache-Control": "s-maxage=3600, stale-while-revalidate",
+					"Cache-Control": "s-maxage=30, stale-while-revalidate",
 				},
 			}
 		);
