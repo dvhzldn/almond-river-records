@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 type VinylRecord = {
 	id: string;
@@ -16,11 +18,25 @@ export default function ManageRecordsPage() {
 	const [records, setRecords] = useState<VinylRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const router = useRouter();
 
 	useEffect(() => {
-		const fetchRecords = async () => {
+		const checkAuthAndFetchRecords = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+
+			if (!session) {
+				router.replace("/login");
+				return;
+			}
+
 			try {
-				const res = await fetch("/api/get-records");
+				const res = await fetch("/api/get-records", {
+					headers: {
+						Authorization: `Bearer ${session.access_token}`,
+					},
+				});
 				if (!res.ok) throw new Error("Failed to fetch records");
 				const data = await res.json();
 				setRecords(data.records);
@@ -32,8 +48,8 @@ export default function ManageRecordsPage() {
 			}
 		};
 
-		fetchRecords();
-	}, []);
+		checkAuthAndFetchRecords();
+	}, [router]);
 
 	const handleArchive = async (id: string) => {
 		const confirmed = confirm("Delete this record?");

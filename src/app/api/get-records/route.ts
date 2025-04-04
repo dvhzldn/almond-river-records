@@ -18,6 +18,22 @@ type VinylRecord = {
 };
 
 export async function GET(request: Request) {
+	const authHeader = request.headers.get("Authorization");
+
+	// Ensure the Authorization header exists and extract the token
+	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	const token = authHeader.replace("Bearer ", "");
+
+	// Validate the token with Supabase
+	const { data: user, error } = await supabase.auth.getUser(token);
+
+	if (error || !user) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
 	try {
 		const { searchParams } = new URL(request.url);
 		const getParam = (key: string): string | undefined => {
