@@ -1,19 +1,12 @@
 "use client";
 import Image from "next/image";
-import { useState, KeyboardEvent } from "react";
+import { useState, useEffect, KeyboardEvent } from "react";
+import type { ComponentType } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-import dynamic from "next/dynamic";
-
-const Modal = dynamic(() => import("./Modal"), {
-	ssr: false,
-	loading: () => null,
-});
-
 interface Record {
 	id: string;
 	title: string;
@@ -34,6 +27,16 @@ interface NewThisWeekProps {
 
 export default function NewThisWeek({ records }: NewThisWeekProps) {
 	const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
+	const [ModalComponent, setModalComponent] = useState<ComponentType<{
+		record: Record;
+		onClose: () => void;
+	}> | null>(null);
+
+	useEffect(() => {
+		if (selectedRecord && !ModalComponent) {
+			import("./Modal").then((mod) => setModalComponent(() => mod.default));
+		}
+	}, [selectedRecord, ModalComponent]);
 
 	const handleRecordClick = (record: Record) => {
 		setSelectedRecord(record);
@@ -110,13 +113,13 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 						<div className="swiper-button-next"></div>
 					</div>
 				)}
-
-				{selectedRecord && (
-					<Modal
+				{selectedRecord && ModalComponent && (
+					<ModalComponent
 						record={selectedRecord}
 						onClose={() => setSelectedRecord(null)}
 					/>
 				)}
+				{selectedRecord && !ModalComponent && <p>Loading details...</p>}
 			</div>
 		</section>
 	);
