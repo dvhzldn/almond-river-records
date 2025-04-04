@@ -56,8 +56,12 @@ export default function ManageRecordsPage() {
 		fetchSessionAndRecords();
 	}, [fetchSessionAndRecords]); // Now the fetchSessionAndRecords function is included in the dependency array
 
-	// Archive (delete) a record and refresh the page
-	const handleArchive = async (id: string) => {
+	// Archive (delete) a record and redirect to /admin/home
+	const handleArchive = async (
+		id: string,
+		title: string,
+		artist: string[]
+	) => {
 		const confirmed = confirm("Delete this record?");
 		if (!confirmed) return;
 
@@ -82,9 +86,10 @@ export default function ManageRecordsPage() {
 			if (!res.ok) throw new Error("Deletion failed");
 
 			// Show success confirmation message
-			setStatus("✅ Record deleted successfully!");
-			// Refresh the page to get the updated list of records
-			router.refresh(); // Trigger a page refresh and refetch the data
+			alert(`Deletion of ${artist.join(" & ")} - ${title} successful`);
+
+			// Redirect to the admin home page after successful deletion
+			router.push("/admin/home");
 		} catch (err) {
 			console.error("[Deletion Error]", err);
 			alert("❌ Failed to delete record.");
@@ -146,7 +151,13 @@ export default function ManageRecordsPage() {
 									<td>
 										<button
 											className="basket-button"
-											onClick={() => handleArchive(record.id)}
+											onClick={() =>
+												handleArchive(
+													record.id,
+													record.title,
+													record.artistName
+												)
+											}
 										>
 											Delete
 										</button>
