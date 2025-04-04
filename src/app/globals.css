@@ -761,7 +761,7 @@ footer.footer {
 	align-items: center;
 	text-align: center;
 	aspect-ratio: 1 / 1;
-	min-height: 300px;
+	min-height: 350px;
 }
 
 .record-image-container {
@@ -983,6 +983,7 @@ fieldset div {
 	padding-block: 0rem;
 	padding-inline: 1.2rem;
 	box-shadow: var(--box-shadow);
+	min-height: 470px;
 }
 
 .featured-record-details p,

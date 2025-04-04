@@ -62,8 +62,8 @@ export default function AlbumOfTheWeek() {
 						height={400}
 						className="featured-record-cover"
 						sizes="(max-width: 768px) 100vw, 250px"
-						quality={60}
-						loading="lazy"
+						quality={50}
+						priority
 					/>
 				) : (
 					<p>No cover image available.</p>
