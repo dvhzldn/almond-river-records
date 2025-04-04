@@ -40,6 +40,7 @@ export async function POST(req: Request) {
 			sys?.contentType?.sys?.id === "vinylRecord"
 		) {
 			const recordId = sys.id;
+			console.log("Archived record webhook received for:", recordId);
 			await logEvent("vinyl-record-archived", {
 				source: "contentful-webhook",
 				status: "success",
@@ -47,14 +48,14 @@ export async function POST(req: Request) {
 				message: "Record archived via Contentful webhook",
 			});
 
-			// Delete the archived record from Supabase
+			// Delete from Supabase
 			const { error } = await supabase
 				.from("vinyl_records")
 				.delete()
 				.eq("id", recordId);
 
 			if (error) {
-				console.error("❌ Error deleting vinyl record:", error);
+				console.error("Error deleting vinyl record:", error.message);
 				await logEvent("vinyl-record-archive-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
 				);
 			}
 
-			console.log(`✅ Vinyl record ${recordId} deleted from Supabase.`);
+			console.log(`Vinyl record ${recordId} deleted from Supabase.`);
 			return NextResponse.json({ success: true }, { status: 200 });
 		}
 
