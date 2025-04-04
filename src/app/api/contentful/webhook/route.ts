@@ -214,15 +214,6 @@ export async function POST(req: Request) {
 				}
 			}
 
-			// Discogs tracklist
-			if (!error) {
-				await fetchAndUpdateTracklist(supabase, {
-					id,
-					title: record.title,
-					artist_names_text: record.artist_names_text,
-				});
-			}
-
 			// Insert or update the record in Supabase
 			const { error } = await supabase
 				.from("vinyl_records")
@@ -239,6 +230,15 @@ export async function POST(req: Request) {
 					error: error.message,
 				});
 				return NextResponse.json({ error: error.message }, { status: 500 });
+			}
+
+			// Discogs tracklist
+			if (!error) {
+				await fetchAndUpdateTracklist(supabase, {
+					id,
+					title: record.title,
+					artist_names_text: record.artist_names_text,
+				});
 			}
 
 			console.log(`✅ Vinyl record ${id} inserted/updated successfully.`);

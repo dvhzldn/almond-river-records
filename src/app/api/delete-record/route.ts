@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "contentful-management";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
+import { logEvent } from "@/lib/logger";
 export async function DELETE(req: NextRequest) {
 	// Start of the process - log incoming request
 	console.log("Received DELETE request to archive and delete record.");
