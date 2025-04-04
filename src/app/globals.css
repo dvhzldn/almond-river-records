@@ -111,7 +111,7 @@ main {
 	padding: 1rem;
 	box-shadow: var(--box-shadow);
 	border-radius: var(--border-radius);
-	min-height: 400px;
+	min-height: 1000px;
 }
 
 .content-box-grid {
@@ -761,7 +761,7 @@ footer.footer {
 	align-items: center;
 	text-align: center;
 	aspect-ratio: 1 / 1;
-	min-height: 250px;
+	min-height: 300px;
 }
 
 .record-image-container {

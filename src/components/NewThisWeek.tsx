@@ -97,7 +97,6 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 													height={250}
 													sizes="(max-width: 768px) 50vw, 250px"
 													quality={40}
-													loading="lazy"
 												/>
 											)}
 											<p>
