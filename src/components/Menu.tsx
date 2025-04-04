@@ -113,6 +113,7 @@ export default function SiteMenu() {
 						/>
 						<span
 							className="basket-count"
+							data-empty={basketCount === 0}
 							aria-hidden={basketCount === 0}
 						>
 							{basketCount > 0 ? basketCount : "\u00A0"}

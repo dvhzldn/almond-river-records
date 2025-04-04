@@ -1162,6 +1162,11 @@ fieldset div {
 	line-height: 1;
 }
 
+.basket-count[data-empty="true"] {
+	background-color: transparent;
+	color: transparent;
+}
+
 .bill-line {
 	display: flex;
 	justify-content: space-between;
