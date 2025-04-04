@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
@@ -15,41 +15,46 @@ type VinylRecord = {
 };
 
 export default function ManageRecordsPage() {
+	const [status, setStatus] = useState<string | null>(null);
 	const [records, setRecords] = useState<VinylRecord[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
 
+	// Memoize the fetchSessionAndRecords function with useCallback
+	const fetchSessionAndRecords = useCallback(async () => {
+		const {
+			data: { session },
+		} = await supabase.auth.getSession();
+
+		// If session doesn't exist, redirect to login
+		if (!session) {
+			setStatus("You must be logged in to manage records.");
+			router.replace("/login");
+			return;
+		}
+
+		try {
+			const res = await fetch("/api/get-records", {
+				headers: {
+					Authorization: `Bearer ${session.access_token}`,
+				},
+			});
+			if (!res.ok) throw new Error("Failed to fetch records");
+			const data = await res.json();
+			setRecords(data.records);
+		} catch (err) {
+			console.error("[Fetch Error]", err);
+			setError("Could not load records.");
+		} finally {
+			setLoading(false);
+		}
+	}, [router]); // Add router as dependency if it's used inside useCallback
+
+	// Fetch records on page load
 	useEffect(() => {
-		const checkAuthAndFetchRecords = async () => {
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
-
-			if (!session) {
-				router.replace("/login");
-				return;
-			}
-
-			try {
-				const res = await fetch("/api/get-records", {
-					headers: {
-						Authorization: `Bearer ${session.access_token}`,
-					},
-				});
-				if (!res.ok) throw new Error("Failed to fetch records");
-				const data = await res.json();
-				setRecords(data.records);
-			} catch (err) {
-				console.error("[Fetch Error]", err);
-				setError("Could not load records.");
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		checkAuthAndFetchRecords();
-	}, [router]);
+		fetchSessionAndRecords();
+	}, [fetchSessionAndRecords]); // Now the fetchSessionAndRecords function is included in the dependency array
 
 	// Archive (delete) a record and refresh the page
 	const handleArchive = async (id: string) => {
@@ -57,10 +62,12 @@ export default function ManageRecordsPage() {
 		if (!confirmed) return;
 
 		try {
+			// Fetch session before performing actions
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
 
+			// If session doesn't exist, set status and return
 			if (!session) {
 				setStatus("You must be logged in to delete a record.");
 				return;
@@ -88,6 +95,7 @@ export default function ManageRecordsPage() {
 			<h1>Manage Records</h1>
 			{loading && <p>Loading...</p>}
 			{error && <p className="text-red-600">{error}</p>}
+			{status && <p className="status-message">{status}</p>}
 
 			{records.length === 0 ? (
 				<p>No records found.</p>
