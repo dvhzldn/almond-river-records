@@ -79,8 +79,7 @@ export async function GET(request: Request) {
 			)
 			.eq("in_stock", true)
 			.eq("sold", false)
-			.gt("quantity", 0) // Only in-stock and unsold records
-			.eq("archived", false); // Exclude archived records
+			.gt("quantity", 0); // Only in-stock and unsold records
 
 		// Apply sorting
 		if (sort === "artist") {
