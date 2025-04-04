@@ -23,7 +23,7 @@ export default function ManageRecordsPage() {
 				const res = await fetch("/api/get-records");
 				if (!res.ok) throw new Error("Failed to fetch records");
 				const data = await res.json();
-				setRecords(data);
+				setRecords(data.records);
 			} catch (err) {
 				console.error("[Fetch Error]", err);
 				setError("Could not load records.");

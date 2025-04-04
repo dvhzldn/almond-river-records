@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -113,8 +114,20 @@ export default function EditRecordPage() {
 		formData.append("albumOfTheWeek", form.albumOfTheWeek ? "true" : "false");
 
 		try {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+
+			if (!session) {
+				setStatus("You must be logged in to add a record.");
+				return;
+			}
+
 			const res = await fetch("/api/edit-record", {
 				method: "POST",
+				headers: {
+					Authorization: `Bearer ${session.access_token}`,
+				},
 				body: formData,
 			});
 
