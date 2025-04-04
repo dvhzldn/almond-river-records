@@ -48,7 +48,8 @@ export default async function Home() {
 							width={300}
 							height={300}
 							priority
-							sizes="(max-width: 768px) 100vw, 250px"
+							sizes="(max-width: 768px) 50vw, 250px"
+							quality={50}
 						/>
 					</div>
 

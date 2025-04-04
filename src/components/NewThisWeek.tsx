@@ -95,8 +95,8 @@ export default function NewThisWeek({ records }: NewThisWeekProps) {
 													alt={`${record.title} by ${record.artistName.join(" & ")} cover art`}
 													width={250}
 													height={250}
-													sizes="(max-width: 768px) 100vw, 250px"
-													quality={60}
+													sizes="(max-width: 768px) 50vw, 250px"
+													quality={40}
 													loading="lazy"
 												/>
 											)}
