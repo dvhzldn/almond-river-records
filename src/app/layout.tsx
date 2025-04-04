@@ -37,11 +37,16 @@ export default function RootLayout({
 					name="viewport"
 					content="width=device-width, initial-scale=1"
 				/>
-
-				<UmamiAnalytics />
+				<link rel="preconnect" href="https://vercel.live" crossOrigin="" />
+				<link rel="preconnect" href="https://umami.dev" crossOrigin="" />
+				<link
+					rel="preconnect"
+					href="https://api-gateway.umami.dev"
+					crossOrigin=""
+				/>
 			</head>
 			<BasketProvider>
-				<body>
+				<body lang="en">
 					<header>
 						<SiteMenu />
 					</header>
@@ -53,6 +58,7 @@ export default function RootLayout({
 					</footer>
 				</body>
 			</BasketProvider>
+			<UmamiAnalytics />
 			<Analytics />
 		</html>
 	);

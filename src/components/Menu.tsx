@@ -6,12 +6,11 @@ import { useBasket } from "@/app/api/context/BasketContext";
 import { ShoppingBasket, Menu, X } from "lucide-react";
 
 export default function SiteMenu() {
-	const [hasMounted, setHasMounted] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [animateBasket, setAnimateBasket] = useState(false);
 	const { basket } = useBasket();
 	const basketCount = basket.length;
 	const pathname = usePathname();
-	const [animateBasket, setAnimateBasket] = useState(false);
 
 	const toggleMenu = () => setIsOpen((prev) => !prev);
 	const closeMenu = () => setIsOpen(false);
@@ -19,7 +18,7 @@ export default function SiteMenu() {
 	const firstNavLinkRef = useRef<HTMLAnchorElement | null>(null);
 	const burgerButtonRef = useRef<HTMLButtonElement | null>(null);
 
-	// Focus management when menu opens
+	// Focus management when menu opens/closes
 	useEffect(() => {
 		if (isOpen && firstNavLinkRef.current) {
 			firstNavLinkRef.current.focus();
@@ -32,15 +31,13 @@ export default function SiteMenu() {
 	// Close menu on Escape key
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				closeMenu();
-			}
+			if (e.key === "Escape") closeMenu();
 		};
 		document.addEventListener("keydown", handleKeyDown);
 		return () => document.removeEventListener("keydown", handleKeyDown);
 	}, []);
 
-	// Trigger basket animation when count changes
+	// Trigger basket animation on update
 	useEffect(() => {
 		if (basketCount > 0) {
 			setAnimateBasket(true);
@@ -49,21 +46,15 @@ export default function SiteMenu() {
 		}
 	}, [basketCount]);
 
-	useEffect(() => {
-		setHasMounted(true);
-	}, []);
-
 	const isActive = (path: string): boolean => {
 		if (!pathname) return false;
 		return path === "/" ? pathname === "/" : pathname.startsWith(path);
 	};
 
-	if (!hasMounted) return null;
-
 	return (
 		<nav className="menu" aria-label="Main site navigation">
 			<div className="menu-container">
-				{/* Burger Menu Button */}
+				{/* Burger Button */}
 				<button
 					type="button"
 					className="burger"
@@ -75,7 +66,7 @@ export default function SiteMenu() {
 					{isOpen ? <X size={20} /> : <Menu size={20} />}
 				</button>
 
-				{/* Navigation Links */}
+				{/* Nav Links */}
 				<ul className={isOpen ? "nav-links open" : "nav-links"}>
 					<li className={isActive("/") ? "active" : ""}>
 						<Link href="/" onClick={closeMenu} ref={firstNavLinkRef}>
@@ -109,6 +100,7 @@ export default function SiteMenu() {
 					</li>
 				</ul>
 
+				{/* Basket */}
 				<div className={`basket-wrapper ${animateBasket ? "animate" : ""}`}>
 					<Link
 						href="/basket"
@@ -119,9 +111,12 @@ export default function SiteMenu() {
 							size={25}
 							className={`basket-icon ${animateBasket ? "animate" : ""}`}
 						/>
-						{basketCount > 0 && (
-							<span className="basket-count">{basketCount}</span>
-						)}
+						<span
+							className="basket-count"
+							aria-hidden={basketCount === 0}
+						>
+							{basketCount > 0 ? basketCount : "\u00A0"}
+						</span>
 					</Link>
 				</div>
 			</div>

@@ -1106,6 +1106,11 @@ fieldset div {
 	inset-inline-end: 0px;
 	inset-block-start: 50%;
 	transform: translateY(-50%);
+	inline-size: 40px; /* or match your nav height */
+	block-size: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .basket-icon {
@@ -1144,8 +1149,6 @@ fieldset div {
 	position: absolute;
 	inset-block-start: -5px;
 	inset-inline-end: -10px;
-	background-color: var(--colour-3);
-	color: var(--colour-7);
 	font-size: 12px;
 	font-weight: bold;
 	inline-size: 18px;
@@ -1154,6 +1157,9 @@ fieldset div {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	background-color: var(--colour-3);
+	color: var(--colour-7);
+	line-height: 1;
 }
 
 .bill-line {
