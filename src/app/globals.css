@@ -440,6 +440,7 @@ footer.footer {
 	padding: 0.1rem;
 	border-radius: var(--border-radius);
 	max-inline-size: 700px;
+	max-block-size: 95%;
 	inline-size: 90%;
 	position: relative;
 	text-align: center;
