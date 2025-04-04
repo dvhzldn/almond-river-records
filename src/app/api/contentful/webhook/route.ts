@@ -48,6 +48,43 @@ export async function POST(req: Request) {
 				message: "Record archived via Contentful webhook",
 			});
 
+			// Check record exists in Supabase before deleting
+			const { data, error: fetchError } = await supabase
+				.from("vinyl_records")
+				.select("id")
+				.eq("id", recordId);
+
+			if (fetchError) {
+				console.error(
+					"❌ Error fetching record from Supabase:",
+					fetchError.message
+				);
+				await logEvent("vinyl-record-fetch-error", {
+					source: "contentful-webhook",
+					status: "error",
+					recordId,
+					error: fetchError.message,
+				});
+				return NextResponse.json(
+					{ error: "Error fetching vinyl record from Supabase" },
+					{ status: 500 }
+				);
+			}
+
+			if (!data || data.length === 0) {
+				console.log(`No record found in Supabase with ID: ${recordId}`);
+				await logEvent("vinyl-record-archive-no-record", {
+					source: "contentful-webhook",
+					status: "warning",
+					recordId,
+					message: `No record found in Supabase for ID: ${recordId}`,
+				});
+				return NextResponse.json(
+					{ error: "Record not found in Supabase" },
+					{ status: 404 }
+				);
+			}
+
 			// Delete from Supabase
 			const { error } = await supabase
 				.from("vinyl_records")
@@ -55,7 +92,7 @@ export async function POST(req: Request) {
 				.eq("id", recordId);
 
 			if (error) {
-				console.error("Error deleting vinyl record:", error.message);
+				console.error("❌ Error deleting vinyl record:", error.message);
 				await logEvent("vinyl-record-archive-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -69,12 +106,19 @@ export async function POST(req: Request) {
 			}
 
 			console.log(`Vinyl record ${recordId} deleted from Supabase.`);
+			await logEvent("vinyl-record-archive-success", {
+				source: "contentful-webhook",
+				status: "success",
+				recordId,
+				message: "Record successfully archived and deleted from Supabase",
+			});
 			return NextResponse.json({ success: true }, { status: 200 });
 		}
 
 		// ---- Handle Deleted Assets ----
 		if (sys?.type === "DeletedAsset") {
 			const assetId = sys.id;
+			console.log(`Asset deleted: ${assetId}`);
 			await logEvent("contentful-asset-deleted", {
 				source: "contentful-webhook",
 				status: "success",
@@ -87,7 +131,7 @@ export async function POST(req: Request) {
 				.eq("id", assetId);
 
 			if (error) {
-				console.error("❌ Error deleting asset:", error);
+				console.error("❌ Error deleting asset:", error.message);
 				await logEvent("contentful-asset-delete-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -101,6 +145,12 @@ export async function POST(req: Request) {
 			}
 
 			console.log(`✅ Asset ${assetId} deleted from Supabase.`);
+			await logEvent("contentful-asset-delete-success", {
+				source: "contentful-webhook",
+				status: "success",
+				assetId,
+				message: "Asset successfully deleted from Supabase",
+			});
 			return NextResponse.json({ success: true }, { status: 200 });
 		}
 
@@ -110,6 +160,7 @@ export async function POST(req: Request) {
 			sys?.contentType?.sys?.id === "vinylRecord"
 		) {
 			const recordId = sys.id;
+			console.log("Deleting vinyl record from Contentful:", recordId);
 			await logEvent("vinyl-record-deleted", {
 				source: "contentful-webhook",
 				status: "success",
@@ -122,7 +173,7 @@ export async function POST(req: Request) {
 				.eq("id", recordId);
 
 			if (error) {
-				console.error("❌ Error deleting vinyl record:", error);
+				console.error("❌ Error deleting vinyl record:", error.message);
 				await logEvent("vinyl-record-delete-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -136,6 +187,12 @@ export async function POST(req: Request) {
 			}
 
 			console.log(`✅ Vinyl record ${recordId} deleted from Supabase.`);
+			await logEvent("vinyl-record-delete-success", {
+				source: "contentful-webhook",
+				status: "success",
+				recordId,
+				message: "Record successfully deleted from Supabase",
+			});
 			return NextResponse.json({ success: true }, { status: 200 });
 		}
 
@@ -169,7 +226,7 @@ export async function POST(req: Request) {
 				.upsert(asset, { onConflict: "id" });
 
 			if (error) {
-				console.error("❌ Error inserting asset:", error);
+				console.error("❌ Error inserting asset:", error.message);
 				await logEvent("contentful-asset-insert-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -304,7 +361,7 @@ export async function POST(req: Request) {
 		}
 
 		if (error) {
-			console.error("❌ Error inserting vinyl record:", error);
+			console.error("❌ Error inserting vinyl record:", error.message);
 			await logEvent("vinyl-record-insert-error", {
 				source: "contentful-webhook",
 				status: "error",
