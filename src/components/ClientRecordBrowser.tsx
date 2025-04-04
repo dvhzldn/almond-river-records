@@ -111,7 +111,16 @@ export default function ClientRecordBrowser({
 			<div
 				key={record.id}
 				className="record-card"
+				tabIndex={0}
+				role="button"
+				aria-label={`View details for ${record.title} by ${record.artistName.join(", ")}`}
 				onClick={() => setSelectedRecord(record)}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						setSelectedRecord(record);
+					}
+				}}
 			>
 				<div className="record-image-container">
 					<Image
