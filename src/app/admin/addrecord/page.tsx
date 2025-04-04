@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRef } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 const vinylConditions = ["Mint", "Near Mint", "Very Good", "Good", "Fair"];
 
@@ -167,8 +168,20 @@ export default function AddRecordPage() {
 		setStatus(null);
 
 		try {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+
+			if (!session) {
+				setStatus("You must be logged in to add a record.");
+				return;
+			}
+
 			const res = await fetch("/api/add-record", {
 				method: "POST",
+				headers: {
+					Authorization: `Bearer ${session.access_token}`,
+				},
 				body: toFormData(form),
 			});
 
