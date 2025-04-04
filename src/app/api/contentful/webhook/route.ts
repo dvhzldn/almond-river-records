@@ -34,108 +34,32 @@ export async function POST(req: Request) {
 		const payload = await req.json();
 		const sys = payload.sys;
 
-		// Handle Archived Vinyl Records
-		// Ensure we process the correct archived entry event
-		if (
-			sys?.type === "ArchivedEntry" &&
-			sys?.contentType?.sys?.id === "vinylRecord"
-		) {
-			const recordId = sys.id;
-			console.log("Archived record webhook received for:", recordId);
-			await logEvent("vinyl-record-archived", {
-				source: "contentful-webhook",
-				status: "success",
-				recordId,
-				message: "Record archived via Contentful webhook",
-			});
-
-			// Check if the record exists in Supabase before deleting
-			const { data, error: fetchError } = await supabase
-				.from("vinyl_records")
-				.select("id")
-				.eq("id", recordId);
-
-			if (fetchError) {
-				console.error(
-					"❌ Error fetching record from Supabase:",
-					fetchError.message
-				);
-				await logEvent("vinyl-record-fetch-error", {
-					source: "contentful-webhook",
-					status: "error",
-					recordId,
-					error: fetchError.message,
-				});
-				return NextResponse.json(
-					{ error: "Error fetching vinyl record from Supabase" },
-					{ status: 500 }
-				);
-			}
-
-			if (!data || data.length === 0) {
-				console.log(`No record found in Supabase with ID: ${recordId}`);
-				await logEvent("vinyl-record-archive-no-record", {
-					source: "contentful-webhook",
-					status: "warning",
-					recordId,
-					message: `No record found in Supabase for ID: ${recordId}`,
-				});
-				return NextResponse.json(
-					{ error: "Record not found in Supabase" },
-					{ status: 404 }
-				);
-			}
-
-			// Delete the record from Supabase
-			const { error } = await supabase
-				.from("vinyl_records")
-				.delete()
-				.eq("id", recordId);
-
-			if (error) {
-				console.error("❌ Error deleting vinyl record:", error.message);
-				await logEvent("vinyl-record-archive-error", {
-					source: "contentful-webhook",
-					status: "error",
-					recordId,
-					error: error.message,
-				});
-				return NextResponse.json(
-					{ error: "Error deleting vinyl record" },
-					{ status: 500 }
-				);
-			}
-
-			console.log(`Vinyl record ${recordId} deleted from Supabase.`);
-			await logEvent("vinyl-record-archive-success", {
-				source: "contentful-webhook",
-				status: "success",
-				recordId,
-				message: "Record successfully archived and deleted from Supabase",
-			});
-			return NextResponse.json({ success: true }, { status: 200 });
-		}
-
-		// Handle other Contentful events (deleted, published, etc.)
+		// Handle Deleted Vinyl Record
 		if (
 			sys?.type === "DeletedEntry" &&
 			sys?.contentType?.sys?.id === "vinylRecord"
 		) {
 			const recordId = sys.id;
-			console.log("Deleting vinyl record from Contentful:", recordId);
+			console.log(`Deleting vinyl record from Contentful: ${recordId}`);
+
+			// Log that the record is being deleted
 			await logEvent("vinyl-record-deleted", {
 				source: "contentful-webhook",
 				status: "success",
 				recordId,
 				message: "Record deleted via Contentful webhook",
 			});
+
+			// Try to delete the record from Supabase
 			const { error } = await supabase
 				.from("vinyl_records")
 				.delete()
 				.eq("id", recordId);
 
 			if (error) {
-				console.error("❌ Error deleting vinyl record:", error.message);
+				console.error(
+					`❌ Error deleting vinyl record ${recordId}: ${error.message}`
+				);
 				await logEvent("vinyl-record-delete-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -143,7 +67,7 @@ export async function POST(req: Request) {
 					error: error.message,
 				});
 				return NextResponse.json(
-					{ error: "Error deleting vinyl record" },
+					{ error: "Error deleting vinyl record from Supabase" },
 					{ status: 500 }
 				);
 			}
@@ -155,10 +79,11 @@ export async function POST(req: Request) {
 				recordId,
 				message: "Record successfully deleted from Supabase",
 			});
+
 			return NextResponse.json({ success: true }, { status: 200 });
 		}
 
-		// Handle other cases like asset updates, etc.
+		// Handle Contentful Asset Updates
 		if (sys?.type === "Asset") {
 			const id = sys.id;
 			const f = payload.fields;
@@ -176,6 +101,8 @@ export async function POST(req: Request) {
 				revision: sys.revision ?? null,
 				published_version: sys.publishedVersion ?? null,
 			};
+
+			console.log(`Inserting/Updating Asset ${id} in Supabase.`);
 			await logEvent("contentful-asset-inserted", {
 				source: "contentful-webhook",
 				status: "success",
@@ -183,12 +110,13 @@ export async function POST(req: Request) {
 				message: "Asset inserted via Contentful webhook",
 			});
 
+			// Upsert the asset in Supabase
 			const { error } = await supabase
 				.from("contentful_assets")
 				.upsert(asset, { onConflict: "id" });
 
 			if (error) {
-				console.error("❌ Error inserting asset:", error.message);
+				console.error(`❌ Error inserting asset ${id}: ${error.message}`);
 				await logEvent("contentful-asset-insert-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -196,21 +124,21 @@ export async function POST(req: Request) {
 					error: error.message,
 				});
 				return NextResponse.json(
-					{ error: "Error inserting asset" },
+					{ error: "Error inserting asset into Supabase" },
 					{ status: 500 }
 				);
 			}
 
-			console.log(`✅ Asset ${id} inserted/updated.`);
+			console.log(`✅ Asset ${id} inserted/updated successfully.`);
 			return NextResponse.json({ success: true }, { status: 200 });
 		}
 
-		// Handle Vinyl Record updates if necessary (optional)
+		// Handle Vinyl Record Updates
 		if (sys?.contentType?.sys?.id === "vinylRecord") {
 			const f = payload.fields;
 			const id = sys.id;
 
-			// Build base record object
+			// Build the record object for update
 			const record = {
 				id,
 				title: f.title?.["en-GB"] ?? "",
@@ -231,7 +159,6 @@ export async function POST(req: Request) {
 				in_stock: f.inStock?.["en-GB"] ?? true,
 				sold: f.sold?.["en-GB"] ?? false,
 				album_of_the_week: f.albumOfTheWeek?.["en-GB"] ?? false,
-				album_of_week: f.albumOfTheWeek?.["en-GB"] ?? false,
 				cover_image: null as string | null,
 				cover_image_url: null as string | null,
 				other_images: [] as string[],
@@ -241,13 +168,15 @@ export async function POST(req: Request) {
 			const coverRef = f.coverImage?.["en-GB"];
 			const otherRefs = f.otherImages?.["en-GB"] ?? [];
 
-			// ✅ Fetch and assign cover image
+			// Fetch cover image and assign
 			if (coverRef?.sys?.id) {
 				const assetId = coverRef.sys.id;
 				const asset = await fetchContentfulAsset(assetId);
 
 				if (!asset) {
-					console.error("❌ Could not retrieve cover asset. Aborting.");
+					console.error(
+						`❌ Could not retrieve cover asset for record ${id}.`
+					);
 					return NextResponse.json(
 						{ error: "Asset not found" },
 						{ status: 500 }
@@ -258,60 +187,51 @@ export async function POST(req: Request) {
 				const filePath = file?.url;
 
 				if (!filePath) {
-					console.error("❌ Asset file path missing.");
+					console.error("❌ Missing file path for cover image.");
 					return NextResponse.json(
 						{ error: "Asset file missing" },
 						{ status: 500 }
 					);
 				}
 
-				// Required values
 				record.cover_image = assetId;
 				record.cover_image_url = constructImageUrl(filePath, true);
-
-				// Optional: upsert asset to contentful_assets table
-				await supabase.from("contentful_assets").upsert(
-					{
-						id: asset.sys.id,
-						title: asset.fields?.title?.["en-GB"] ?? null,
-						url: constructImageUrl(filePath, false),
-						details: file?.details ?? null,
-						file_name: file?.fileName ?? null,
-						content_type: file?.contentType ?? null,
-						created_at: asset.sys?.createdAt ?? new Date().toISOString(),
-						updated_at: asset.sys?.updatedAt ?? new Date().toISOString(),
-						revision: asset.sys?.revision ?? null,
-						published_version: asset.sys?.publishedVersion ?? null,
-					},
-					{ onConflict: "id" }
-				);
 			}
 
-			// 🚨 Guard against missing required image fields
+			// Check if cover image or URL is missing
 			if (!record.cover_image || !record.cover_image_url) {
-				console.error(
-					"❌ Missing cover_image or cover_image_url — cannot insert vinyl record."
-				);
+				console.error("❌ Missing cover image or cover image URL.");
 				return NextResponse.json(
 					{ error: "Missing cover_image or cover_image_url" },
 					{ status: 400 }
 				);
 			}
 
-			// Add other image references (if any)
+			// Handle other image references if present
 			for (const ref of otherRefs) {
 				if (ref?.sys?.id && ref.sys.id !== record.cover_image) {
 					record.other_images.push(ref.sys.id);
 				}
 			}
 
-			// ✅ Insert vinyl record
+			// Discogs tracklist
+			if (!error) {
+				await fetchAndUpdateTracklist(supabase, {
+					id,
+					title: record.title,
+					artist_names_text: record.artist_names_text,
+				});
+			}
+
+			// Insert or update the record in Supabase
 			const { error } = await supabase
 				.from("vinyl_records")
 				.upsert(record, { onConflict: "id" });
 
 			if (error) {
-				console.error("❌ Error inserting vinyl record:", error.message);
+				console.error(
+					`❌ Error inserting vinyl record ${id}: ${error.message}`
+				);
 				await logEvent("vinyl-record-insert-error", {
 					source: "contentful-webhook",
 					status: "error",
@@ -321,7 +241,7 @@ export async function POST(req: Request) {
 				return NextResponse.json({ error: error.message }, { status: 500 });
 			}
 
-			console.log(`✅ Record ${id} inserted/updated successfully.`);
+			console.log(`✅ Vinyl record ${id} inserted/updated successfully.`);
 			await logEvent("vinyl-record-inserted", {
 				source: "contentful-webhook",
 				status: "success",
@@ -331,14 +251,6 @@ export async function POST(req: Request) {
 				cover_image_url: record.cover_image_url,
 			});
 			return NextResponse.json({ success: true }, { status: 200 });
-
-			if (!error) {
-				await fetchAndUpdateTracklist(supabase, {
-					id,
-					title: record.title,
-					artist_names_text: record.artist_names_text,
-				});
-			}
 		}
 	} catch (err) {
 		console.error("❌ Webhook error:", err);
