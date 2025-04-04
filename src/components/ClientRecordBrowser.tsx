@@ -149,7 +149,7 @@ export default function ClientRecordBrowser({
 									handleRemoveFromBasket(record.id);
 								}}
 							>
-								Remove <ShoppingBasket size={12} />
+								Remove
 							</button>
 						) : (
 							<button

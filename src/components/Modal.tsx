@@ -164,8 +164,7 @@ export default function Modal({ record, onClose }: ModalProps) {
 							className="remove-button modal-above-image modal-top-right"
 							onClick={onRemoveFromBasket}
 						>
-							Remove{` `}
-							<ShoppingBasket size={12} />
+							Remove
 						</button>
 					) : (
 						<button
