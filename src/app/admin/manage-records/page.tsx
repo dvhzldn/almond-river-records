@@ -59,6 +59,9 @@ export default function ManageRecordsPage() {
 		try {
 			const res = await fetch(`/api/delete-record?id=${id}`, {
 				method: "DELETE",
+				headers: {
+					Authorization: `Bearer ${session.access_token}`,
+				},
 			});
 			if (!res.ok) throw new Error("Deletion failed");
 
