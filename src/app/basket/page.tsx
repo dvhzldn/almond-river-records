@@ -35,7 +35,8 @@ export default function BasketPage() {
 
 	const subTotalPrice = basket.reduce((acc, item) => acc + item.price, 0);
 	const postagePrice = 7;
-	const totalPrice = subTotalPrice + postagePrice;
+	// const totalPrice = subTotalPrice + postagePrice;
+	const totalPrice = 1;
 
 	const recordIds = basket.map((item) => item.id);
 	const description = basket
