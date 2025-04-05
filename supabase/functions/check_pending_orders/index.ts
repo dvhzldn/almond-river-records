@@ -1,8 +1,7 @@
-// supabase/functions/check_pending_orders/index.ts
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.5?dts";
 import { logOrderEvent } from "./logOrderEvent.ts";
 
+// Structure of orders pulled from Supabase
 interface ScheduledOrder {
 	id: string;
 	sumup_id: string;
@@ -16,20 +15,26 @@ interface SumUpCheckoutResponse {
 	status: string;
 }
 
+// Supabase service role client
 const supabase = createClient(
 	Deno.env.get("SUPABASE_URL")!,
 	Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
+// Configurable constants
 const MAX_RETRIES = 5;
 const BACKOFF_MINUTES = 10;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default async function handler(_req: Request): Promise<Response> {
+
+export default async function handler(): Promise<Response> {
+	console.log("✅ check_pending_orders: Running scheduled job");
+
+	// Calculate cutoff timestamp for backoff
 	const now = new Date();
 	const backoffCutoff = new Date(
 		now.getTime() - BACKOFF_MINUTES * 60 * 1000
 	).toISOString();
 
+	// Fetch orders that are still pending and eligible for retry
 	const { data: orders, error } = (await supabase
 		.from("orders")
 		.select(
@@ -42,14 +47,19 @@ export default async function handler(_req: Request): Promise<Response> {
 		)) as { data: ScheduledOrder[] | null; error: Error | null };
 
 	if (error) {
-		console.error("Scheduled check error:", error);
+		console.error(
+			"❌ check_pending_orders: Error fetching pending orders",
+			error
+		);
 		return new Response("Error during scheduled check", { status: 500 });
 	}
 
 	for (const order of orders ?? []) {
 		const checkoutId = order.sumup_checkout_reference;
+		console.log(`🔍 check_pending_orders: Checking status for ${checkoutId}`);
 
 		try {
+			// Re-check the current SumUp status
 			const sumupRes = await fetch(
 				`https://api.sumup.com/v0.1/checkouts/${order.sumup_id}`,
 				{
@@ -61,23 +71,24 @@ export default async function handler(_req: Request): Promise<Response> {
 
 			if (!sumupRes.ok) {
 				throw new Error(
-					`Failed to fetch SumUp checkout status (${sumupRes.status})`
+					`Failed to fetch SumUp status (HTTP ${sumupRes.status})`
 				);
 			}
 
 			const sumupData: SumUpCheckoutResponse = await sumupRes.json();
+			console.log(`💬 SumUp status for ${checkoutId}: ${sumupData.status}`);
 
 			if (sumupData.status !== "PAID") {
 				await logOrderEvent({
 					event: "scheduled-check",
 					checkout_reference: checkoutId,
-					message: `Still not paid (SumUp status: ${sumupData.status})`,
+					message: `Still not paid (SumUp: ${sumupData.status})`,
 					metadata: { status: sumupData.status },
 				});
 				continue;
 			}
 
-			// Update to PAID
+			// Update status in Supabase to PAID
 			await supabase
 				.from("orders")
 				.update({ sumup_status: "PAID" })
@@ -86,12 +97,13 @@ export default async function handler(_req: Request): Promise<Response> {
 			await logOrderEvent({
 				event: "checkout-status-update",
 				checkout_reference: checkoutId,
-				message: "Status manually updated to PAID via scheduled function",
+				message: "Marked as PAID via scheduled check",
+				metadata: { origin: "check_pending_orders" },
 			});
 
-			// Trigger fulfillment
+			// ⚙️ Call internal API to trigger fulfillment
 			const fulfillRes = await fetch(
-				`${Deno.env.get("NEXT_PUBLIC_BASE_URL")}/api/fulfill-order`,
+				`${Deno.env.get("NEXT_PUBLIC_BASE_URL")}/api/fulfill`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -100,16 +112,17 @@ export default async function handler(_req: Request): Promise<Response> {
 			);
 
 			if (!fulfillRes.ok) {
-				const text = await fulfillRes.text();
-				throw new Error(`Fulfillment failed: ${text}`);
+				const responseText = await fulfillRes.text();
+				throw new Error(`Fulfillment failed: ${responseText}`);
 			}
 
 			await logOrderEvent({
 				event: "fulfillment-triggered",
 				checkout_reference: checkoutId,
-				message: "Fulfillment triggered by scheduled job.",
+				message: "Fulfillment triggered by scheduled job",
 			});
 
+			// Reset retry tracking after success
 			await supabase
 				.from("orders")
 				.update({
@@ -117,18 +130,19 @@ export default async function handler(_req: Request): Promise<Response> {
 					last_fulfillment_attempt_at: new Date().toISOString(),
 				})
 				.eq("id", order.id);
-		} catch (err) {
-			const errorMessage =
-				err instanceof Error ? err.message : "Unknown error occurred";
 
-			console.error("Retry error:", checkoutId, errorMessage);
+			console.log(`✅ Fulfilled order ${checkoutId}`);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err);
+			console.error(`🚨 Error fulfilling ${checkoutId}:`, message);
 
 			await logOrderEvent({
 				event: "fulfillment-retry-failed",
 				checkout_reference: checkoutId,
-				message: `Scheduled retry failed: ${errorMessage}`,
+				message: `Scheduled retry failed: ${message}`,
 			});
 
+			// Increment retry tracking
 			await supabase
 				.from("orders")
 				.update({
@@ -139,5 +153,6 @@ export default async function handler(_req: Request): Promise<Response> {
 		}
 	}
 
+	console.log("⏹ check_pending_orders: Scheduled job complete");
 	return new Response("Scheduled function executed", { status: 200 });
 }
